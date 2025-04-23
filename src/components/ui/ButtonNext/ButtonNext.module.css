@@ -1,0 +1,22 @@
+.button-next {
+	cursor: pointer;
+	display: flex;
+	width: 6.458vw;
+	height: 3.542vw;
+	padding: 1.042vw 1.389vw;
+	justify-content: center;
+	align-items: center;
+	border-radius: 1.111vw;
+	background-color: transparent;
+	border: 0.104vw solid var(--active);
+	outline: none;
+}
+
+.button-next__image {
+	width: 0.881vw;
+	height: 0.75vw;
+}
+
+.button-next__image_isBack {
+	transform: rotate(180deg);
+}

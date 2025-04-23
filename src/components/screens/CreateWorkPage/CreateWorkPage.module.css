@@ -1,0 +1,24 @@
+.create-work-page {
+	margin-top: 1.944vw;
+	display: flex;
+	gap: 10.139vw;
+	align-items: flex-start;
+}
+
+.create-work-page__content {
+	display: flex;
+	flex-direction: column;
+	gap: 2.083vw;
+}
+
+.create-work-page__section {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.create-work-page__task-types {
+	display: flex;
+	align-items: center;
+	gap: 1.389vw;
+}

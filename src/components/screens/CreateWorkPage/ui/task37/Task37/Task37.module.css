@@ -1,0 +1,105 @@
+.task37 {
+	display: flex;
+	flex-direction: column;
+	gap: 2.083vw;
+	width: 61.597vw;
+}
+
+.task37__task-fields {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.task37__reserved-fields {
+	display: flex;
+	justify-content: space-between;
+}
+
+.task37__instructions {
+	display: inline-flex;
+}
+
+.task37__instruction-text {
+	font-size: 1.389vw;
+}
+
+.task37__inline-input {
+	display: inline-flex;
+	padding: 0.139vw 0.833vw 0.278vw 0.903vw;
+	justify-content: center;
+	width: 10.764vw;
+	height: 2.083vw;
+	font-size: 1.389vw;
+	align-items: center;
+	border-radius: 0.694vw;
+	background: var(--background);
+	border: none;
+	outline: none;
+}
+
+.task37__student-work {
+	display: flex;
+	justify-content: space-between;
+}
+
+.task37__student-step {
+	display: flex;
+	flex-direction: column;
+	gap: 0.694vw;
+}
+
+.task37__step-icon {
+	width: 30.069vw;
+	height: 0.417vw;
+	background: var(--semi-active);
+	border-radius: 1.389vw;
+}
+
+.task37__step-icon_isActive {
+	background: var(--active);
+}
+
+.task37__textarea_active::selection {
+	background-color: #f7e9e5;
+	color: var(--active);
+}
+
+.task37__textarea {
+	height: 24.444vw;
+}
+
+.task37__step-text {
+	color: var(--grey-text);
+	font-size: 1.25vw;
+}
+
+.task37__marks {
+	width: 51.25vw;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.389vw;
+}
+
+.task37__buttons {
+	display: flex;
+	align-items: center;
+	gap: 1.389vw;
+}
+
+.task37__button-save {
+	height: 3.542vw;
+	width: 14.722vw;
+}
+
+.task37__input_error,
+.task37__textarea_error,
+.task37__inline-input_error {
+	border: 0.139vw solid #eb3131;
+}
+
+.task37__input_error::placeholder,
+.task37__textarea_error::placeholder,
+.task37__inline-input_error::placeholder {
+	color: #eb3131;
+}

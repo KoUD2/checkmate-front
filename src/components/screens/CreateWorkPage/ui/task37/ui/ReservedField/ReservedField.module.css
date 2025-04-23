@@ -1,0 +1,11 @@
+.reserved-field {
+	display: flex;
+	width: 30.069vw;
+	padding: 1.389vw;
+	align-items: center;
+	border-radius: 1.389vw;
+	background: var(--background);
+}
+.reserved-field__text {
+	font-size: 1.389vw;
+}

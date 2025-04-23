@@ -1,0 +1,21 @@
+.dropdown-list {
+	cursor: pointer;
+	display: flex;
+	gap: 4.236vw;
+	padding: 1.042vw;
+	justify-content: center;
+	align-items: center;
+	border-radius: 1.111vw;
+	background: var(--background);
+	border: none;
+	outline: none;
+}
+
+.dropdown-list__text {
+	font-size: 1.25vw;
+}
+
+.dropdown-list__arrow {
+	width: 0.833vw;
+	height: 0.417vw;
+}

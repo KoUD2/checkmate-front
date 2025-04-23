@@ -1,0 +1,53 @@
+.mark-criteria {
+	display: flex;
+	flex-direction: column;
+	width: 3.958vw;
+	align-items: center;
+	border-radius: 1.111vw;
+	background: var(--background);
+}
+
+.mark-criteria_isOpen {
+	padding-bottom: 1.042vw;
+}
+
+.mark-criteria__button {
+	padding-left: 1.042vw;
+	padding-right: 1.042vw;
+	border-radius: 1.111vw;
+	width: 3.958vw;
+	height: 3.542vw;
+	display: flex;
+	align-items: center;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	justify-content: space-between;
+}
+
+.mark-criteria__selected-mark {
+	font-size: 1.25vw;
+}
+
+.mark-criteria__dropdown {
+	width: 1.944vw;
+	display: flex;
+	flex-direction: column;
+	gap: 0.556vw;
+}
+
+.mark-criteria__dropdown-item {
+	cursor: pointer;
+	font-size: 1.25vw;
+	height: 1.458vw;
+}
+
+.mark-criteria__arrow {
+	width: 0.764vw;
+	height: 0.417vw;
+}
+
+.mark-criteria__arrow_isOpen {
+	transform: rotate(180deg);
+}

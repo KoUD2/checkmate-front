@@ -1,0 +1,53 @@
+@import url('./_reset');
+@import url('./_vars');
+@import url('./fonts');
+
+* {
+	box-sizing: border-box;
+	font-family: 'Gilroy', Arial, sans-serif;
+}
+
+body {
+	font-family: 'Gilroy', Arial, sans-serif;
+	padding: 3.472vw;
+}
+
+h1,
+h2,
+h3 {
+	color: var(--active-text);
+	font-weight: 600;
+}
+
+p {
+	color: var(--active-text);
+	font-weight: 500;
+}
+
+input::placeholder,
+textarea::placeholder {
+	color: var(--grey-text);
+	opacity: 1;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+	color: var(--grey-text);
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+	color: var(--grey-text);
+	opacity: 1;
+}
+
+input:-moz-placeholder,
+textarea:-moz-placeholder {
+	color: var(--grey-text);
+	opacity: 1;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+	color: var(--grey-text);
+}

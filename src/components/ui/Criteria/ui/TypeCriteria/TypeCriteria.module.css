@@ -1,0 +1,19 @@
+.type-criteria {
+	display: flex;
+	padding: 1.042vw;
+	align-items: flex-start;
+	width: fit-content;
+	align-items: center;
+	gap: 0.556vw;
+	border-radius: 1.111vw;
+	background: var(--background);
+}
+
+.type-criteria__number {
+	color: var(--grey-text);
+	font-size: 1.25vw;
+}
+
+.type-criteria__description {
+	font-size: 1.25vw;
+}

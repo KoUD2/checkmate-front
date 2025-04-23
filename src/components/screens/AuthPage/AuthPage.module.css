@@ -1,0 +1,18 @@
+.auth-page {
+	width: 100%;
+	height: calc(100vh - 3.472vw - 3.472vw);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.auth-page__content-main {
+	display: flex;
+	gap: 15.694vw;
+	align-items: center;
+}
+
+.auth-page__image {
+	width: 28.819vw;
+	height: 28.819vw;
+}

@@ -1,0 +1,13 @@
+.average-mark {
+	display: inline-flex;
+	padding: 1.042vw;
+	height: fit-content;
+	align-items: flex-start;
+	border-radius: 1.111vw;
+	background: var(--semi-active);
+}
+
+.average-mark__text {
+	color: var(--active);
+	font-size: 1.25vw;
+}

@@ -1,0 +1,23 @@
+.main {
+	display: flex;
+	flex-direction: column;
+	gap: 1.875vw;
+}
+
+.main__content {
+	margin-top: 3.472vw;
+	display: flex;
+	justify-content: space-between;
+}
+
+.main__header {
+	display: flex;
+	gap: 8.194vw;
+	align-items: center;
+}
+
+.main__content-cards {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.389vw;
+}

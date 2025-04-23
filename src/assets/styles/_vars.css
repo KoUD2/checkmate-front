@@ -1,0 +1,14 @@
+:root {
+	--active-text: #2e3339;
+	--grey-text: #a1a1a1;
+	--semi-active: rgba(235, 89, 49, 0.25);
+	--active: #eb5931;
+	--background: #f8f8f8;
+	--active-background: #e5e5e5;
+	--light-color: #ffffff;
+
+	--approved: #c4edc8;
+
+	--active-button: #fdeeea;
+	--active-section: #f9c9bc;
+}

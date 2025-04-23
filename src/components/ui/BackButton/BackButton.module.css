@@ -1,0 +1,18 @@
+.back-button {
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 0.417vw;
+	color: var(--grey-text);
+	font-size: 1.389vw;
+	font-weight: 500;
+	line-height: 140%;
+	background-color: transparent;
+	border: none;
+	outline: none;
+}
+
+.back-button__icon {
+	width: 0.976vw;
+	height: 0.833vw;
+}

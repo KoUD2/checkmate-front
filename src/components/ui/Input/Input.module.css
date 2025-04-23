@@ -1,0 +1,20 @@
+.input {
+	display: flex;
+	width: 61.597vw;
+	padding: 1.181vw 1.389vw;
+	align-items: center;
+	border-radius: 1.389vw;
+	background: var(--background);
+}
+.input__text {
+	color: var(--active-text);
+	font-size: 1.389vw;
+}
+.input__field {
+	margin-left: 0.694vw;
+	background-color: transparent;
+	width: 100%;
+	font-size: 1.389vw;
+	border: none;
+	outline: none;
+}

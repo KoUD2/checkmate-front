@@ -1,0 +1,5 @@
+.criteria {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: 0.556vw;
+}

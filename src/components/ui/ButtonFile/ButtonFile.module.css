@@ -1,0 +1,43 @@
+.button-file {
+	display: flex;
+	flex-direction: column;
+	width: 17.361vw;
+}
+
+.button-file__upload-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.694vw;
+	border-radius: 1.389vw;
+	background: var(--background);
+	padding: 1.389vw;
+	cursor: pointer;
+	font-size: 1.389vw;
+	color: var(--grey-text);
+	border: none;
+	position: relative;
+}
+
+.button-file__text {
+	font-size: 1.389vw;
+	color: var(--grey-text);
+}
+
+.button-file__input {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.button-file__image-container {
+	margin-bottom: 1.389vw;
+}
+
+.button-file__image {
+	width: 38.036vw;
+	height: auto;
+}

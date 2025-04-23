@@ -1,0 +1,22 @@
+.active-button {
+	cursor: pointer;
+	display: flex;
+	padding: 1.042vw 1.389vw;
+	justify-content: center;
+	align-items: center;
+	gap: 0.556vw;
+	border-radius: 1.111vw;
+	background: var(--active);
+	border: none;
+	outline: none;
+}
+
+.active-button__icon {
+	width: 1.272vw;
+	height: 1.272vw;
+}
+
+.active-button__text {
+	color: var(--light-color);
+	font-size: 1.25vw;
+}

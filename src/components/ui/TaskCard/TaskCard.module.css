@@ -1,0 +1,50 @@
+.task-card {
+	cursor: pointer;
+	padding: 1.736vw;
+	display: flex;
+	flex-direction: column;
+	gap: 0.833vw;
+	width: fit-content;
+	border-radius: 1.389vw;
+	background: var(--background);
+}
+
+.task-card__title {
+	font-size: 1.944vw;
+}
+
+.task-card__text {
+	width: 18.75vw;
+	color: var(--grey-text);
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 4;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-height: calc(1em * 4);
+}
+
+.task-card__date {
+	color: var(--grey-text);
+}
+
+.task-card__wrapper-name {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.task-card__approved {
+	background-color: var(--approved);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 2.292vw;
+	height: 2.292vw;
+	border-radius: 100%;
+}
+
+.task-card__approved-icon {
+	width: 0.903vw;
+	height: 0.625vw;
+}

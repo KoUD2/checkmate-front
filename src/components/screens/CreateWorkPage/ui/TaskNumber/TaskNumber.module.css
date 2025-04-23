@@ -1,0 +1,43 @@
+.task-number {
+	cursor: pointer;
+	display: inline-flex;
+	padding: 1.389vw;
+	justify-content: center;
+	align-items: center;
+	gap: 0.694vw;
+	border-radius: 1.389vw;
+	background: var(--background);
+	border: none;
+	outline: none;
+}
+
+.task-number_isActive {
+	background-color: var(--active-button);
+}
+
+.task-number__wrapper-icon {
+	width: 1.528vw;
+	height: 1.528vw;
+	border-radius: 100%;
+	background-color: var(--active-background);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.task-number__wrapper-icon_isActive {
+	background-color: var(--active-section);
+}
+
+.task-number__icon-image {
+	width: 0.694vw;
+	height: 0.556vw;
+}
+
+.task-number__text {
+	font-size: 1.389vw;
+}
+
+.task-number__text_isActive {
+	color: var(--active);
+}
