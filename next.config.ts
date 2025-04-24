@@ -1,7 +1,14 @@
-import type { NextConfig } from "next";
+// next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+	async rewrites() {
+		return [
+			{
+				source: '/api/:path*',
+				destination: 'https://checkmateai.ru/:path*',
+			},
+		]
+	},
+}
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+export default nextConfig
