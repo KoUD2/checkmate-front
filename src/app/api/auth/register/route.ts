@@ -26,6 +26,16 @@ export async function POST(request: NextRequest) {
       status: apiResponse.status,
     });
 
+    // Добавляем CORS заголовки
+    const origin = request.headers.get("origin") || "";
+    response.headers.set("Access-Control-Allow-Origin", origin);
+    response.headers.set("Access-Control-Allow-Credentials", "true");
+    response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    response.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+
     // Если успешный ответ с токенами
     if (apiResponse.ok && data.accessToken) {
       // Устанавливаем куки для токенов
@@ -60,4 +70,25 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Добавляем OPTIONS для предварительной проверки CORS
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get("origin") || "";
+
+  // Создаем ответ с CORS заголовками
+  const response = new NextResponse(null, {
+    status: 200,
+  });
+
+  // Устанавливаем CORS заголовки
+  response.headers.set("Access-Control-Allow-Origin", origin);
+  response.headers.set("Access-Control-Allow-Credentials", "true");
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  response.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+
+  return response;
 }
