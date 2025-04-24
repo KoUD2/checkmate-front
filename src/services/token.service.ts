@@ -1,61 +1,82 @@
 class TokenService {
-	private _accessToken: string | null = null
-	private _refreshToken: string | null = null // Добавляем refreshToken
+  private _accessToken: string | null = null;
+  private _refreshToken: string | null = null;
 
-	setAccessToken(token: string) {
-		this._accessToken = token // Сохраняем accessToken локально
+  setAccessToken(token: string) {
+    this._accessToken = token;
 
-		// Не нужно делать запрос для установки токена
-		// Этот метод должен только хранить токен для использования в запросах
-		return Promise.resolve() // Возвращаем успешный Promise
-	}
+    // Устанавливаем токен в куки для использования в middleware
+    try {
+      document.cookie = `accessToken=${token}; path=/; secure; samesite=strict`;
+    } catch {
+      // Игнорируем ошибки в SSR режиме
+    }
 
-	// Добавляем метод для сохранения refreshToken
-	setRefreshToken(token: string) {
-		this._refreshToken = token
-	}
+    return Promise.resolve();
+  }
 
-	// Добавляем метод для обновления токена
-	refreshAccessToken() {
-		// Используем refreshToken для получения нового accessToken
-		return fetch('https://checkmateai.ru/auth/refresh', {
-			method: 'POST',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			// Отправляем refreshToken, а не accessToken
-			body: JSON.stringify({
-				refreshToken: this._refreshToken,
-			}),
-		})
-			.then(response => {
-				if (!response.ok) {
-					throw new Error('Failed to refresh token')
-				}
-				return response.json()
-			})
-			.then(data => {
-				if (data.accessToken) {
-					this._accessToken = data.accessToken
-				}
-				return data
-			})
-	}
+  setRefreshToken(token: string) {
+    this._refreshToken = token;
 
-	getAccessToken(): string | null {
-		return this._accessToken
-	}
+    // Обязательно устанавливаем secure-флаг для HTTPS
+    try {
+      document.cookie = `refreshToken=${token}; path=/; secure; samesite=strict`;
+    } catch {
+      // Игнорируем ошибки в SSR режиме
+    }
+  }
 
-	getRefreshToken(): string | null {
-		return this._refreshToken
-	}
+  refreshAccessToken() {
+    // Используем https URL
+    const apiBaseUrl =
+      process.env.NEXT_PUBLIC_API_URL || "https://checkmateai.ru";
+    return fetch(`${apiBaseUrl}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        refreshToken: this._refreshToken,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to refresh token");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.accessToken) {
+          this.setAccessToken(data.accessToken);
+        }
+        return data;
+      });
+  }
 
-	clearTokens() {
-		this._accessToken = null
-		this._refreshToken = null
-	}
+  getAccessToken(): string | null {
+    return this._accessToken;
+  }
+
+  getRefreshToken(): string | null {
+    return this._refreshToken;
+  }
+
+  clearTokens() {
+    this._accessToken = null;
+    this._refreshToken = null;
+
+    // Очищаем куки при выходе
+    try {
+      document.cookie =
+        "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+      document.cookie =
+        "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict";
+    } catch {
+      // Игнорируем ошибки в SSR режиме
+    }
+  }
 }
 
-const tokenService = new TokenService()
-export default tokenService
+const tokenService = new TokenService();
+export default tokenService;

@@ -28,6 +28,12 @@ interface ITextArea {
 	readOnly?: boolean
 	isCommentable?: boolean
 	htmlContent?: string
+	onCommentAdd?: (comment: {
+		criterion: string
+		text: string
+		start_pos: number
+		end_pos: number
+	}) => void
 }
 
 const DEBUG_MODE = false
@@ -47,6 +53,7 @@ const TextArea: FC<ITextArea> = ({
 	className,
 	placeholder,
 	onMarkChange,
+	onCommentAdd,
 	readOnly = false,
 	isCommentable = false,
 	htmlContent,
@@ -54,6 +61,8 @@ const TextArea: FC<ITextArea> = ({
 	const textAreaRef = useRef<HTMLTextAreaElement>(null)
 	const commentPopupRef = useRef<HTMLDivElement>(null)
 	const divRef = useRef<HTMLDivElement>(null)
+	const [commentText, setCommentText] = useState('')
+	const [selectedCriterion, setSelectedCriterion] = useState('К1')
 
 	const [savedSelection, setSavedSelection] =
 		useState<SavedSelectionType | null>(null)
@@ -81,6 +90,11 @@ const TextArea: FC<ITextArea> = ({
 		console.log('[Комментарий] updateContent', { htmlContent, value })
 		setContent(htmlContent || value.replace(/\n/g, '<br/>'))
 	}, [htmlContent, value])
+
+	const handleMarkSelect = (mark: string) => {
+		setSelectedCriterion(mark)
+		onMarkChange?.(mark)
+	}
 
 	useEffect(updateContent, [updateContent])
 
@@ -266,7 +280,7 @@ const TextArea: FC<ITextArea> = ({
 		} finally {
 			console.groupEnd()
 		}
-	}, [isCommentable, getTextNodesIn])
+	}, [isCommentable])
 
 	const findAllOccurrences = (text: string, searchString: string): number[] => {
 		const positions: number[] = []
@@ -370,12 +384,22 @@ const TextArea: FC<ITextArea> = ({
 
 				const fullText = divRef.current.textContent || ''
 				const positions = findAllOccurrences(fullText, selectedText)
+				const start_pos = fullText.indexOf(savedSelection.selectedText)
+				const end_pos = start_pos + savedSelection.selectedText.length
+
+				onCommentAdd?.({
+					criterion: selectedCriterion,
+					text: commentText.trim(),
+					start_pos,
+					end_pos,
+				})
 
 				if (positions.length === 0) {
 					console.error(
 						'[Комментарий] Не найдено вхождений текста:',
 						selectedText
 					)
+					setCommentText('')
 					setShowCommentInput(false)
 					return
 				}
@@ -655,7 +679,15 @@ const TextArea: FC<ITextArea> = ({
 		}
 
 		setShowCommentInput(false)
-	}, [savedSelection, onChange, onMarkChange, getTextNodesIn])
+	}, [
+		savedSelection,
+		onChange,
+		onMarkChange,
+		getTextNodesIn,
+		commentText,
+		onCommentAdd,
+		selectedCriterion,
+	])
 
 	return (
 		<div style={{ position: 'relative', width: '100%' }}>
@@ -717,6 +749,7 @@ const TextArea: FC<ITextArea> = ({
 										e.stopPropagation()
 										e.nativeEvent.stopImmediatePropagation()
 									}}
+									onChange={e => setCommentText(e.target.value)}
 									onClick={e => {
 										console.log('[Комментарий] onClick input внутри попапа')
 										e.stopPropagation()
@@ -726,7 +759,7 @@ const TextArea: FC<ITextArea> = ({
 								<MarkCriteria
 									withK={false}
 									maxMark={3}
-									onMarkChange={onMarkChange}
+									onMarkChange={handleMarkSelect}
 								/>
 							</div>
 							<div className={styles.popupActions}>

@@ -1,5 +1,7 @@
 'use client'
 
+import { submitEssay } from '@/api/essayService'
+import { EssayFormData, Marks } from '@/api/types'
 import ActiveButton from '@/components/ui/ActiveButton/ActiveButton'
 import AverageMark from '@/components/ui/AverageMark/AverageMark'
 import ButtonNext from '@/components/ui/ButtonNext/ButtonNext'
@@ -11,6 +13,8 @@ import cn from 'classnames'
 import { FC, useState } from 'react'
 import ReservedField from '../ui/ReservedField/ReservedField'
 import styles from './Task37.module.css'
+
+const initialMarks: Marks = { К1: '0', К2: '0', К3: '0' }
 
 const Task37: FC = () => {
 	const [formData, setFormData] = useState({
@@ -36,7 +40,15 @@ const Task37: FC = () => {
 	const [isDisabled, setIsDisabled] = useState(false)
 	const [isActive, setIsActive] = useState(false)
 	const [submitting, setSubmitting] = useState(false)
-	const [marks, setMarks] = useState({ К1: '0', К2: '0', К3: '0' })
+	const [marks, setMarks] = useState<Marks>(initialMarks)
+	const [comments, setComments] = useState<
+		Array<{
+			criterion: string
+			text: string
+			start_pos: number
+			end_pos: number
+		}>
+	>([])
 
 	const handleMarkChange = (criteriaId: string, mark: string) => {
 		setMarks(prev => ({
@@ -72,11 +84,30 @@ const Task37: FC = () => {
 		setIsDisabled(false)
 	}
 
+	const handleCommentAdd = (comment: {
+		criterion: string
+		text: string
+		start_pos: number
+		end_pos: number
+	}) => {
+		setComments(prev => [...prev, comment])
+	}
+
 	const handleSubmit = async () => {
 		setSubmitting(true)
 		try {
-			// ... ваша логика отправки
-			console.log('Данные сохранены')
+			const dataToSubmit: EssayFormData = {
+				comments,
+				email: formData.emailText,
+				essay: formData.studentWork,
+				k1: parseInt(marks.К1, 10),
+				k2: parseInt(marks.К2, 10),
+				k3: parseInt(marks.К3, 10),
+				questions_theme: formData.inlineInput,
+				subject: formData.subject,
+			}
+
+			await submitEssay(dataToSubmit)
 		} finally {
 			setSubmitting(false)
 		}
@@ -137,6 +168,7 @@ const Task37: FC = () => {
 								{ [styles['task37__textarea_error']]: errors.studentWork },
 								{ [styles['task37__textarea_active']]: isActive }
 							)}
+							onCommentAdd={handleCommentAdd}
 							value={formData.studentWork}
 							htmlContent={formData.studentWorkHtml}
 							readOnly={isDisabled}
