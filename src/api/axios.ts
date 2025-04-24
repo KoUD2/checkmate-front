@@ -1,8 +1,14 @@
 import axios from "axios";
 import { getCookie } from "cookies-next";
 
+// Для локальной разработки и билда используем относительные пути к API-маршрутам
+const isServerSide = typeof window === "undefined";
+const baseURL = isServerSide
+  ? process.env.NEXT_PUBLIC_API_URL || "https://checkmateai.ru"
+  : "/api"; // Используем локальный API route для проксирования запросов
+
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://checkmateai.ru",
+  baseURL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -26,6 +32,7 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
+        // Перенаправляем на страницу логина при проблемах с авторизацией
         window.location.href = "/login";
         return Promise.reject(error);
       } catch (refreshError) {

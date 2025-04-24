@@ -1,56 +1,63 @@
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import type { NextRequest } from 'next/server'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-	try {
-		const { name, username, password } = await request.json()
+  try {
+    const requestBody = await request.json();
 
-		if (!name || !username || !password) {
-			return NextResponse.json(
-				{ message: 'Все поля обязательны для заполнения' },
-				{ status: 400 }
-			)
-		}
+    // Перенаправляем запрос на реальный API
+    const apiResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "https://checkmateai.ru"
+      }/auth/register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      }
+    );
 
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const _hashedPassword = await bcrypt.hash(password, 10)
+    // Получаем данные ответа
+    const data = await apiResponse.json();
 
-		const accessToken = jwt.sign(
-			{ id: 1, username },
-			process.env.JWT_ACCESS_SECRET!,
-			{ expiresIn: '15m' }
-		)
+    // Создаем ответ
+    const response = NextResponse.json(data, {
+      status: apiResponse.status,
+    });
 
-		const refreshToken = jwt.sign({ id: 1 }, process.env.JWT_REFRESH_SECRET!, {
-			expiresIn: '7d',
-		})
+    // Если успешный ответ с токенами
+    if (apiResponse.ok && data.accessToken) {
+      // Устанавливаем куки для токенов
+      response.cookies.set({
+        name: "accessToken",
+        value: data.accessToken,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 15 * 60, // 15 минут
+        path: "/",
+      });
 
-		const response = NextResponse.json(
-			{
-				user: { id: /* user.id */ 1, name, username },
-				accessToken,
-			},
-			{ status: 201 }
-		)
+      if (data.refreshToken) {
+        response.cookies.set({
+          name: "refreshToken",
+          value: data.refreshToken,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60, // 7 дней
+          path: "/",
+        });
+      }
+    }
 
-		response.cookies.set({
-			name: 'refreshToken',
-			value: refreshToken,
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'strict',
-			maxAge: 7 * 24 * 60 * 60, // 7 дней
-			path: '/',
-		})
-
-		return response
-	} catch (error) {
-		console.error('Registration error:', error)
-		return NextResponse.json(
-			{ message: 'Произошла ошибка при регистрации' },
-			{ status: 500 }
-		)
-	}
+    return response;
+  } catch (error) {
+    console.error("Register proxy error:", error);
+    return NextResponse.json(
+      { message: "Ошибка при обработке запроса регистрации" },
+      { status: 500 }
+    );
+  }
 }

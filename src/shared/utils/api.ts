@@ -1,7 +1,14 @@
 import axios from "axios";
 
+// Для локальной разработки и билда используем относительные пути к API-маршрутам
+// которые затем прокисруют запросы к реальному бэкенду
+const isServerSide = typeof window === "undefined";
+const baseURL = isServerSide
+  ? process.env.NEXT_PUBLIC_API_URL || "https://checkmateai.ru"
+  : "/api"; // Используем локальный API route для проксирования запросов с фронтенда
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "https://checkmateai.ru",
+  baseURL,
   withCredentials: true, // Важно для отправки куков с запросами
   headers: {
     "Content-Type": "application/json",
@@ -20,14 +27,18 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // Используем полный URL для refresh endpoint
-        const refreshUrl =
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh` ||
-          "https://https://checkmateai.ru/auth/refresh";
+        // Используем локальный API маршрут для обновления токена вместо прямого запроса
+        const refreshUrl = "/api/auth/refresh";
         await fetch(refreshUrl, {
           method: "POST",
           credentials: "include",
           cache: "no-store", // Отключаем кэширование
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            refreshToken: localStorage.getItem("refreshToken"),
+          }),
         });
 
         // Повторяем исходный запрос

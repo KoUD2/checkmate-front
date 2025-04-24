@@ -1,68 +1,64 @@
-import jwt from 'jsonwebtoken'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-	try {
-		// Получаем refreshToken из тела запроса
-		const body = await request.json()
-		const { refreshToken } = body
+  try {
+    const requestBody = await request.json();
 
-		// Проверяем наличие токена
-		if (!refreshToken) {
-			return NextResponse.json(
-				{ message: 'Refresh токен отсутствует' },
-				{ status: 400 }
-			)
-		}
+    // Перенаправляем запрос на реальный API
+    const apiResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_API_URL || "https://checkmateai.ru"
+      }/auth/refresh`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+        credentials: "include",
+      }
+    );
 
-		try {
-			// Верифицируем refreshToken
-			const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!)
+    // Получаем данные ответа
+    const data = await apiResponse.json();
 
-			if (typeof payload === 'string' || !payload.id) {
-				throw new Error('Invalid token payload')
-			}
+    // Создаем ответ
+    const response = NextResponse.json(data, {
+      status: apiResponse.status,
+    });
 
-			// Создаем новый accessToken
-			const accessToken = jwt.sign(
-				{ id: payload.id, username: payload.username || 'username' },
-				process.env.JWT_ACCESS_SECRET!,
-				{ expiresIn: '15m' }
-			)
+    // Если успешный ответ с токенами
+    if (apiResponse.ok && data.accessToken) {
+      // Устанавливаем куки для токенов
+      response.cookies.set({
+        name: "accessToken",
+        value: data.accessToken,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 15 * 60, // 15 минут
+        path: "/",
+      });
 
-			// Создаем новый refreshToken (optional)
-			const newRefreshToken = jwt.sign(
-				{ id: payload.id },
-				process.env.JWT_REFRESH_SECRET!,
-				{ expiresIn: '7d' }
-			)
+      if (data.refreshToken) {
+        response.cookies.set({
+          name: "refreshToken",
+          value: data.refreshToken,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60, // 7 дней
+          path: "/",
+        });
+      }
+    }
 
-			// Настраиваем ответ
-			const response = NextResponse.json(
-				{ accessToken, refreshToken: newRefreshToken },
-				{ status: 200 }
-			)
-
-			// Устанавливаем CORS заголовки
-			const origin = request.headers.get('origin') || 'http://localhost:3000'
-			response.headers.set('Access-Control-Allow-Origin', origin)
-			response.headers.set('Access-Control-Allow-Credentials', 'true')
-			response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS')
-			response.headers.set('Access-Control-Allow-Headers', 'Content-Type')
-
-			return response
-		} catch (error) {
-			console.error('Invalid refresh token:', error)
-			return NextResponse.json(
-				{ message: 'Недействительный refresh токен' },
-				{ status: 401 }
-			)
-		}
-	} catch (error) {
-		console.error('Refresh token error:', error)
-		return NextResponse.json(
-			{ message: 'Внутренняя ошибка сервера' },
-			{ status: 500 }
-		)
-	}
+    return response;
+  } catch (error) {
+    console.error("Refresh token proxy error:", error);
+    return NextResponse.json(
+      { message: "Ошибка при обновлении токена" },
+      { status: 500 }
+    );
+  }
 }
