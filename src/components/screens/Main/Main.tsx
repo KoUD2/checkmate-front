@@ -1,5 +1,4 @@
 import ActiveButton from '@/components/ui/ActiveButton/ActiveButton'
-import DropDownList from '@/components/ui/DropDownList/DropDownList'
 import MainTitle from '@/components/ui/MainTitle/MainTitle'
 import TaskCard from '@/components/ui/TaskCard/TaskCard'
 import Link from 'next/link'
@@ -13,7 +12,7 @@ const Main: FC = () => {
 			<div className={styles['main__content']}>
 				<div className={styles['main__header']}>
 					<MainTitle text='Все работы' />
-					<DropDownList text='Недавнее' alt='Тип сортировки работ' />
+					{/* <DropDownList text='Недавнее' alt='Тип сортировки работ' /> */}
 				</div>
 				<Link href='/create-work'>
 					<ActiveButton

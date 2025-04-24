@@ -51,3 +51,10 @@ input:-ms-input-placeholder,
 textarea:-ms-input-placeholder {
 	color: var(--grey-text);
 }
+
+.orange-highlight {
+	background-color: orange !important;
+	color: inherit !important;
+	padding: 0.1em 0.3em;
+	border-radius: 3px;
+}

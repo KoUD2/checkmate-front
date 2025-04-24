@@ -1,5 +1,4 @@
 .textarea {
-	display: inline-flex;
 	padding: 1.389vw;
 	align-items: center;
 	border-radius: 1.389vw;
@@ -25,16 +24,6 @@
 	color: inherit;
 }
 
-.comment-popup {
-	width: 19.444vw;
-	min-height: 6.319vw;
-	border-radius: 1.111vw;
-	background: var(--light-color);
-	box-shadow: 0vw 0.347vw 1.389vw -1.25vw rgba(46, 51, 57, 0.08);
-	padding: 1.389vw;
-	z-index: 1000;
-}
-
 .comment-popup__wrapper {
 	display: flex;
 	flex-direction: column;
@@ -53,22 +42,23 @@
 	justify-content: space-between;
 }
 
-.comment-input {
-	width: 11.319vw;
-	border: none;
-	outline: none;
-	min-height: 100%;
-	font-size: 1.25vw;
-	resize: none;
+.commentInput {
+	width: 100%;
+	padding: 8px;
+	/* остальные стили */
 }
 
-/* .comment-popup__wrapper {
+.textarea__div {
+	align-items: flex-start;
+}
+
+.comment-popup__wrapper {
 	position: fixed;
 	transform: translateX(-50%);
 	transition: top 0.1s, left 0.1s;
-} */
+}
 
-/* .mirror {
+.mirror {
 	pointer-events: none;
 	color: var(--active-text);
 }
@@ -82,4 +72,91 @@
 .highlight-commented {
 	color: #eb5931;
 	background: transparent;
-} */
+}
+
+.popupActions {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+}
+
+.popupActions button {
+	padding: 6px 12px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.popupActions button:last-child {
+	background: #1890ff;
+	color: white;
+}
+
+.editableDiv {
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	cursor: text;
+	background: var(--background);
+	color: var(--active-text);
+	font-size: 1.389vw;
+	line-height: 120%;
+	height: fit-content !important;
+}
+
+.orange-highlight {
+	color: #eb5931 !important;
+	display: inline;
+	white-space: pre-wrap;
+}
+
+.commentPopupWrapper {
+	position: absolute;
+	transform: translate(-9.722vw, 0.694vw);
+	z-index: 10000;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0;
+}
+
+.commentPopup {
+	background: white;
+	border-radius: 1.111vw;
+	padding: 1.389vw;
+	width: 19.444vw;
+	pointer-events: auto;
+	box-shadow: 0 0.239vw 0.556vw rgba(0, 0, 0, 0.15);
+}
+
+.commentInput {
+	width: 100%;
+	border: none;
+	outline: none;
+	font-size: 1.25vw;
+	resize: none;
+}
+
+.popupActions {
+	margin-top: 1.389vw;
+	display: flex;
+	gap: 0.556vw;
+	justify-content: flex-end;
+}
+
+.popupActions button {
+	padding: 0.417vw 0.833vw;
+	border: none;
+	border-radius: 0.278vw;
+	font-size: 0.972vw;
+	cursor: pointer;
+}
+
+.popupActions button:last-child {
+	background: var(--active);
+	color: white;
+}
+
+.commentInputWrapper {
+	display: flex;
+	justify-content: flex-start;
+}

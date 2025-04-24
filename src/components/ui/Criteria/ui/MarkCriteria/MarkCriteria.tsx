@@ -37,7 +37,9 @@ const MarkCriteria = ({
 		>
 			<button
 				type='button'
-				className={styles['mark-criteria__button']}
+				className={cn(styles['mark-criteria__button'], {
+					[styles['mark-criteria__button_isK']]: !withK,
+				})}
 				onClick={e => {
 					e.stopPropagation()
 					setIsOpen(!isOpen)

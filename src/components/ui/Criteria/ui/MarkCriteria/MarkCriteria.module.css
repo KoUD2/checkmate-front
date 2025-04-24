@@ -5,6 +5,7 @@
 	align-items: center;
 	border-radius: 1.111vw;
 	background: var(--background);
+	height: fit-content;
 }
 
 .mark-criteria_isOpen {
@@ -24,6 +25,10 @@
 	outline: none;
 	cursor: pointer;
 	justify-content: space-between;
+}
+
+.mark-criteria__button_isK {
+	gap: 0.486vw;
 }
 
 .mark-criteria__selected-mark {
