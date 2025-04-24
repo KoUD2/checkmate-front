@@ -1,64 +1,41 @@
-import { NextResponse, type NextRequest } from "next/server";
+// middleware.ts
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
-// Расширяем список публичных путей для обхода проверки авторизации
-const PUBLIC_PATHS = new Set([
-  "/login",
-  "/register",
-  "/_next",
-  "/favicon.ico",
-  "/auth/refresh", // Добавляем путь для обновления токена
-]);
+export function middleware(request: NextRequest) {
+	// Skip middleware processing for non-API routes
+	if (!request.nextUrl.pathname.startsWith('/api/')) {
+		return NextResponse.next()
+	}
 
-export async function middleware(request: NextRequest) {
-  // Включаем проверку и в dev-режиме для тестирования HTTPS
-  // if (process.env.NODE_ENV === 'development') {
-  // 	return NextResponse.next()
-  // }
+	// Handle preflight requests
+	if (request.method === 'OPTIONS') {
+		const response = new NextResponse(null, { status: 200 })
+		applyHeaders(response, request)
+		return response
+	}
 
-  const { pathname } = request.nextUrl;
+	// For other requests, just apply the headers
+	const response = NextResponse.next()
+	applyHeaders(response, request)
+	return response
+}
 
-  // Пропускаем статические файлы и публичные пути
-  if (
-    PUBLIC_PATHS.has(pathname) ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api/auth")
-  ) {
-    return NextResponse.next();
-  }
+function applyHeaders(response: NextResponse, request: NextRequest) {
+	const origin = request.headers.get('origin') || ''
 
-  // Проверка cookies через заголовки и объект cookies
-  const accessToken = request.cookies.get("accessToken")?.value;
-  const cookieHeader = request.headers.get("cookie") || "";
-
-  console.log("Middleware check for:", pathname);
-  console.log("AccessToken in cookies:", accessToken ? "present" : "missing");
-  console.log("Cookies in header:", cookieHeader.includes("accessToken"));
-
-  if (!accessToken && !cookieHeader.includes("accessToken")) {
-    const response = NextResponse.redirect(new URL("/login", request.url));
-    response.headers.set("x-middleware-cache", "no-cache");
-
-    // Устанавливаем заголовки безопасности для HTTPS
-    response.headers.set(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains"
-    );
-    return response;
-  }
-
-  const response = NextResponse.next();
-  response.headers.set("x-middleware-cache", "no-cache");
-
-  // Устанавливаем заголовки безопасности для HTTPS
-  response.headers.set(
-    "Strict-Transport-Security",
-    "max-age=31536000; includeSubDomains"
-  );
-  return response;
+	response.headers.set('Access-Control-Allow-Origin', origin)
+	response.headers.set('Access-Control-Allow-Credentials', 'true')
+	response.headers.set(
+		'Access-Control-Allow-Methods',
+		'GET, POST, PUT, DELETE, OPTIONS'
+	)
+	response.headers.set(
+		'Access-Control-Allow-Headers',
+		'Content-Type, Authorization, X-Requested-With'
+	)
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|login|register|_next).*)",
-  ],
-};
+	matcher: '/api/:path*',
+}

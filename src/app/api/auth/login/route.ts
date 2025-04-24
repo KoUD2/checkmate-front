@@ -76,12 +76,12 @@ export async function POST(request: NextRequest) {
 export async function OPTIONS(request: NextRequest) {
 	const origin = request.headers.get('origin') || ''
 
-	// Создаем ответ с CORS заголовками
+	// Create response with CORS headers
 	const response = new NextResponse(null, {
 		status: 200,
 	})
 
-	// Устанавливаем CORS заголовки
+	// Set CORS headers
 	response.headers.set('Access-Control-Allow-Origin', origin)
 	response.headers.set('Access-Control-Allow-Credentials', 'true')
 	response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')

@@ -1,12 +1,9 @@
-// next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	// Remove the rewrites for the auth endpoints
 	async rewrites() {
 		return [
-			{
-				source: '/api/:path*',
-				destination: 'https://checkmateai.ru/:path*',
-			},
+			// Keep other rewrites if needed, but remove those that conflict with your API routes
 		]
 	},
 }
