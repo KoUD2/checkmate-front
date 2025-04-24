@@ -1,4 +1,4 @@
-import MainLayout from "@/components/layout/MainLayout/MainLayout";
+import AppLayout from "@/components/layout/AppLayout/AppLayout";
 import { AuthProvider } from "@/config/context/AuthContext";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -29,8 +29,7 @@ export default function RootLayout({
     <html lang="ru">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <AuthProvider>
-          <MainLayout />
-          {children}
+          <AppLayout>{children}</AppLayout>
         </AuthProvider>
       </body>
     </html>
