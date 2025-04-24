@@ -3,7 +3,7 @@ import api from "@/shared/utils/api";
 class AuthService {
   async register(name: string, username: string, password: string) {
     try {
-      const response = await api.post("/users", {
+      const response = await api.post("/api/auth/register", {
         name,
         username,
         password,
@@ -16,7 +16,7 @@ class AuthService {
 
   async login(username: string, password: string) {
     try {
-      const response = await api.post("/auth/login", {
+      const response = await api.post("/api/auth/login", {
         username,
         password,
       });
@@ -29,7 +29,7 @@ class AuthService {
 
   async refreshToken() {
     try {
-      const response = await api.post("/auth/refresh", {
+      const response = await api.post("/api/auth/refresh", {
         refreshToken: localStorage.getItem("refreshToken") || "",
       });
 
@@ -41,7 +41,7 @@ class AuthService {
 
   async logout() {
     try {
-      await api.post("/auth/logout");
+      await api.post("/api/auth/logout");
     } catch (error) {
       throw error;
     }
