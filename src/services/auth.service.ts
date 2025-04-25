@@ -30,14 +30,18 @@ class AuthService {
         throw new Error("Ошибка авторизации: отсутствуют данные в ответе");
       }
 
+      // Check tokens using snake_case property names
+      const hasAccessToken = !!response.data.access_token;
+      const hasRefreshToken = !!response.data.refresh_token;
+
       // Redirect only after successful login with valid tokens
-      if (response.data.accessToken && response.data.refreshToken) {
+      if (hasAccessToken && hasRefreshToken) {
         // Schedule redirect to avoid race conditions
         setTimeout(() => window.location.assign("/"), 100);
       } else {
         console.warn("Login successful but tokens missing:", {
-          hasAccessToken: !!response.data.accessToken,
-          hasRefreshToken: !!response.data.refreshToken,
+          hasAccessToken,
+          hasRefreshToken,
         });
       }
 

@@ -13,6 +13,8 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 interface AuthResponse {
   accessToken: string;
   refreshToken?: string;
+  access_token?: string;
+  refresh_token?: string;
   user: User;
 }
 
@@ -91,7 +93,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.log("Login response:", response);
 
       if (response && typeof response === "object") {
-        const { accessToken, refreshToken, user } = response;
+        // Поддержка как camelCase, так и snake_case имён свойств
+        const accessToken = response.accessToken || response.access_token;
+        const refreshToken = response.refreshToken || response.refresh_token;
+        const { user } = response;
 
         // Проверяем, что токены имеют значения перед сохранением
         if (accessToken && typeof accessToken === "string") {

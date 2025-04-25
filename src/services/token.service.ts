@@ -37,7 +37,7 @@ class TokenService {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        refreshToken: this.getRefreshToken(),
+        refresh_token: this.getRefreshToken(),
       }),
     })
       .then((response) => {
@@ -47,8 +47,9 @@ class TokenService {
         return response.json();
       })
       .then((data) => {
-        if (data.accessToken) {
-          this.setAccessToken(data.accessToken);
+        const newAccessToken = data.accessToken || data.access_token;
+        if (newAccessToken) {
+          this.setAccessToken(newAccessToken);
         }
         return data;
       });
