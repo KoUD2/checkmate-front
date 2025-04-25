@@ -20,9 +20,30 @@ class AuthService {
         username,
         password,
       });
-      window.location.assign("/");
+
+      // Log the response for debugging
+      console.log("Login response data:", response.data);
+
+      // Check if the response contains the expected data
+      if (!response.data) {
+        console.error("Login response missing data");
+        throw new Error("Ошибка авторизации: отсутствуют данные в ответе");
+      }
+
+      // Redirect only after successful login with valid tokens
+      if (response.data.accessToken && response.data.refreshToken) {
+        // Schedule redirect to avoid race conditions
+        setTimeout(() => window.location.assign("/"), 100);
+      } else {
+        console.warn("Login successful but tokens missing:", {
+          hasAccessToken: !!response.data.accessToken,
+          hasRefreshToken: !!response.data.refreshToken,
+        });
+      }
+
       return response.data;
     } catch (error) {
+      console.error("Login error:", error);
       throw error;
     }
   }

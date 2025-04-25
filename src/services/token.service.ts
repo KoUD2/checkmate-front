@@ -37,7 +37,7 @@ class TokenService {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        refreshToken: this._refreshToken,
+        refreshToken: this.getRefreshToken(),
       }),
     })
       .then((response) => {
@@ -55,10 +55,40 @@ class TokenService {
   }
 
   getAccessToken(): string | null {
+    if (!this._accessToken) {
+      // Try to get from cookie if not in memory
+      try {
+        const cookies = document.cookie.split(";");
+        for (const cookie of cookies) {
+          const [name, value] = cookie.trim().split("=");
+          if (name === "accessToken" && value) {
+            this._accessToken = value;
+            break;
+          }
+        }
+      } catch {
+        // Ignore errors in SSR mode
+      }
+    }
     return this._accessToken;
   }
 
   getRefreshToken(): string | null {
+    if (!this._refreshToken) {
+      // Try to get from cookie if not in memory
+      try {
+        const cookies = document.cookie.split(";");
+        for (const cookie of cookies) {
+          const [name, value] = cookie.trim().split("=");
+          if (name === "refreshToken" && value) {
+            this._refreshToken = value;
+            break;
+          }
+        }
+      } catch {
+        // Ignore errors in SSR mode
+      }
+    }
     return this._refreshToken;
   }
 
