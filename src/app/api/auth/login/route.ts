@@ -3,11 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const requestBody = await request.json();
+    console.log("Login request body:", JSON.stringify(requestBody));
 
-    // Перенаправляем запрос на реальный API
-    const apiUrl = `${
-      process.env.NEXT_PUBLIC_API_URL || "https://checkmateai.ru"
-    }/auth/login`;
+    // Use the correct backend URL without api prefix
+    const apiUrl = "https://checkmateai.ru/auth/login";
     console.log(`Forwarding login request to: ${apiUrl}`);
 
     const apiResponse = await fetch(apiUrl, {
@@ -22,23 +21,43 @@ export async function POST(request: NextRequest) {
 
     // Check if response is ok before parsing JSON
     if (!apiResponse.ok) {
-      const errorText = await apiResponse.text();
-      console.error(`API error response: ${apiResponse.status}`, errorText);
+      try {
+        const errorText = await apiResponse.text();
+        console.error(`API error response: ${apiResponse.status}`, errorText);
+        return NextResponse.json(
+          {
+            message: `Ошибка авторизации: ${apiResponse.status} - ${errorText}`,
+          },
+          { status: apiResponse.status }
+        );
+      } catch (e) {
+        console.error("Failed to parse error response", e);
+        return NextResponse.json(
+          { message: `Ошибка авторизации: ${apiResponse.status}` },
+          { status: apiResponse.status }
+        );
+      }
+    }
+
+    // Parse response data
+    let data;
+    try {
+      data = await apiResponse.json();
+      console.log("API response data structure:", Object.keys(data));
+    } catch (e) {
+      console.error("Failed to parse JSON response", e);
       return NextResponse.json(
-        { message: `Ошибка авторизации: ${apiResponse.status}` },
-        { status: apiResponse.status }
+        { message: "Ошибка при обработке ответа сервера" },
+        { status: 500 }
       );
     }
 
-    // Получаем данные ответа
-    const data = await apiResponse.json();
-
-    // Создаем ответ
+    // Create response
     const response = NextResponse.json(data, {
       status: apiResponse.status,
     });
 
-    // Добавляем CORS заголовки
+    // Add CORS headers
     const origin = request.headers.get("origin") || "";
     response.headers.set("Access-Control-Allow-Origin", origin);
     response.headers.set("Access-Control-Allow-Credentials", "true");
@@ -48,16 +67,15 @@ export async function POST(request: NextRequest) {
       "Content-Type, Authorization"
     );
 
-    // Если успешный ответ с токенами
+    // Set cookies if successful login with tokens
     if (apiResponse.ok && data.accessToken) {
-      // Устанавливаем куки для токенов
       response.cookies.set({
         name: "accessToken",
         value: data.accessToken,
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 15 * 60, // 15 минут
+        maxAge: 15 * 60, // 15 minutes
         path: "/",
       });
 
@@ -68,7 +86,7 @@ export async function POST(request: NextRequest) {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
-          maxAge: 7 * 24 * 60 * 60, // 7 дней
+          maxAge: 7 * 24 * 60 * 60, // 7 days
           path: "/",
         });
       }
@@ -89,7 +107,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Добавляем OPTIONS для предварительной проверки CORS
+// CORS preflight
 export async function OPTIONS(request: NextRequest) {
   const origin = request.headers.get("origin") || "";
 
