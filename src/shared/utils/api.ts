@@ -1,8 +1,9 @@
 import axios from "axios";
 import { getCookie } from "cookies-next";
 
-// Always use the relative path to route through Next.js API routes
-const baseURL = "/api";
+// Use the full API URL instead of relative path
+const baseURL =
+  process.env.NEXT_PUBLIC_API_URL || "https://checkmate-ashen.vercel.app/api";
 
 const api = axios.create({
   baseURL,
