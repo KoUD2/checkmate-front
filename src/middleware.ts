@@ -1,32 +1,49 @@
 // middleware.ts
 import { NextResponse, type NextRequest } from 'next/server'
+import { verifyJWT } from './lib/auth'
 
-// 1. Добавляем публичные страницы и API пути
+// Публичные страницы (не требуют авторизации)
 const PUBLIC_PAGES = new Set(['/login', '/register'])
 
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl
 
-	// Публичные пути - пропускаем
+	// Публичные страницы пропускаем
 	if (PUBLIC_PAGES.has(pathname)) {
 		return NextResponse.next()
 	}
 
-	// Проверяем ТОЛЬКО наличие куки, БЕЗ проверки подписи
+	// Получаем токен из куки
 	const accessToken = request.cookies.get('accessToken')?.value
 
+	// Если токена нет - редирект на логин
 	if (!accessToken) {
+		console.log('No access token found, redirecting to login')
 		return NextResponse.redirect(new URL('/login', request.url))
 	}
 
-	// Если на странице логина и есть токен - редирект на главную
-	if (pathname === '/login' && accessToken) {
-		return NextResponse.redirect(new URL('/', request.url))
-	}
+	// Проверяем подпись токена
+	try {
+		const isValid = await verifyJWT(accessToken)
 
-	return NextResponse.next()
+		if (!isValid) {
+			console.log('Token signature invalid, redirecting to login')
+			return NextResponse.redirect(new URL('/login', request.url))
+		}
+
+		// Для авторизованных на странице логина - редирект на главную
+		if (pathname === '/login') {
+			return NextResponse.redirect(new URL('/', request.url))
+		}
+
+		// Токен валидный - пропускаем запрос
+		return NextResponse.next()
+	} catch (error) {
+		console.error('Token verification error:', error)
+		return NextResponse.redirect(new URL('/login', request.url))
+	}
 }
 
 export const config = {
-	matcher: ['/((?!api/|_next/static|_next/image|favicon.ico).*)'],
+	matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }
