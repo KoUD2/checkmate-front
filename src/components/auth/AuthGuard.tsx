@@ -31,10 +31,10 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
       }
     };
 
-    // Даем время AuthContext выполнить свои проверки перед нашими
+    // Увеличиваем задержку, чтобы дать больше времени AuthContext на выполнение его проверок
     const timer = setTimeout(() => {
       checkAuth();
-    }, 100);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);

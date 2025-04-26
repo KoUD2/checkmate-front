@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             console.log(
               "[AuthProvider] Authenticated user on public page, redirecting to home"
             );
-            router.push("/");
+            window.location.href = "/";
           }
           // Если токен есть и страница не публичная - всё в порядке, ничего не делаем
         } else {
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             console.log(
               "[AuthProvider] Unauthenticated user on protected page, redirecting to login"
             );
-            router.push("/login");
+            window.location.href = "/login";
           }
           // Если токена нет и страница публичная - всё в порядке, ничего не делаем
         }
@@ -215,15 +215,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser({ id: 1, name: "Пользователь", username });
         }
 
-        // Упрощаем редирект после успешного логина
+        // Используем window.location для прямого редиректа вместо Next.js router
         console.log(
           "[AuthProvider] Login successful, redirecting to home page"
         );
-
-        // Одиночный редирект с небольшой задержкой
-        setTimeout(() => {
-          router.push("/");
-        }, 500);
+        window.location.href = "/";
       } else {
         console.error("Invalid response format:", response);
       }
