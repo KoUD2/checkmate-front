@@ -32,6 +32,7 @@ class AuthService {
 			const { access_token, refresh_token } = response.data
 			if (!access_token) throw new Error('No access token received')
 
+			console.log(1)
 			// Установка куки с флагом secure
 			tokenService.setAccessToken(access_token)
 			if (refresh_token) tokenService.setRefreshToken(refresh_token)
