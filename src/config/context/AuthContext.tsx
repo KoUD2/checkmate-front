@@ -55,12 +55,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const checkAuth = async () => {
       try {
         console.log("[AuthProvider] Checking authentication on page load");
+        // Чтение токена вынесено в переменную для отладки
         const accessToken = tokenService.getAccessToken();
         const isPublicPath = PUBLIC_PATHS.includes(pathname || "");
 
         console.log(`[AuthProvider] Current path: ${pathname}`);
         console.log(`[AuthProvider] Is public path: ${isPublicPath}`);
         console.log(`[AuthProvider] Access token present: ${!!accessToken}`);
+
+        // Прямая проверка cookie
+        if (typeof document !== "undefined") {
+          console.log(`[AuthProvider] Raw cookies: ${document.cookie}`);
+          console.log(
+            `[AuthProvider] Manually checking for accessToken in cookies...`
+          );
+
+          // Ручной парсинг cookie для проверки
+          const cookies = document.cookie.split(";");
+          for (const cookie of cookies) {
+            const parts = cookie.trim().split("=");
+            if (parts.length >= 2) {
+              const name = parts[0].trim();
+              if (name === "accessToken") {
+                console.log(
+                  `[AuthProvider] accessToken found in cookie manually`
+                );
+              }
+            }
+          }
+        }
 
         if (accessToken) {
           try {
@@ -159,15 +182,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         // Проверяем, что токены имеют значения перед сохранением
         if (accessToken && typeof accessToken === "string") {
+          console.log(
+            "[AuthProvider] Setting accessToken:",
+            accessToken.substring(0, 10) + "..."
+          );
           tokenService.setAccessToken(accessToken);
         } else {
-          console.error("Invalid accessToken received:", accessToken);
+          console.error(
+            "[AuthProvider] Invalid accessToken received:",
+            accessToken
+          );
         }
 
         if (refreshToken && typeof refreshToken === "string") {
+          console.log(
+            "[AuthProvider] Setting refreshToken:",
+            refreshToken.substring(0, 10) + "..."
+          );
           tokenService.setRefreshToken(refreshToken);
         } else {
-          console.error("Invalid refreshToken received:", refreshToken);
+          console.error(
+            "[AuthProvider] Invalid refreshToken received:",
+            refreshToken
+          );
         }
 
         if (user) {
@@ -181,9 +218,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         console.log(
           "[AuthProvider] Login successful, redirecting to home page"
         );
+
+        // Проверяем наличие токенов в cookie после их установки
+        console.log("[AuthProvider] Checking tokens after setting:");
+        const accessTokenAfterSet = tokenService.getAccessToken();
+        console.log(
+          "[AuthProvider] Access token after setting:",
+          !!accessTokenAfterSet
+        );
+
+        // Увеличиваем задержку для гарантии сохранения cookies
         setTimeout(() => {
           router.push("/");
-        }, 500); // Небольшая задержка чтобы куки успели сохраниться
+        }, 800);
       } else {
         console.error("Invalid response format:", response);
       }
