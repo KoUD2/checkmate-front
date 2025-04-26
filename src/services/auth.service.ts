@@ -1,77 +1,74 @@
-import api from "@/shared/utils/api";
+import api from '@/shared/utils/api'
+import tokenService from './token.service'
 
 class AuthService {
-  async register(name: string, username: string, password: string) {
-    try {
-      const response = await api.post("/auth/register", {
-        name,
-        username,
-        password,
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  }
+	async register(name: string, username: string, password: string) {
+		try {
+			const response = await api.post('/auth/register', {
+				name,
+				username,
+				password,
+			})
+			return response.data
+		} catch (error) {
+			throw error
+		}
+	}
 
-  async login(username: string, password: string) {
-    try {
-      const response = await api.post("/auth/login", {
-        username,
-        password,
-      });
+	private tokenService: typeof tokenService
 
-      // Log the response for debugging
-      console.log("Login response data:", response.data);
+	constructor() {
+		// 3. Инициализируем service в конструкторе
+		this.tokenService = tokenService
+	}
 
-      // Check if the response contains the expected data
-      if (!response.data) {
-        console.error("Login response missing data");
-        throw new Error("Ошибка авторизации: отсутствуют данные в ответе");
-      }
+	async login(username: string, password: string) {
+		try {
+			const response = await api.post('/auth/login', {
+				username,
+				password,
+			})
 
-      // Check tokens using snake_case property names
-      const hasAccessToken = !!response.data.access_token;
-      const hasRefreshToken = !!response.data.refresh_token;
+			const { access_token, refresh_token } = response.data
+			if (!access_token) throw new Error('No access token received')
 
-      // Redirect only after successful login with valid tokens
-      if (hasAccessToken && hasRefreshToken) {
-        // Schedule redirect to avoid race conditions
-        setTimeout(() => window.location.assign("/"), 100);
-      } else {
-        console.warn("Login successful but tokens missing:", {
-          hasAccessToken,
-          hasRefreshToken,
-        });
-      }
+			// Установка куки с флагом secure
+			tokenService.setAccessToken(access_token)
+			if (refresh_token) tokenService.setRefreshToken(refresh_token)
 
-      return response.data;
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
-    }
-  }
+			// Принудительный редирект с обновлением страницы
+			if (typeof window !== 'undefined') {
+				window.location.href = '/'
+				window.location.reload() // Добавляем принудительное обновление
+			}
 
-  async refreshToken() {
-    try {
-      const response = await api.post("/auth/refresh", {
-        refreshToken: localStorage.getItem("refreshToken") || "",
-      });
+			return response.data
+		} catch (error) {
+			console.error('Login error:', error)
+			throw error
+		}
+	}
 
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  }
+	async refreshToken() {
+		try {
+			const response = await api.post('/auth/refresh', {
+				refreshToken: localStorage.getItem('refreshToken') || '',
+			})
 
-  async logout() {
-    try {
-      await api.post("/auth/logout");
-    } catch (error) {
-      throw error;
-    }
-  }
+			return response.data
+		} catch (error) {
+			throw error
+		}
+	}
+
+	async logout() {
+		try {
+			await api.post('/auth/logout')
+		} catch (error) {
+			throw error
+		}
+	}
 }
 
-const authService = new AuthService();
-export default authService;
+const authService = new AuthService()
+export default authService
