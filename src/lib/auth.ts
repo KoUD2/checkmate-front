@@ -5,12 +5,12 @@ export async function verifyJWT(token: string): Promise<boolean> {
 	try {
 		// Секрет должен быть в том же формате, как на сервере
 		// Вариант 1: текстовый ключ (обычная строка)
-		// const secretText = process.env.JWT_ACCESS_SECRET!;
-		// const secretKey = new TextEncoder().encode(secretText);
+		const secretText = process.env.JWT_ACCESS_SECRET!
+		const secretKey = new TextEncoder().encode(secretText)
 
 		// Вариант 2: если секрет на сервере в base64
-		const secretBase64 = process.env.JWT_ACCESS_SECRET!
-		const secretKey = Buffer.from(secretBase64, 'base64')
+		// const secretBase64 = process.env.JWT_ACCESS_SECRET!;
+		// const secretKey = Buffer.from(secretBase64, 'base64');
 
 		// Расширенная проверка с логированием
 		console.log('Trying to verify token with alg: HS256')
