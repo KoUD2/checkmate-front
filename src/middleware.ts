@@ -55,6 +55,7 @@ function unauthorizedResponse(request: NextRequest): NextResponse {
 // middleware.ts
 export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl
+	console.log('Middleware triggered for:', pathname)
 	const isPublicPage = PUBLIC_PAGES.has(pathname)
 
 	// Пропускаем CORS для OPTIONS
@@ -69,13 +70,16 @@ export async function middleware(request: NextRequest) {
 
 	// Проверка авторизации
 	const accessToken = request.cookies.get('accessToken')?.value
+	console.log('accessToken:', accessToken)
 	let isAuthenticated = false
 
 	if (accessToken) {
+		console.log('Access token found:', accessToken.slice(0, 15) + '...')
 		try {
 			isAuthenticated = await verifyJWT(accessToken)
+			console.log('JWT verification result:', isAuthenticated)
 		} catch (error) {
-			console.error('Auth check failed:', error)
+			console.error('JWT verification error details:', error)
 		}
 	}
 

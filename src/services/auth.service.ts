@@ -37,11 +37,11 @@ class AuthService {
 			tokenService.setAccessToken(access_token)
 			if (refresh_token) tokenService.setRefreshToken(refresh_token)
 
-			// Принудительный редирект с обновлением страницы
-			if (typeof window !== 'undefined') {
-				window.location.href = '/'
-				window.location.reload() // Добавляем принудительное обновление
-			}
+			console.log('Login OK! Manual redirect needed.')
+			// if (typeof window !== 'undefined') {
+			// 	window.location.href = '/'
+			// 	window.location.reload()
+			// }
 
 			return response.data
 		} catch (error) {
