@@ -24,7 +24,8 @@ class AuthService {
 
   async login(username: string, password: string) {
     try {
-      const response = await api.post("/api/auth/login", {
+      // Use the new API route that doesn't conflict with page routes
+      const response = await api.post("/api/auth-proxy/login", {
         username,
         password,
       });
@@ -52,7 +53,8 @@ class AuthService {
 
   async refreshToken() {
     try {
-      const response = await api.post("/api/auth/refresh", {
+      // Use the new API route that doesn't conflict with page routes
+      const response = await api.post("/api/auth-proxy/refresh", {
         refreshToken: tokenService.getRefreshToken() || "",
       });
 
@@ -64,7 +66,8 @@ class AuthService {
 
   async logout() {
     try {
-      await api.post("/api/auth/logout");
+      // Use the new API route that doesn't conflict with page routes
+      await api.post("/api/auth-proxy/logout");
     } catch (error) {
       throw error;
     }
