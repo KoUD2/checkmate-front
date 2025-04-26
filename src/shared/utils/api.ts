@@ -1,9 +1,9 @@
 import axios from "axios";
 import { getCookie } from "cookies-next";
 
-// Use the full API URL instead of relative path
+// Update baseURL to remove /api since that's handled in the service files
 const baseURL =
-  process.env.NEXT_PUBLIC_API_URL || "https://checkmate-ashen.vercel.app/api";
+  process.env.NEXT_PUBLIC_API_URL || "https://checkmate-ashen.vercel.app";
 
 const api = axios.create({
   baseURL,
