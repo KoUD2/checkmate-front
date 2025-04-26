@@ -99,6 +99,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               "[AuthProvider] Token in localStorage:",
               !!localStorageToken
             );
+
+            // Если токена нет в памяти или куках, но есть в localStorage,
+            // восстанавливаем его в памяти
+            if (localStorageToken && !accessToken) {
+              console.log(
+                "[AuthProvider] Restoring token from localStorage to memory"
+              );
+              await tokenService.setAccessToken(localStorageToken);
+              isTokenAvailable = true;
+            }
           }
         } catch (e) {
           console.error("[AuthProvider] Error checking localStorage:", e);
@@ -181,6 +191,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           isTokenAvailable ||
           isLoggedInMemory ||
           !!localStorageToken;
+
+        // СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ СТРАНИЦЫ ЛОГИНА
+        // Если мы на странице login и есть токен в localStorage - редирект на главную
+        if (
+          pathname === "/login" &&
+          localStorageToken &&
+          !redirectionPerformed
+        ) {
+          console.log(
+            "[AuthProvider] Found token in localStorage while on login page - redirecting to home"
+          );
+          setUser({ id: 1, name: "Пользователь", username: "user" });
+          setRedirectionPerformed(true);
+          router.push("/");
+          return;
+        }
 
         // ИСПРАВЛЕНО: Используем router вместо window.location для избежания перезагрузки страницы
         // и добавляем защиту от циклического редиректа

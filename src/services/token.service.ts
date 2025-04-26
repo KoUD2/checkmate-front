@@ -155,6 +155,28 @@ export class TokenService {
         return token;
       }
 
+      // Если токена нет в куках, пробуем localStorage
+      try {
+        if (typeof localStorage !== "undefined") {
+          const localToken = localStorage.getItem("auth_token");
+          if (localToken) {
+            console.log(
+              "[TokenService] Retrieved access token from localStorage"
+            );
+            this._accessToken = localToken;
+            this._isTokenAvailable = true;
+
+            // Пробуем восстановить куки из localStorage
+            const cookieOptions = "path=/; max-age=900; samesite=lax";
+            document.cookie = `${this.ACCESS_TOKEN_KEY}=${localToken}; ${cookieOptions}`;
+
+            return localToken;
+          }
+        }
+      } catch (e) {
+        console.error("[TokenService] Error accessing localStorage:", e);
+      }
+
       // Отладка
       console.log("[TokenService] Current cookies:", document.cookie);
       console.log(
@@ -465,6 +487,25 @@ export class TokenService {
           this._isTokenAvailable = true;
           return true;
         }
+      }
+
+      // Прямая проверка localStorage
+      try {
+        if (typeof localStorage !== "undefined") {
+          const localToken = localStorage.getItem("auth_token");
+          if (localToken) {
+            console.log(
+              "[TokenService] Found token in localStorage, setting logged in state"
+            );
+            this._isTokenAvailable = true;
+            return true;
+          }
+        }
+      } catch (e) {
+        console.error(
+          "[TokenService] Error checking localStorage in isLoggedIn:",
+          e
+        );
       }
 
       // Для httpOnly cookies в getAccessToken больше не возвращается "httpOnly",
