@@ -55,14 +55,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const checkAuth = async () => {
       try {
         console.log("[AuthProvider] Checking authentication on page load");
-        const accessToken = tokenService.getAccessToken();
-        const isPublicPath = PUBLIC_PATHS.includes(pathname || "");
+        // Проверяем наличие токена через isLoggedInClient вместо прямого доступа к _accessToken
+        const isLoggedInMemory = tokenService.isLoggedInClient();
+        console.log("[AuthProvider] Token in memory:", isLoggedInMemory);
 
+        // Проверяем наличие токена через TokenService
+        const accessToken = tokenService.getAccessToken();
+        console.log(
+          "[AuthProvider] Token after getAccessToken:",
+          !!accessToken
+        );
+
+        // Явно проверяем статус в TokenService
+        const isLoggedIn = tokenService.isLoggedIn();
+        console.log("[AuthProvider] isLoggedIn from TokenService:", isLoggedIn);
+
+        const isPublicPath = PUBLIC_PATHS.includes(pathname || "");
         console.log(`[AuthProvider] Current path: ${pathname}`);
         console.log(`[AuthProvider] Is public path: ${isPublicPath}`);
         console.log(`[AuthProvider] Access token present: ${!!accessToken}`);
 
-        if (accessToken) {
+        // Для отладки проверим куки напрямую
+        if (typeof document !== "undefined") {
+          console.log("[AuthProvider] Cookies:", document.cookie);
+        }
+
+        if (accessToken || isLoggedIn) {
           // Устанавливаем временного пользователя если нет данных
           if (!user) {
             setUser({ id: 1, name: "Пользователь", username: "user" });

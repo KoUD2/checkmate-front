@@ -17,8 +17,21 @@ export class TokenService {
 
     // В Next.js 15 рекомендуется использовать js-cookie или эквивалент
     try {
-      const cookieOptions = "path=/; max-age=900; samesite=lax";
-      document.cookie = `accessToken=${token}; ${cookieOptions}`;
+      if (typeof document === "undefined") return Promise.resolve();
+
+      // Использовать более строгие параметры для кук
+      const cookieOptions = "path=/; max-age=900; samesite=lax; secure";
+      document.cookie = `${this.ACCESS_TOKEN_KEY}=${token}; ${cookieOptions}`;
+
+      // Проверка, что кука установлена
+      setTimeout(() => {
+        const storedToken = this.getCookieValue(this.ACCESS_TOKEN_KEY);
+        console.log(
+          "[TokenService] accessToken cookie verification:",
+          storedToken ? "set successfully" : "FAILED TO SET"
+        );
+      }, 100);
+
       console.log(
         "[TokenService] accessToken set in client cookie",
         token.substring(0, 10) + "..."
@@ -34,8 +47,21 @@ export class TokenService {
     this._refreshToken = token;
 
     try {
-      const cookieOptions = "path=/; max-age=604800; samesite=lax";
-      document.cookie = `refreshToken=${token}; ${cookieOptions}`;
+      if (typeof document === "undefined") return;
+
+      // Использовать более строгие параметры для кук
+      const cookieOptions = "path=/; max-age=604800; samesite=lax; secure";
+      document.cookie = `${this.REFRESH_TOKEN_KEY}=${token}; ${cookieOptions}`;
+
+      // Проверка, что кука установлена
+      setTimeout(() => {
+        const storedToken = this.getCookieValue(this.REFRESH_TOKEN_KEY);
+        console.log(
+          "[TokenService] refreshToken cookie verification:",
+          storedToken ? "set successfully" : "FAILED TO SET"
+        );
+      }, 100);
+
       console.log(
         "[TokenService] refreshToken set in client cookie",
         token.substring(0, 10) + "..."
@@ -82,19 +108,35 @@ export class TokenService {
       if (typeof document === "undefined") return this._accessToken;
 
       // Если у нас уже есть токен в памяти, используем его
-      if (this._accessToken) return this._accessToken;
+      if (this._accessToken) {
+        this._isTokenAvailable = true;
+        return this._accessToken;
+      }
 
       // Используем улучшенный метод для получения куки
       const token = this.getCookieValue(this.ACCESS_TOKEN_KEY);
       if (token) {
         this._accessToken = token;
         this._isTokenAvailable = true;
+        console.log("[TokenService] Retrieved access token from cookie");
         return token;
       }
+
+      // Отладка
+      console.log("[TokenService] Current cookies:", document.cookie);
+      console.log(
+        "[TokenService] Access token from cookie:",
+        this.getCookieValue(this.ACCESS_TOKEN_KEY)
+      );
+      console.log(
+        "[TokenService] Refresh token from cookie:",
+        this.getCookieValue(this.REFRESH_TOKEN_KEY)
+      );
 
       // Проверяем косвенные признаки наличия httpOnly cookie
       // Так как JavaScript не может прочитать httpOnly cookies напрямую
       this._isTokenAvailable = false;
+      console.log("[TokenService] No access token found in cookies");
 
       return null;
     } catch (error) {
@@ -219,7 +261,22 @@ export class TokenService {
     try {
       if (typeof document === "undefined") return null;
 
+      console.log(`[TokenService] Searching for cookie: ${name}`);
+
+      // Используем регулярное выражение для более точного поиска
+      const match = document.cookie.match(
+        "(^|;)\\s*" + name + "\\s*=\\s*([^;]+)"
+      );
+      if (match) {
+        console.log(`[TokenService] Found cookie ${name} with RegExp`);
+        return match[2];
+      }
+
+      // Резервный метод, если регулярное выражение не сработало
       const cookies = document.cookie.split(";");
+      console.log(
+        `[TokenService] Trying manual search in ${cookies.length} cookies`
+      );
 
       for (const cookie of cookies) {
         // Разделяем cookie только по первому символу '='
@@ -229,11 +286,14 @@ export class TokenService {
         const cookieName = cookie.substring(0, equalsIndex).trim();
         const cookieValue = cookie.substring(equalsIndex + 1).trim();
 
+        console.log(`[TokenService] Checking cookie: ${cookieName}`);
         if (cookieName === name) {
+          console.log(`[TokenService] Found cookie ${name} with manual search`);
           return cookieValue;
         }
       }
 
+      console.log(`[TokenService] Cookie ${name} not found`);
       return null;
     } catch (error) {
       console.error(`[TokenService] Error getting cookie '${name}':`, error);
@@ -249,15 +309,33 @@ export class TokenService {
 
     // Очищаем куки при выходе
     try {
+      if (typeof document === "undefined") return;
+
+      // Удаляем куки, используя имена из констант
       // Метод 1: использование expires в прошлом
-      document.cookie =
-        "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax";
-      document.cookie =
-        "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax";
+      document.cookie = `${this.ACCESS_TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax`;
+      document.cookie = `${this.REFRESH_TOKEN_KEY}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax`;
 
       // Метод 2: установка max-age=0
-      document.cookie = "accessToken=; path=/; max-age=0; samesite=lax";
-      document.cookie = "refreshToken=; path=/; max-age=0; samesite=lax";
+      document.cookie = `${this.ACCESS_TOKEN_KEY}=; path=/; max-age=0; samesite=lax`;
+      document.cookie = `${this.REFRESH_TOKEN_KEY}=; path=/; max-age=0; samesite=lax`;
+
+      // Проверка, что куки удалены
+      setTimeout(() => {
+        const accessToken = this.getCookieValue(this.ACCESS_TOKEN_KEY);
+        const refreshToken = this.getCookieValue(this.REFRESH_TOKEN_KEY);
+        console.log("[TokenService] Cookies after clearing:");
+        console.log(
+          `- ${this.ACCESS_TOKEN_KEY}: ${
+            accessToken ? "still exists" : "cleared"
+          }`
+        );
+        console.log(
+          `- ${this.REFRESH_TOKEN_KEY}: ${
+            refreshToken ? "still exists" : "cleared"
+          }`
+        );
+      }, 100);
 
       console.log("[TokenService] Client cookies cleared");
 

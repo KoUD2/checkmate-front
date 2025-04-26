@@ -30,19 +30,32 @@ class AuthService {
         password,
       });
 
-      const { access_token, refresh_token } = response.data;
-      if (!access_token) throw new Error("No access token received");
+      console.log("API response from /api-auth/login:", response.status);
 
-      console.log(1);
-      // Установка куки с флагом secure
-      tokenService.setAccessToken(access_token);
-      if (refresh_token) tokenService.setRefreshToken(refresh_token);
+      // Проверяем данные ответа
+      const data = response.data;
+      console.log("Login response data:", JSON.stringify(data, null, 2));
+
+      // Извлекаем токены, поддерживая разные форматы ответов
+      const access_token = data.access_token || data.accessToken;
+      const refresh_token = data.refresh_token || data.refreshToken;
+
+      if (!access_token) {
+        console.error("No access token received in response:", data);
+        throw new Error("No access token received");
+      }
+
+      console.log("Setting tokens from login response");
+      // Установка токенов и ожидание завершения операции
+      await tokenService.setAccessToken(access_token);
+      if (refresh_token) await tokenService.setRefreshToken(refresh_token);
+
+      // Проверяем, что токены установлены
+      console.log("Verifying tokens were set correctly");
+      const storedAccessToken = tokenService.getAccessToken();
+      console.log(`Access token stored: ${!!storedAccessToken}`);
 
       console.log("Login OK! Manual redirect needed.");
-      // if (typeof window !== 'undefined') {
-      // 	window.location.href = '/'
-      // 	window.location.reload()
-      // }
 
       return response.data;
     } catch (error) {
