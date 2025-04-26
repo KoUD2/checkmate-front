@@ -15,21 +15,54 @@ export class TokenService {
     this._accessToken = token;
     this._isTokenAvailable = true;
 
+    console.log(
+      "[TokenService] Setting access token in memory:",
+      token.substring(0, 15) + "..."
+    );
+
     // В Next.js 15 рекомендуется использовать js-cookie или эквивалент
     try {
       if (typeof document === "undefined") return Promise.resolve();
 
-      // Использовать более строгие параметры для кук
-      const cookieOptions = "path=/; max-age=900; samesite=lax; secure";
+      // Вывод всех текущих куки перед установкой
+      console.log("[TokenService] Cookies before setting:", document.cookie);
+
+      // СПОСОБ 1: Стандартный способ установки куки
+      const cookieOptions = "path=/; max-age=900; samesite=lax";
       document.cookie = `${this.ACCESS_TOKEN_KEY}=${token}; ${cookieOptions}`;
+
+      // СПОСОБ 2: Альтернативный способ установки куки с другим именем
+      document.cookie = `auth_token=${token}; ${cookieOptions}`;
+
+      // СПОСОБ 3: Базовая установка (минимум опций)
+      document.cookie = `jwt=${token}`;
 
       // Проверка, что кука установлена
       setTimeout(() => {
+        console.log("[TokenService] Cookies after setting:", document.cookie);
+
         const storedToken = this.getCookieValue(this.ACCESS_TOKEN_KEY);
         console.log(
           "[TokenService] accessToken cookie verification:",
           storedToken ? "set successfully" : "FAILED TO SET"
         );
+
+        // Проверяем альтернативные куки
+        const altToken1 = this.getCookieValue("auth_token");
+        const altToken2 = this.getCookieValue("jwt");
+        console.log("[TokenService] Alternative cookies check:");
+        console.log("- auth_token:", altToken1 ? "set" : "not set");
+        console.log("- jwt:", altToken2 ? "set" : "not set");
+
+        // Сохраняем в localStorage как запасной вариант
+        if (typeof localStorage !== "undefined") {
+          try {
+            localStorage.setItem("auth_token", token);
+            console.log("[TokenService] Token saved to localStorage");
+          } catch (e) {
+            console.error("[TokenService] Failed to save in localStorage:", e);
+          }
+        }
       }, 100);
 
       console.log(

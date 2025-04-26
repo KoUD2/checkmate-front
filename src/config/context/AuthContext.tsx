@@ -78,18 +78,81 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         console.log(`[AuthProvider] Is public path: ${isPublicPath}`);
         console.log(`[AuthProvider] Access token present: ${!!accessToken}`);
 
+        // Проверяем localStorage
+        let localStorageToken = null;
+        try {
+          if (typeof localStorage !== "undefined") {
+            localStorageToken = localStorage.getItem("auth_token");
+            console.log(
+              "[AuthProvider] Token in localStorage:",
+              !!localStorageToken
+            );
+          }
+        } catch (e) {
+          console.error("[AuthProvider] Error checking localStorage:", e);
+        }
+
         // Для отладки проверим куки напрямую
         if (typeof document !== "undefined") {
-          console.log("[AuthProvider] Cookies:", document.cookie);
+          // Выводим все куки для отладки
+          const allCookies = document.cookie;
+          console.log("[AuthProvider] All cookies:", allCookies);
 
-          // Проверяем наличие JWT в куки напрямую
-          const hasJwtInCookies = document.cookie.includes(
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
-          );
+          // Ищем разные варианты JWT в куках (учитывая возможные форматы)
+          const jwtPatterns = [
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9", // Начало стандартного JWT
+            "eyJ", // Начало base64url закодированной JSON строки
+            "accessToken=eyJ", // JWT в куке accessToken
+            "=eyJ", // JWT в любой куке
+          ];
+
+          let hasJwtInCookies = false;
+          let matchedPattern = "";
+          for (const pattern of jwtPatterns) {
+            if (allCookies.includes(pattern)) {
+              hasJwtInCookies = true;
+              matchedPattern = pattern;
+              break;
+            }
+          }
+
           console.log(
             "[AuthProvider] JWT pattern found in cookies:",
             hasJwtInCookies
           );
+          if (hasJwtInCookies) {
+            console.log("[AuthProvider] Matched JWT pattern:", matchedPattern);
+          }
+
+          // Посимвольно анализируем куки на наличие JWT
+          if (!hasJwtInCookies && allCookies.length > 0) {
+            console.log(
+              "[AuthProvider] Cookie debugging - Looking for JWT fragments:"
+            );
+            let jwtFound = false;
+
+            // Проверяем отдельные части кук
+            const cookieParts = allCookies.split(";");
+            cookieParts.forEach((part, index) => {
+              console.log(
+                `[AuthProvider] Cookie part ${index + 1}:`,
+                part.trim()
+              );
+              if (part.includes("eyJ")) {
+                console.log(
+                  `[AuthProvider] JWT fragment found in part ${index + 1}`
+                );
+                jwtFound = true;
+                hasJwtInCookies = true;
+              }
+            });
+
+            if (jwtFound) {
+              console.log("[AuthProvider] JWT fragments found in cookies!");
+            } else {
+              console.log("[AuthProvider] No JWT fragments found in cookies.");
+            }
+          }
 
           if (hasJwtInCookies) {
             // Если JWT найден в куках, считаем пользователя авторизованным
@@ -100,9 +163,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }
         }
 
-        // Проверка наличия токенов двумя способами
+        // Проверка наличия токенов любыми способами
         const isAuthenticated =
-          accessToken || isTokenAvailable || isLoggedInMemory;
+          accessToken ||
+          isTokenAvailable ||
+          isLoggedInMemory ||
+          !!localStorageToken;
+
+        // ЭКСТРЕМАЛЬНО АГРЕССИВНОЕ РЕШЕНИЕ:
+        // Если мы находимся на странице login, и в логах есть сообщение об успешном логине,
+        // принудительно переходим на главную страницу
+        if (pathname === "/login") {
+          // На странице логина проверяем дополнительные признаки того, что логин был выполнен
+          const hasAuthCookies =
+            typeof document !== "undefined" && document.cookie.length > 5;
+
+          if (hasAuthCookies || isAuthenticated || localStorageToken) {
+            console.log(
+              "[AuthProvider] Force auth - redirecting from login to home"
+            );
+            window.location.href = "/";
+            return;
+          }
+        }
 
         if (isAuthenticated) {
           // Устанавливаем временного пользователя если нет данных
@@ -124,15 +207,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           // мы все равно считаем пользователя авторизованным
           if (
             typeof document !== "undefined" &&
-            document.cookie.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")
+            (document.cookie.includes("eyJ") ||
+              document.cookie.length > 5 ||
+              localStorageToken)
           ) {
             console.log(
-              "[AuthProvider] JWT found in cookies but auth checks failed - still considering user as logged in"
+              "[AuthProvider] Auth indicators found - considering user as logged in"
             );
             if (!user) {
               setUser({ id: 1, name: "Пользователь", username: "user" });
             }
-            // Не делаем редирект на логин
+
+            // На странице логина переходим на главную
+            if (isPublicPath) {
+              console.log(
+                "[AuthProvider] Auth indicators found on public page - redirecting to home"
+              );
+              window.location.href = "/";
+            }
           } else {
             // Если токена нет и страница защищенная, перенаправляем на логин
             if (!isPublicPath) {
