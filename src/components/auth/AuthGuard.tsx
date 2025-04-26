@@ -1,67 +1,57 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import tokenService from "@/services/token.service";
 
 interface AuthGuardProps {
   children: React.ReactNode;
 }
 
-export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    const checkAuth = () => {
-      console.log("[AuthGuard] Checking authentication...");
+    // Функция проверки авторизации, упрощена для минимизации конфликтов с AuthContext
+    const checkAuth = async () => {
+      // Проверяем токен с небольшой задержкой
       try {
-        // Проверяем наличие токена
-        const hasToken = tokenService.isLoggedIn();
-        console.log(`[AuthGuard] Has token: ${hasToken}`);
+        console.log("[AuthGuard] Checking token availability");
+        const token = tokenService.getAccessToken();
 
-        if (!hasToken) {
-          console.log("[AuthGuard] No token found, redirecting to login");
-          router.push("/login");
-          return;
+        if (!token) {
+          console.log("[AuthGuard] No token found, not authorized");
+          setAuthorized(false);
+        } else {
+          console.log("[AuthGuard] Token found, authorized");
+          setAuthorized(true);
         }
-
-        setIsAuthenticated(true);
       } catch (error) {
-        console.error("[AuthGuard] Auth check error:", error);
-        router.push("/login");
-      } finally {
-        setLoading(false);
+        console.error("[AuthGuard] Error checking authorization:", error);
+        setAuthorized(false);
       }
     };
 
-    checkAuth();
-
-    // Также проверяем авторизацию при фокусе на окне (если пользователь вернулся на вкладку)
-    const handleFocus = () => {
-      console.log("[AuthGuard] Window focused, checking auth...");
+    // Даем время AuthContext выполнить свои проверки перед нашими
+    const timer = setTimeout(() => {
       checkAuth();
-    };
+    }, 100);
 
-    window.addEventListener("focus", handleFocus);
+    return () => clearTimeout(timer);
+  }, []);
 
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, [router]);
-
-  // Если проверка еще не завершена, показываем индикатор загрузки
-  if (loading) {
+  // Если не авторизован и не на странице логина, показываем заглушку
+  if (!authorized) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Проверка авторизации...</h2>
+        </div>
       </div>
     );
   }
 
-  // Если пользователь авторизован, показываем защищенный контент
-  return isAuthenticated ? <>{children}</> : null;
+  // Если авторизован, показываем защищенный контент
+  return <>{children}</>;
 };
 
 export default AuthGuard;

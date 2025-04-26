@@ -55,7 +55,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const checkAuth = async () => {
       try {
         console.log("[AuthProvider] Checking authentication on page load");
-        // Чтение токена вынесено в переменную для отладки
         const accessToken = tokenService.getAccessToken();
         const isPublicPath = PUBLIC_PATHS.includes(pathname || "");
 
@@ -63,54 +62,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         console.log(`[AuthProvider] Is public path: ${isPublicPath}`);
         console.log(`[AuthProvider] Access token present: ${!!accessToken}`);
 
-        // Прямая проверка cookie
-        if (typeof document !== "undefined") {
-          console.log(`[AuthProvider] Raw cookies: ${document.cookie}`);
-          console.log(
-            `[AuthProvider] Manually checking for accessToken in cookies...`
-          );
-
-          // Ручной парсинг cookie для проверки
-          const cookies = document.cookie.split(";");
-          for (const cookie of cookies) {
-            const parts = cookie.trim().split("=");
-            if (parts.length >= 2) {
-              const name = parts[0].trim();
-              if (name === "accessToken") {
-                console.log(
-                  `[AuthProvider] accessToken found in cookie manually`
-                );
-              }
-            }
-          }
-        }
-
         if (accessToken) {
-          try {
-            // Здесь можно добавить запрос на получение профиля пользователя
-            // const userProfile = await authService.getProfile();
-            // setUser(userProfile);
-
-            // Временное решение - устанавливаем базовый объект пользователя
+          // Устанавливаем временного пользователя если нет данных
+          if (!user) {
             setUser({ id: 1, name: "Пользователь", username: "user" });
-
-            // Если аутентифицированный пользователь попал на страницу логина, перенаправляем на главную
-            if (isPublicPath) {
-              console.log(
-                "[AuthProvider] Authenticated user on login page, redirecting to home"
-              );
-              router.push("/");
-            }
-          } catch (err) {
-            console.error("[AuthProvider] Error fetching user data:", err);
-            tokenService.clearTokens();
           }
-        } else if (!isPublicPath) {
-          // Если неаутентифицированный пользователь попал на защищенную страницу, перенаправляем на логин
-          console.log(
-            "[AuthProvider] Unauthenticated user on protected page, redirecting to login"
-          );
-          router.push("/login");
+
+          // Если у пользователя есть токен и он на странице логина/регистрации,
+          // перенаправляем на главную
+          if (isPublicPath) {
+            console.log(
+              "[AuthProvider] Authenticated user on public page, redirecting to home"
+            );
+            router.push("/");
+          }
+          // Если токен есть и страница не публичная - всё в порядке, ничего не делаем
+        } else {
+          // Если токена нет и страница защищенная, перенаправляем на логин
+          if (!isPublicPath) {
+            console.log(
+              "[AuthProvider] Unauthenticated user on protected page, redirecting to login"
+            );
+            router.push("/login");
+          }
+          // Если токена нет и страница публичная - всё в порядке, ничего не делаем
         }
 
         setLoading(false);
@@ -121,7 +96,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     };
 
     checkAuth();
-  }, [pathname, router]);
+  }, [pathname, router, user]);
 
   // Добавим функцию автоматического обновления токена
   useEffect(() => {
@@ -240,44 +215,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser({ id: 1, name: "Пользователь", username });
         }
 
-        // Автоматический редирект после успешного логина
+        // Упрощаем редирект после успешного логина
         console.log(
           "[AuthProvider] Login successful, redirecting to home page"
         );
 
-        // Проверяем наличие токенов в cookie после их установки
-        console.log("[AuthProvider] Checking tokens after setting:");
-        const accessTokenAfterSet = tokenService.getAccessToken();
-        console.log(
-          "[AuthProvider] Access token after setting:",
-          !!accessTokenAfterSet
-        );
-
-        // Выполняем перенаправление несколькими способами для надежности
-        try {
-          // Способ 1: использование router.push с увеличенной задержкой
-          setTimeout(() => {
-            console.log("[AuthProvider] Attempting redirect via router.push");
-            router.push("/");
-          }, 1000);
-
-          // Способ 2: использование imperative routing для принудительного перехода
-          setTimeout(() => {
-            console.log(
-              "[AuthProvider] Attempting redirect via window.location"
-            );
-            if (typeof window !== "undefined") {
-              window.location.href = "/";
-            }
-          }, 1500);
-        } catch (redirectError) {
-          console.error("[AuthProvider] Redirect error:", redirectError);
-
-          // Запасной вариант: если ничего не сработало, используем жесткий редирект
-          if (typeof window !== "undefined") {
-            window.location.href = "/";
-          }
-        }
+        // Одиночный редирект с небольшой задержкой
+        setTimeout(() => {
+          router.push("/");
+        }, 500);
       } else {
         console.error("Invalid response format:", response);
       }
