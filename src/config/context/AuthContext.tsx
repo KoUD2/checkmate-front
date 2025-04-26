@@ -50,8 +50,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const router = useRouter();
   const pathname = usePathname();
 
+  // Добавляем флаг, чтобы избежать бесконечных перезагрузок
+  const [redirectionPerformed, setRedirectionPerformed] =
+    useState<boolean>(false);
+
   // Проверка аутентификации при загрузке страницы
   useEffect(() => {
+    // Защита от повторных проверок при перенаправлении
+    if (redirectionPerformed) {
+      console.log(
+        "[AuthProvider] Redirection already performed, skipping auth check"
+      );
+      return;
+    }
+
     const checkAuth = async () => {
       try {
         console.log("[AuthProvider] Checking authentication on page load");
@@ -170,22 +182,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           isLoggedInMemory ||
           !!localStorageToken;
 
-        // ЭКСТРЕМАЛЬНО АГРЕССИВНОЕ РЕШЕНИЕ:
-        // Если мы находимся на странице login, и в логах есть сообщение об успешном логине,
-        // принудительно переходим на главную страницу
-        if (pathname === "/login") {
-          // На странице логина проверяем дополнительные признаки того, что логин был выполнен
-          const hasAuthCookies =
-            typeof document !== "undefined" && document.cookie.length > 5;
-
-          if (hasAuthCookies || isAuthenticated || localStorageToken) {
-            console.log(
-              "[AuthProvider] Force auth - redirecting from login to home"
-            );
-            window.location.href = "/";
-            return;
-          }
-        }
+        // ИСПРАВЛЕНО: Используем router вместо window.location для избежания перезагрузки страницы
+        // и добавляем защиту от циклического редиректа
 
         if (isAuthenticated) {
           // Устанавливаем временного пользователя если нет данных
@@ -195,11 +193,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
           // Если у пользователя есть токен и он на странице логина/регистрации,
           // перенаправляем на главную
-          if (isPublicPath) {
+          if (isPublicPath && !redirectionPerformed) {
             console.log(
               "[AuthProvider] Authenticated user on public page, redirecting to home"
             );
-            window.location.href = "/";
+            // Отмечаем, что редирект выполнен, чтобы избежать цикла
+            setRedirectionPerformed(true);
+            router.push("/");
           }
           // Если токен есть и страница не публичная - всё в порядке, ничего не делаем
         } else {
@@ -219,19 +219,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             }
 
             // На странице логина переходим на главную
-            if (isPublicPath) {
+            if (isPublicPath && !redirectionPerformed) {
               console.log(
                 "[AuthProvider] Auth indicators found on public page - redirecting to home"
               );
-              window.location.href = "/";
+              setRedirectionPerformed(true);
+              router.push("/");
             }
           } else {
             // Если токена нет и страница защищенная, перенаправляем на логин
-            if (!isPublicPath) {
+            if (!isPublicPath && !redirectionPerformed) {
               console.log(
                 "[AuthProvider] Unauthenticated user on protected page, redirecting to login"
               );
-              window.location.href = "/login";
+              setRedirectionPerformed(true);
+              router.push("/login");
             }
           }
           // Если токена нет и страница публичная - всё в порядке, ничего не делаем
@@ -244,8 +246,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     };
 
-    checkAuth();
-  }, [pathname, router, user]);
+    // Выполняем проверку только если перенаправление еще не было выполнено
+    if (!redirectionPerformed) {
+      checkAuth();
+    }
+  }, [pathname, router, user, redirectionPerformed]);
 
   // Добавим функцию автоматического обновления токена
   useEffect(() => {
@@ -364,11 +369,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser({ id: 1, name: "Пользователь", username });
         }
 
-        // Используем window.location для прямого редиректа вместо Next.js router
+        // Отмечаем, что скоро будет выполнен редирект
+        setRedirectionPerformed(true);
+
+        // Используем Next.js router вместо window.location для более плавной навигации
         console.log(
           "[AuthProvider] Login successful, redirecting to home page"
         );
-        window.location.href = "/";
+        router.push("/");
       } else {
         console.error("Invalid response format:", response);
       }
@@ -389,6 +397,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await AuthService.logout();
       tokenService.clearTokens();
       setUser(null);
+
+      // Помечаем, что редирект скоро будет выполнен
+      setRedirectionPerformed(true);
+
+      // Используем Next.js router вместо window.location
+      console.log(
+        "[AuthProvider] Logout successful, redirecting to login page"
+      );
       router.push("/login");
     } catch (err) {
       console.error("Logout error:", err);
