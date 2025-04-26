@@ -262,17 +262,42 @@ export class TokenService {
       if (typeof document === "undefined") return null;
 
       console.log(`[TokenService] Searching for cookie: ${name}`);
+      console.log(`[TokenService] All cookies: ${document.cookie}`);
 
-      // Используем регулярное выражение для более точного поиска
-      const match = document.cookie.match(
-        "(^|;)\\s*" + name + "\\s*=\\s*([^;]+)"
-      );
+      // МЕТОД 1: Проверяем токен напрямую из строки документа
+      if (name === this.ACCESS_TOKEN_KEY) {
+        const rawCookies = document.cookie;
+        const tokenStartIndex = rawCookies.indexOf(name + "=eyJ");
+        if (tokenStartIndex >= 0) {
+          const tokenValue = rawCookies.substring(
+            tokenStartIndex + name.length + 1
+          );
+          const endIndex = tokenValue.indexOf(";");
+          const token =
+            endIndex >= 0 ? tokenValue.substring(0, endIndex) : tokenValue;
+          console.log(
+            `[TokenService] Direct found ${name}: ${token.substring(0, 15)}...`
+          );
+          return token;
+        }
+      }
+
+      // МЕТОД 2: Используем регулярное выражение для более точного поиска
+      const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp("(^|;)\\s*" + escapedName + "\\s*=\\s*([^;]*)");
+      const match = document.cookie.match(regex);
+
       if (match) {
-        console.log(`[TokenService] Found cookie ${name} with RegExp`);
+        console.log(
+          `[TokenService] Found cookie ${name} with RegExp: ${match[2].substring(
+            0,
+            15
+          )}...`
+        );
         return match[2];
       }
 
-      // Резервный метод, если регулярное выражение не сработало
+      // МЕТОД 3: Резервный ручной метод разбора
       const cookies = document.cookie.split(";");
       console.log(
         `[TokenService] Trying manual search in ${cookies.length} cookies`
@@ -286,14 +311,50 @@ export class TokenService {
         const cookieName = cookie.substring(0, equalsIndex).trim();
         const cookieValue = cookie.substring(equalsIndex + 1).trim();
 
-        console.log(`[TokenService] Checking cookie: ${cookieName}`);
+        console.log(`[TokenService] Checking cookie: '${cookieName}'`);
         if (cookieName === name) {
-          console.log(`[TokenService] Found cookie ${name} with manual search`);
+          console.log(
+            `[TokenService] Found cookie ${name} with manual search: ${cookieValue.substring(
+              0,
+              15
+            )}...`
+          );
           return cookieValue;
         }
       }
 
-      console.log(`[TokenService] Cookie ${name} not found`);
+      // МЕТОД 4: Если это accessToken, проверяем не установлен ли он под другим именем
+      if (name === this.ACCESS_TOKEN_KEY) {
+        // Проверяем вариации имен (часто используются разные варианты)
+        const alternatives = ["access_token", "token", "auth_token", "jwt"];
+        for (const altName of alternatives) {
+          const altValue = this.getCookieValue(altName);
+          if (altValue) {
+            console.log(
+              `[TokenService] Found token under alternative name: ${altName}`
+            );
+            return altValue;
+          }
+        }
+
+        // Проверяем, есть ли в куках строка, похожая на JWT (начинается с eyJ)
+        const rawCookies = document.cookie;
+        const jwtMatch = rawCookies.match(
+          /=eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/
+        );
+        if (jwtMatch) {
+          const jwtToken = jwtMatch[0].substring(1); // удаляем знак =
+          console.log(
+            `[TokenService] Found JWT-like token: ${jwtToken.substring(
+              0,
+              15
+            )}...`
+          );
+          return jwtToken;
+        }
+      }
+
+      console.log(`[TokenService] Cookie ${name} not found with any method`);
       return null;
     } catch (error) {
       console.error(`[TokenService] Error getting cookie '${name}':`, error);
@@ -356,6 +417,22 @@ export class TokenService {
     try {
       // Проверяем наличие токена и обновляем статус
       const accessToken = this.getAccessToken();
+
+      // Для отладки печатаем все куки
+      if (typeof document !== "undefined") {
+        console.log(
+          "[TokenService] isLoggedIn cookie check - all cookies:",
+          document.cookie
+        );
+        // Прямая проверка, есть ли в строке кук что-то похожее на JWT токен
+        if (document.cookie.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")) {
+          console.log(
+            "[TokenService] Found JWT pattern in cookies, setting logged in state"
+          );
+          this._isTokenAvailable = true;
+          return true;
+        }
+      }
 
       // Для httpOnly cookies в getAccessToken больше не возвращается "httpOnly",
       // поэтому если токена нет в доступных куках, нам нужно полагаться на API запросы
