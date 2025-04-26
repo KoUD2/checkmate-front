@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
+    // Проверяем доступность переменных окружения
+    const secretKey = process.env.JWT_ACCESS_SECRET;
+    console.log(
+      `[API] JWT_ACCESS_SECRET присутствует: ${!!secretKey}, длина: ${
+        secretKey ? secretKey.length : 0
+      }`
+    );
+
     const requestBody = await request.json();
     console.log("Login request body:", JSON.stringify(requestBody));
 
@@ -73,6 +81,10 @@ export async function POST(request: NextRequest) {
       const accessToken = data.accessToken || data.access_token;
       const refreshToken = data.refreshToken || data.refresh_token;
 
+      console.log(
+        `[API] Received tokens - Access: ${!!accessToken}, Refresh: ${!!refreshToken}`
+      );
+
       if (accessToken) {
         response.cookies.set({
           name: "accessToken",
@@ -95,6 +107,10 @@ export async function POST(request: NextRequest) {
             path: "/",
           });
         }
+
+        console.log(
+          `[API] Cookies set successfully - accessToken and refreshToken`
+        );
       }
     }
 
