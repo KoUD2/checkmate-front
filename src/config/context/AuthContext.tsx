@@ -123,6 +123,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     checkAuth();
   }, [pathname, router]);
 
+  // Добавим функцию автоматического обновления токена
+  useEffect(() => {
+    // Функция для проверки и обновления токена
+    const refreshTokenIfNeeded = async () => {
+      try {
+        const accessToken = tokenService.getAccessToken();
+        if (!accessToken) return;
+
+        // Проверяем, истекает ли токен в ближайшие 5 минут
+        // Поскольку мы не можем декодировать токен на клиенте,
+        // будем полагаться на периодическое обновление каждые 10 минут
+        await authService.refreshToken();
+      } catch (error) {
+        console.error("[AuthProvider] Token refresh error:", error);
+      }
+    };
+
+    // Запускаем периодическое обновление токена каждые 10 минут
+    const refreshInterval = setInterval(refreshTokenIfNeeded, 10 * 60 * 1000);
+
+    // Очищаем интервал при размонтировании компонента
+    return () => {
+      clearInterval(refreshInterval);
+    };
+  }, []);
+
   const register = async (
     name: string,
     username: string,
@@ -227,10 +253,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           !!accessTokenAfterSet
         );
 
-        // Увеличиваем задержку для гарантии сохранения cookies
-        setTimeout(() => {
-          router.push("/");
-        }, 800);
+        // Выполняем перенаправление несколькими способами для надежности
+        try {
+          // Способ 1: использование router.push с увеличенной задержкой
+          setTimeout(() => {
+            console.log("[AuthProvider] Attempting redirect via router.push");
+            router.push("/");
+          }, 1000);
+
+          // Способ 2: использование imperative routing для принудительного перехода
+          setTimeout(() => {
+            console.log(
+              "[AuthProvider] Attempting redirect via window.location"
+            );
+            if (typeof window !== "undefined") {
+              window.location.href = "/";
+            }
+          }, 1500);
+        } catch (redirectError) {
+          console.error("[AuthProvider] Redirect error:", redirectError);
+
+          // Запасной вариант: если ничего не сработало, используем жесткий редирект
+          if (typeof window !== "undefined") {
+            window.location.href = "/";
+          }
+        }
       } else {
         console.error("Invalid response format:", response);
       }
