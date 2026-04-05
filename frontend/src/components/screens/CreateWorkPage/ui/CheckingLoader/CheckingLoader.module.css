@@ -1,0 +1,102 @@
+.section {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.marks {
+	width: 51.25vw;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.389vw;
+}
+
+.feedback {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.feedback-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.417vw;
+	padding: 1.389vw;
+	background: var(--background);
+	border-radius: 1.389vw;
+}
+
+.step {
+	color: var(--grey-text);
+	font-size: 1.111vw;
+	margin-bottom: 0.4vw;
+}
+
+/* Skeleton base */
+.skeleton {
+	border-radius: 0.556vw;
+	background: linear-gradient(90deg, #ececec 25%, #f7f7f7 50%, #ececec 75%);
+	background-size: 200% 100%;
+	animation: shimmer 1.5s infinite;
+}
+
+/* Criteria row */
+.criteria-skeleton {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: 0.556vw;
+}
+
+.sk-label {
+	width: 3vw;
+	height: 4vw;
+	border-radius: 0.694vw;
+}
+
+.sk-desc {
+	width: 13vw;
+	height: 4vw;
+	border-radius: 0.694vw;
+}
+
+.sk-marks {
+	display: flex;
+	gap: 0.4vw;
+	padding-top: 0.3vw;
+}
+
+.sk-mark {
+	width: 2.2vw;
+	height: 2.2vw;
+	border-radius: 50%;
+}
+
+/* Average mark */
+.sk-average {
+	width: 9vw;
+	height: 3.5vw;
+	border-radius: 1.111vw;
+}
+
+/* Feedback label */
+.sk-feedback-label {
+	width: 3vw;
+	height: 1.4vw;
+	border-radius: 0.4vw;
+	margin-bottom: 0.2vw;
+}
+
+/* Feedback lines */
+.sk-line {
+	height: 1.1vw;
+	border-radius: 0.4vw;
+}
+
+.sk-line-full { width: 100%; }
+.sk-line-80  { width: 80%; }
+.sk-line-60  { width: 60%; }
+
+@keyframes shimmer {
+	0%   { background-position: 200% 0; }
+	100% { background-position: -200% 0; }
+}

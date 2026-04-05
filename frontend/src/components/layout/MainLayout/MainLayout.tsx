@@ -1,0 +1,76 @@
+"use client";
+
+import { useAuth } from "@/hooks/useAuth";
+import Image from "next/image";
+import Link from "next/link";
+import { FC, PropsWithChildren } from "react";
+import Logo from "../../../shared/images/A_Logo.svg";
+import styles from "./MainLayout.module.css";
+
+function getInitials(name: string | undefined): string {
+  if (!name) return "";
+  const words = name.trim().split(" ");
+  if (words.length === 1) {
+    return words[0][0]?.toUpperCase() || "";
+  }
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
+const MainLayout: FC<PropsWithChildren> = ({ children }) => {
+  const { user } = useAuth();
+
+  const pluralChecks = (n: number) => {
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod100 >= 11 && mod100 <= 14) return `${n} проверок`;
+    if (mod10 === 1) return `${n} проверка`;
+    if (mod10 >= 2 && mod10 <= 4) return `${n} проверки`;
+    return `${n} проверок`;
+  };
+
+  const checksLabel = () => {
+    if (!user) return null;
+    if (user.subscription?.isActive && user.subscription.expiresAt) {
+      const date = new Date(user.subscription.expiresAt).toLocaleDateString(
+        "ru-RU",
+        {
+          day: "2-digit",
+          month: "2-digit",
+        },
+      );
+      return `подписка до ${date}`;
+    }
+    return pluralChecks(user.freeChecksLeft);
+  };
+
+  const label = checksLabel();
+
+  return (
+    <div className={styles["main-layout-container"]}>
+      <header className={styles["main-layout"]}>
+        <Link href="/">
+          <div className={styles["main-layout__logo-container"]}>
+            <Image
+              src={Logo}
+              alt="Логотип"
+              className={styles["main-layout__logo"]}
+            />
+          </div>
+        </Link>
+        <div className={styles["main-layout__right"]}>
+          {label && (
+            <Link href="/subscribe" className={styles["main-layout__checks"]}>
+              {label}
+            </Link>
+          )}
+          <div className={styles["main-layout__greeting"]}>
+            {user ? getInitials(`${user.firstName} ${user.lastName}`) : ""}
+          </div>
+        </div>
+      </header>
+      <main>{children}</main>
+    </div>
+  );
+};
+
+export default MainLayout;

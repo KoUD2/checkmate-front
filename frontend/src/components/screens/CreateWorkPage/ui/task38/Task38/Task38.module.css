@@ -1,0 +1,169 @@
+.task38 {
+	display: flex;
+	flex-direction: column;
+	gap: 2.083vw;
+	width: 61.597vw;
+}
+
+.task38__instructions {
+	display: inline-flex;
+}
+
+.task38__instruction-text {
+	font-size: 1.389vw;
+	line-height: 140%;
+}
+
+.task38__inline-input {
+	display: inline-flex;
+	padding: 0.139vw 0.833vw 0.278vw 0.903vw;
+	justify-content: center;
+	width: 10.764vw;
+	height: 2.083vw;
+	font-size: 1.389vw;
+	align-items: center;
+	border-radius: 0.694vw;
+	background: var(--background);
+	border: none;
+	outline: none;
+}
+
+.task38__task-fields {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.task38__student-work {
+	display: flex;
+	justify-content: space-between;
+}
+
+.task38__student-step {
+	display: flex;
+	flex-direction: column;
+	gap: 0.694vw;
+}
+
+.task38__step-icon {
+	width: 433px;
+	height: 6px;
+	background: var(--semi-active);
+	border-radius: 1.389vw;
+}
+
+.task38__step-icon_isActive {
+	background: var(--active);
+}
+
+.task38__textarea {
+	height: 24.444vw;
+}
+
+.task38__step-text {
+	color: var(--grey-text);
+	font-size: 1.25vw;
+}
+
+.task38__plan-text {
+	font-size: 1.389vw;
+	line-height: 140%;
+}
+
+.task38__plan-text_isBold {
+	font-weight: 600;
+}
+
+.task38__plan-list {
+	padding-left: 1.389vw;
+	margin-left: 0.694vw;
+	list-style: disc;
+}
+
+.task38__plan-item {
+	font-size: 1.389vw;
+	line-height: 140%;
+}
+.task38__plan-item::marker {
+	font-size: 1.389vw;
+	color: var(--active-text);
+}
+
+.task38__inline-input_error {
+	border: 1px solid red;
+}
+
+.task38__textarea_error {
+	border: 1px solid red;
+}
+
+.task38__textarea_active {
+	background: var(--background);
+}
+
+.task38__file-section {
+	display: flex;
+	align-items: center;
+}
+
+.task38__file-button {
+	padding: 0.556vw 1.389vw;
+	border-radius: 0.694vw;
+	background: var(--background);
+	border: none;
+	font-size: 1.111vw;
+	cursor: pointer;
+}
+
+.task38__file-button:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+.task38__results-section {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.task38__marks {
+	width: 51.25vw;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.389vw;
+}
+
+.task38__feedback {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.task38__feedback-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.417vw;
+	padding: 1.389vw;
+	background: var(--background);
+	border-radius: 1.389vw;
+}
+
+.task38__feedback-label {
+	font-size: 1.25vw;
+	font-weight: 600;
+	color: var(--active);
+}
+
+.task38__feedback-text {
+	font-size: 1.111vw;
+	line-height: 1.6;
+	white-space: pre-wrap;
+}
+
+.task38__buttons {
+	display: flex;
+}
+
+.task38__button-back {
+	margin-top: 0;
+}

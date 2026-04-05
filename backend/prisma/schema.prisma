@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String         @id @default(uuid())
+  email          String         @unique
+  passwordHash   String
+  firstName      String
+  lastName       String
+  organization   String?
+  role           Role           @default(USER)
+  isActive       Boolean        @default(true)
+  freeChecksLeft Int            @default(50)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  tasks         Task[]
+  subscription  Subscription?
+  refreshTokens RefreshToken[]
+  promoUsages   PromoUsage[]
+  payments      Payment[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Task {
+  id              String   @id @default(uuid())
+  type            TaskType
+  userId          String
+  taskDescription String
+  solution        String
+  imageBase64     String?
+  k1              Int?
+  k2              Int?
+  k3              Int?
+  k4              Int?
+  k5              Int?
+  totalScore      Int?
+  feedback        Json?
+  comments        Json?
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+}
+
+enum TaskType {
+  TASK37
+  TASK38
+}
+
+model Subscription {
+  id        String    @id @default(uuid())
+  userId    String    @unique
+  isActive  Boolean   @default(false)
+  expiresAt DateTime?
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id         String        @id @default(uuid())
+  userId     String
+  yookassaId String        @unique
+  status     PaymentStatus @default(PENDING)
+  amount     Decimal       @db.Decimal(10, 2)
+  daysToAdd   Int
+  checksToAdd Int           @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  CANCELED
+}
+
+model PromoCode {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  days        Int
+  description String?
+  maxUses     Int?
+  usedCount   Int       @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  usages PromoUsage[]
+
+  @@map("promo_codes")
+}
+
+model PromoUsage {
+  id      String   @id @default(uuid())
+  promoId String
+  userId  String
+  usedAt  DateTime @default(now())
+
+  promo PromoCode @relation(fields: [promoId], references: [id], onDelete: Cascade)
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([promoId, userId])
+  @@map("promo_usages")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  isRevoked Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}

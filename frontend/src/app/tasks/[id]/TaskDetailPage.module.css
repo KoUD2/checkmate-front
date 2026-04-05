@@ -1,0 +1,149 @@
+.page {
+	margin-top: 1.944vw;
+	display: flex;
+	gap: 10.139vw;
+	align-items: flex-start;
+}
+
+.content {
+	display: flex;
+	flex-direction: column;
+	gap: 2.083vw;
+	width: 61.597vw;
+}
+
+.section {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+/* Task fields — как в Task37/Task38 */
+.task-fields {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.reserved-fields {
+	display: flex;
+	justify-content: space-between;
+}
+
+.input {
+	/* наследует стили Input компонента */
+}
+
+.textarea {
+	height: 14vw;
+}
+
+.textarea--student {
+	height: 24.444vw;
+}
+
+/* Инструкции */
+.instructions {
+	display: inline-flex;
+}
+
+.instruction-text {
+	font-size: 1.389vw;
+	line-height: 140%;
+}
+
+.inline-input {
+	display: inline-flex;
+	padding: 0.139vw 0.833vw 0.278vw 0.903vw;
+	justify-content: center;
+	width: 10.764vw;
+	height: 2.083vw;
+	font-size: 1.389vw;
+	align-items: center;
+	border-radius: 0.694vw;
+	background: var(--background);
+	border: none;
+	outline: none;
+	opacity: 1;
+	color: inherit;
+}
+
+/* Image (Task38) */
+.task-image {
+	max-width: 100%;
+	border-radius: 1.389vw;
+	object-fit: contain;
+}
+
+/* Plan (Task38) */
+.plan {
+	display: flex;
+	flex-direction: column;
+	gap: 0.694vw;
+}
+
+.plan-text {
+	font-size: 1.389vw;
+	line-height: 140%;
+}
+
+.plan-text--bold {
+	font-weight: 600;
+}
+
+.plan-list {
+	padding-left: 1.389vw;
+	margin-left: 0.694vw;
+	list-style: disc;
+}
+
+.plan-item {
+	font-size: 1.389vw;
+	line-height: 140%;
+}
+
+.plan-item::marker {
+	font-size: 1.389vw;
+	color: var(--active-text);
+}
+
+/* Оценки */
+.marks {
+	width: 51.25vw;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.389vw;
+}
+
+/* Обратная связь */
+.feedback {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.feedback__item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.417vw;
+	padding: 1.389vw;
+	background: var(--background);
+	border-radius: 1.389vw;
+}
+
+.feedback__label {
+	font-size: 1.25vw;
+	font-weight: 600;
+	color: var(--active);
+}
+
+.feedback__text {
+	font-size: 1.111vw;
+	line-height: 1.6;
+	white-space: pre-wrap;
+}
+
+.status {
+	font-size: 1.389vw;
+	color: var(--grey-text);
+}
