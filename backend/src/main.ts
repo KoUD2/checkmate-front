@@ -5,14 +5,25 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { setGlobalDispatcher, ProxyAgent } from 'undici';
+import { ProxyAgent, Agent, fetch as undiciFetch } from 'undici';
+
+// Domains that must go through proxy (geo-restricted)
+const PROXY_DOMAINS = ['generativelanguage.googleapis.com'];
 
 async function bootstrap() {
-  // Route all native fetch() calls through proxy (for Gemini API geo-restrictions)
   const proxyUrl = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
   if (proxyUrl) {
-    setGlobalDispatcher(new ProxyAgent(proxyUrl));
-    console.log(`Proxy configured: ${proxyUrl}`);
+    const proxyAgent = new ProxyAgent(proxyUrl);
+    const directAgent = new Agent();
+
+    // Patch global fetch: only proxy Gemini, everything else direct
+    (globalThis as any).fetch = (url: RequestInfo | URL, options: RequestInit = {}) => {
+      const hostname = new URL(url.toString()).hostname;
+      const useProxy = PROXY_DOMAINS.some(d => hostname.includes(d));
+      return undiciFetch(url as any, { ...(options as any), dispatcher: useProxy ? proxyAgent : directAgent });
+    };
+
+    console.log(`Proxy configured for: ${PROXY_DOMAINS.join(', ')} via ${proxyUrl}`);
   }
 
   const app = await NestFactory.create(AppModule, {
