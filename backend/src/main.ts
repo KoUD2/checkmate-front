@@ -5,8 +5,12 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { bootstrap as globalAgentBootstrap } from 'global-agent';
 
 async function bootstrap() {
+  // Initialize global-agent for proxy support (GLOBAL_AGENT_HTTP_PROXY env var)
+  globalAgentBootstrap();
+
   const app = await NestFactory.create(AppModule, {
     bodyParser: true,
   });
