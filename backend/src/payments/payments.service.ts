@@ -67,7 +67,8 @@ export class PaymentsService {
         },
       });
     } catch (err) {
-      const msg = err?.response?.data?.description || 'Ошибка YooKassa';
+      console.error('[Payment] YooKassa error:', JSON.stringify(err?.response?.data || err?.message));
+      const msg = err?.response?.data?.description || err?.message || 'Ошибка YooKassa';
       throw new InternalServerErrorException(msg);
     }
 
