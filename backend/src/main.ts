@@ -5,11 +5,15 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { bootstrap as globalAgentBootstrap } from 'global-agent';
+import { setGlobalDispatcher, ProxyAgent } from 'undici';
 
 async function bootstrap() {
-  // Initialize global-agent for proxy support (GLOBAL_AGENT_HTTP_PROXY env var)
-  globalAgentBootstrap();
+  // Route all native fetch() calls through proxy (for Gemini API geo-restrictions)
+  const proxyUrl = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
+  if (proxyUrl) {
+    setGlobalDispatcher(new ProxyAgent(proxyUrl));
+    console.log(`Proxy configured: ${proxyUrl}`);
+  }
 
   const app = await NestFactory.create(AppModule, {
     bodyParser: true,
