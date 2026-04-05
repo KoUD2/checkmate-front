@@ -11,7 +11,7 @@ import { ProxyAgent, Agent, fetch as undiciFetch } from 'undici';
 const PROXY_DOMAINS = ['generativelanguage.googleapis.com'];
 
 async function bootstrap() {
-  const proxyUrl = process.env.HTTPS_PROXY || process.env.HTTP_PROXY;
+  const proxyUrl = process.env.GEMINI_PROXY;
   if (proxyUrl) {
     const proxyAgent = new ProxyAgent(proxyUrl);
     const directAgent = new Agent();
