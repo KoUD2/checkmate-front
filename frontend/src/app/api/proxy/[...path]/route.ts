@@ -8,6 +8,10 @@ async function handler(request: NextRequest, { params }: { params: Promise<{ pat
 
   const headers = new Headers(request.headers);
   headers.delete('host');
+  headers.delete('connection');
+  headers.delete('transfer-encoding');
+  headers.delete('keep-alive');
+  headers.delete('upgrade');
 
   const response = await fetch(targetUrl, {
     method: request.method,
