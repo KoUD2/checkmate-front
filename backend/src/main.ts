@@ -8,7 +8,7 @@ import helmet from 'helmet';
 import { ProxyAgent, Agent, fetch as undiciFetch } from 'undici';
 
 // Domains that must go through proxy (geo-restricted)
-const PROXY_DOMAINS = ['generativelanguage.googleapis.com'];
+const PROXY_DOMAINS = ['generativelanguage.googleapis.com', 'api.openai.com'];
 
 async function bootstrap() {
   const proxyUrl = process.env.GEMINI_PROXY;

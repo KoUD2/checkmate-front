@@ -1,8 +1,5 @@
 import api from '@/shared/utils/api'
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'
-
 const paymentService = {
   async createPayment(amount: number, daysToAdd: number, checksToAdd: number) {
     const res = await api.post<{ data: { paymentId: string; confirmationUrl: string } }>(

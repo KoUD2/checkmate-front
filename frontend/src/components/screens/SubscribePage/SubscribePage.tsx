@@ -11,11 +11,11 @@ type Period = "month" | "year";
 const PLANS = {
   month: [
     { name: "Plus", price: 549, checks: 50, days: 30 },
-    { name: "Pro", price: 990, checks: 200, days: 30 },
+    { name: "Pro", price: 2099, checks: 200, days: 30 },
   ],
   year: [
-    { name: "Plus", price: 5490, checks: 600, days: 365 },
-    { name: "Pro", price: 8900, checks: 2400, days: 365 },
+    { name: "Plus", price: 6499, checks: 600, days: 365 },
+    { name: "Pro", price: 25999, checks: 2400, days: 365 },
   ],
 };
 
