@@ -2,6 +2,7 @@ import {
   Injectable,
   ForbiddenException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { TaskType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -17,9 +18,17 @@ export class TasksService {
   ) {}
 
   async submitTask37(userId: string, dto: CreateTask37Dto) {
+    if (!dto.solution?.trim() && !dto.solutionImageBase64) {
+      throw new BadRequestException('Необходимо ввести текст работы или загрузить фото ответа');
+    }
+
     await this.checkAccess(userId);
 
-    const result = await this.gemini.checkTask37(dto.taskDescription, dto.solution);
+    const result = await this.gemini.checkTask37(
+      dto.taskDescription,
+      dto.solution ?? '',
+      dto.solutionImageBase64,
+    );
 
     const [task] = await this.prisma.$transaction([
       this.prisma.task.create({
@@ -27,7 +36,8 @@ export class TasksService {
           type: TaskType.TASK37,
           userId,
           taskDescription: dto.taskDescription,
-          solution: dto.solution,
+          solution: dto.solution ?? '',
+          solutionImageBase64: dto.solutionImageBase64,
           k1: result.k1,
           k2: result.k2,
           k3: result.k3,
@@ -45,12 +55,17 @@ export class TasksService {
   }
 
   async submitTask38(userId: string, dto: CreateTask38Dto) {
+    if (!dto.solution?.trim() && !dto.solutionImageBase64) {
+      throw new BadRequestException('Необходимо ввести текст работы или загрузить фото ответа');
+    }
+
     await this.checkAccess(userId);
 
     const result = await this.gemini.checkTask38(
       dto.taskDescription,
-      dto.solution,
+      dto.solution ?? '',
       dto.imageBase64,
+      dto.solutionImageBase64,
     );
 
     const [task] = await this.prisma.$transaction([
@@ -59,8 +74,9 @@ export class TasksService {
           type: TaskType.TASK38,
           userId,
           taskDescription: dto.taskDescription,
-          solution: dto.solution,
+          solution: dto.solution ?? '',
           imageBase64: dto.imageBase64,
+          solutionImageBase64: dto.solutionImageBase64,
           k1: result.k1,
           k2: result.k2,
           k3: result.k3,

@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { Task37Result, useTaskCheck } from '@/config/context/TaskCheckContext'
 import api from '@/shared/utils/api'
 import cn from 'classnames'
-import { FC, useEffect, useState } from 'react'
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
 import CheckingLoader from '../../CheckingLoader/CheckingLoader'
 import ReservedField from '../ui/ReservedField/ReservedField'
 import styles from './Task37.module.css'
@@ -33,6 +33,9 @@ const Task37: FC<Props> = ({ onChecked, onReset }) => {
 	const [emailText, setEmailText] = useState(savedForm?.emailText ?? '')
 	const [inlineInput, setInlineInput] = useState(savedForm?.inlineInput ?? '')
 	const [studentWork, setStudentWork] = useState(savedForm?.studentWork ?? '')
+	const [solutionImageBase64, setSolutionImageBase64] = useState<string | undefined>(savedForm?.solutionImageBase64)
+	const [solutionImageFileName, setSolutionImageFileName] = useState(savedForm?.solutionImageFileName ?? '')
+	const solutionFileInputRef = useRef<HTMLInputElement>(null)
 
 	const [errors, setErrors] = useState({ subject: false, emailText: false, inlineInput: false, studentWork: false })
 
@@ -49,19 +52,37 @@ const Task37: FC<Props> = ({ onChecked, onReset }) => {
 	const taskIsChecking = isThisTask && isChecking
 	const taskIsChecked = isThisTask && isChecked && !!ctxResult
 
+	const handleSolutionFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0]
+		if (!file) return
+		setSolutionImageFileName(file.name)
+		const reader = new FileReader()
+		reader.onload = () => {
+			const base64 = (reader.result as string).split(',')[1]
+			setSolutionImageBase64(base64)
+		}
+		reader.readAsDataURL(file)
+	}
+
+	const handleRemoveSolutionImage = () => {
+		setSolutionImageBase64(undefined)
+		setSolutionImageFileName('')
+		if (solutionFileInputRef.current) solutionFileInputRef.current.value = ''
+	}
+
 	const handleCheck = async () => {
-		const hasErrors = !subject.trim() || !emailText.trim() || !inlineInput.trim() || !studentWork.trim()
+		const hasErrors = !subject.trim() || !emailText.trim() || !inlineInput.trim() || (!studentWork.trim() && !solutionImageBase64)
 		if (hasErrors) {
 			setErrors({
 				subject: !subject.trim(),
 				emailText: !emailText.trim(),
 				inlineInput: !inlineInput.trim(),
-				studentWork: !studentWork.trim(),
+				studentWork: !studentWork.trim() && !solutionImageBase64,
 			})
 			return
 		}
 
-		startCheck('37', { kind: 'task37', subject, emailText, inlineInput, studentWork })
+		startCheck('37', { kind: 'task37', subject, emailText, inlineInput, studentWork, solutionImageBase64, solutionImageFileName })
 
 		try {
 			const taskDescription = [
@@ -73,6 +94,7 @@ const Task37: FC<Props> = ({ onChecked, onReset }) => {
 			const response = await api.post('/tasks/37', {
 				taskDescription,
 				solution: studentWork,
+				...(solutionImageBase64 ? { solutionImageBase64 } : {}),
 			})
 
 			const task = response.data?.data?.task
@@ -145,15 +167,42 @@ const Task37: FC<Props> = ({ onChecked, onReset }) => {
 
 			<div className={styles['task37__task-fields']}>
 				<SecondTitle text='Работа ученика' />
+				<div className={styles['task37__file-section']}>
+					<input
+						ref={solutionFileInputRef}
+						type='file'
+						accept='image/*'
+						style={{ display: 'none' }}
+						onChange={handleSolutionFileChange}
+						disabled={taskIsChecked || taskIsChecking}
+					/>
+					<button
+						type='button'
+						className={styles['task37__file-button']}
+						onClick={() => solutionFileInputRef.current?.click()}
+						disabled={taskIsChecked || taskIsChecking}
+					>
+						{solutionImageFileName || 'Загрузить фото работы'}
+					</button>
+					{solutionImageBase64 && !taskIsChecked && !taskIsChecking && (
+						<button
+							type='button'
+							className={styles['task37__file-remove']}
+							onClick={handleRemoveSolutionImage}
+						>
+							✕
+						</button>
+					)}
+				</div>
 				<TextArea
 					className={cn(styles['task37__textarea'], {
 						[styles['task37__textarea_error']]: errors.studentWork,
-						[styles['task37__textarea_active']]: taskIsChecked || taskIsChecking,
+						[styles['task37__textarea_active']]: taskIsChecked || taskIsChecking || !!solutionImageBase64,
 					})}
 					value={studentWork}
 					onChange={value => { setErrors(prev => ({ ...prev, studentWork: false })); setStudentWork(value) }}
-					placeholder='Введите текст работы'
-					readOnly={taskIsChecked || taskIsChecking}
+					placeholder={solutionImageBase64 ? 'Ответ будет прочитан с изображения' : 'Введите текст работы'}
+					readOnly={taskIsChecked || taskIsChecking || !!solutionImageBase64}
 				/>
 			</div>
 

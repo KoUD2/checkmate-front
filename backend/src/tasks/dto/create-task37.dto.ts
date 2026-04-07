@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateTask37Dto {
   @ApiProperty({ description: 'Текст задания (условие)' })
@@ -7,8 +7,13 @@ export class CreateTask37Dto {
   @MinLength(10, { message: 'Условие задания слишком короткое' })
   taskDescription: string;
 
-  @ApiProperty({ description: 'Текст письма / эссе пользователя' })
+  @ApiPropertyOptional({ description: 'Текст письма / эссе пользователя' })
+  @IsOptional()
   @IsString({ message: 'Работа ученика должна быть строкой' })
-  @MinLength(10, { message: 'Работа ученика должна содержать не менее 10 символов' })
-  solution: string;
+  solution?: string;
+
+  @ApiPropertyOptional({ description: 'Фото работы ученика в base64 (без data:image/... prefix)' })
+  @IsOptional()
+  @IsString()
+  solutionImageBase64?: string;
 }

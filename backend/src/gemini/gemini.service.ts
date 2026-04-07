@@ -43,41 +43,47 @@ export class GeminiService {
   async checkTask37(
     taskDescription: string,
     solution: string,
+    solutionImageBase64?: string,
   ): Promise<GeminiTask37Result> {
     const words = solution.match(/\b\w+\b/g) || [];
     let wordCount = words.length;
     let truncated = false;
 
-    if (wordCount < 90) {
-      return {
-        k1: 0,
-        k2: 0,
-        k3: 0,
-        totalScore: 0,
-        feedback: {
-          k1: `Недостаточно слов (${wordCount} < 90). Выставляется 0 баллов.`,
-          k2: "",
-          k3: "",
-        },
-        wordCount,
-        truncated: false,
-      };
+    if (!solutionImageBase64) {
+      if (wordCount < 90) {
+        return {
+          k1: 0,
+          k2: 0,
+          k3: 0,
+          totalScore: 0,
+          feedback: {
+            k1: `Недостаточно слов (${wordCount} < 90). Выставляется 0 баллов.`,
+            k2: "",
+            k3: "",
+          },
+          wordCount,
+          truncated: false,
+        };
+      }
+
+      if (wordCount > 154) {
+        const truncatedWords = words.slice(0, 154);
+        const lastWord = truncatedWords[truncatedWords.length - 1];
+        const lastIdx = solution.lastIndexOf(lastWord, solution.length);
+        solution = solution.substring(0, lastIdx + lastWord.length);
+        wordCount = 154;
+        truncated = true;
+      }
     }
 
-    if (wordCount > 154) {
-      const truncatedWords = words.slice(0, 154);
-      const lastWord = truncatedWords[truncatedWords.length - 1];
-      const lastIdx = solution.lastIndexOf(lastWord, solution.length);
-      solution = solution.substring(0, lastIdx + lastWord.length);
-      wordCount = 154;
-      truncated = true;
-    }
-
-    const userContent = this.wrapUserInput(taskDescription, solution);
+    const userContent = this.wrapUserInput(taskDescription, solution, !!solutionImageBase64);
     const usage = { prompt: 0, completion: 0 };
+    const images = solutionImageBase64 ? [solutionImageBase64] : [];
 
     const prompt1 = fs.readFileSync(path.join(this.promptsDir, 'prompt1.txt'), 'utf-8');
-    const k1Response = await this.callOpenAI(this.securityPreamble + '\n\n' + prompt1, userContent, usage);
+    const k1Response = solutionImageBase64
+      ? await this.callOpenAIWithImage(this.securityPreamble + '\n\n' + prompt1, userContent, images, usage)
+      : await this.callOpenAI(this.securityPreamble + '\n\n' + prompt1, userContent, usage);
     const k1 = this.extractScore(k1Response);
 
     if (k1 === 0) {
@@ -97,8 +103,13 @@ export class GeminiService {
       };
     }
 
-    const k2Response = await this.callOpenAI(this.securityPreamble + '\n\n' + fs.readFileSync(path.join(this.promptsDir, 'prompt2.txt'), 'utf-8'), userContent, usage);
-    const k3Response = await this.callOpenAI(this.securityPreamble + '\n\n' + fs.readFileSync(path.join(this.promptsDir, 'prompt3.txt'), 'utf-8'), userContent, usage);
+    const readPrompt = (name: string) => fs.readFileSync(path.join(this.promptsDir, name), 'utf-8');
+    const k2Response = solutionImageBase64
+      ? await this.callOpenAIWithImage(this.securityPreamble + '\n\n' + readPrompt('prompt2.txt'), userContent, images, usage)
+      : await this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt('prompt2.txt'), userContent, usage);
+    const k3Response = solutionImageBase64
+      ? await this.callOpenAIWithImage(this.securityPreamble + '\n\n' + readPrompt('prompt3.txt'), userContent, images, usage)
+      : await this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt('prompt3.txt'), userContent, usage);
     const k2 = this.extractScore(k2Response);
     const k3 = this.extractScore(k3Response);
 
@@ -123,13 +134,21 @@ export class GeminiService {
     taskDescription: string,
     solution: string,
     imageBase64?: string,
+    solutionImageBase64?: string,
   ): Promise<GeminiTask38Result> {
-    const userContent = this.wrapUserInput(taskDescription, solution);
+    const userContent = this.wrapUserInput(taskDescription, solution, !!solutionImageBase64);
     const usage = { prompt: 0, completion: 0 };
 
-    const prompt38_1 = fs.readFileSync(path.join(this.promptsDir, 'prompt38_1.txt'), 'utf-8');
-    const k1Response = imageBase64
-      ? await this.callOpenAIWithImage(this.securityPreamble + '\n\n' + prompt38_1, userContent, imageBase64, usage)
+    // For k1: include chart image + solution image (if available)
+    const k1Images = [imageBase64, solutionImageBase64].filter(Boolean) as string[];
+    // For k2-k5: only need solution image
+    const solImages = solutionImageBase64 ? [solutionImageBase64] : [];
+
+    const readPrompt = (name: string) => fs.readFileSync(path.join(this.promptsDir, name), 'utf-8');
+
+    const prompt38_1 = readPrompt('prompt38_1.txt');
+    const k1Response = k1Images.length > 0
+      ? await this.callOpenAIWithImage(this.securityPreamble + '\n\n' + prompt38_1, userContent, k1Images, usage)
       : await this.callOpenAI(this.securityPreamble + '\n\n' + prompt38_1, userContent, usage);
     const k1 = this.extractScore(k1Response);
 
@@ -142,11 +161,14 @@ export class GeminiService {
       };
     }
 
-    const readPrompt = (name: string) => fs.readFileSync(path.join(this.promptsDir, name), 'utf-8');
-    const k2Response = await this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt('prompt38_2.txt'), userContent, usage);
-    const k3Response = await this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt('prompt38_3.txt'), userContent, usage);
-    const k4Response = await this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt('prompt38_4.txt'), userContent, usage);
-    const k5Response = await this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt('prompt38_5.txt'), userContent, usage);
+    const callFn = (promptFile: string) => solImages.length > 0
+      ? this.callOpenAIWithImage(this.securityPreamble + '\n\n' + readPrompt(promptFile), userContent, solImages, usage)
+      : this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt(promptFile), userContent, usage);
+
+    const k2Response = await callFn('prompt38_2.txt');
+    const k3Response = await callFn('prompt38_3.txt');
+    const k4Response = await callFn('prompt38_4.txt');
+    const k5Response = await callFn('prompt38_5.txt');
 
     const k2 = this.extractScore(k2Response);
     const k3 = this.extractScore(k3Response);
@@ -170,8 +192,11 @@ export class GeminiService {
       .replace(/<student_answer>/gi, '[student_answer]');
   }
 
-  private wrapUserInput(taskDescription: string, solution: string): string {
-    return `<task_description>\n${this.sanitize(taskDescription)}\n</task_description>\n\n<student_answer>\n${this.sanitize(solution)}\n</student_answer>`;
+  private wrapUserInput(taskDescription: string, solution: string, hasImage = false): string {
+    const answerContent = hasImage && !solution.trim()
+      ? '[Ответ ученика предоставлен в виде изображения]'
+      : this.sanitize(solution);
+    return `<task_description>\n${this.sanitize(taskDescription)}\n</task_description>\n\n<student_answer>\n${answerContent}\n</student_answer>`;
   }
 
   private async callOpenAI(
@@ -205,11 +230,13 @@ export class GeminiService {
   private async callOpenAIWithImage(
     systemPrompt: string,
     userContent: string,
-    imageBase64: string,
+    images: string[],
     usage: { prompt: number; completion: number },
   ): Promise<string> {
-    const mimeType = imageBase64.startsWith("/9j/") ? "image/jpeg" : "image/png";
-    const dataUrl = `data:${mimeType};base64,${imageBase64}`;
+    const imageContents = images.map(img => {
+      const mimeType = img.startsWith("/9j/") ? "image/jpeg" : "image/png";
+      return { type: "image_url" as const, image_url: { url: `data:${mimeType};base64,${img}` } };
+    });
 
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
@@ -223,7 +250,7 @@ export class GeminiService {
               role: "user",
               content: [
                 { type: "text", text: userContent },
-                { type: "image_url", image_url: { url: dataUrl } },
+                ...imageContents,
               ],
             },
           ],

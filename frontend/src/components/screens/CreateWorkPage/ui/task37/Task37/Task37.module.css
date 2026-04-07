@@ -125,6 +125,40 @@
 	width: 14.722vw;
 }
 
+.task37__file-section {
+	display: flex;
+	align-items: center;
+	gap: 0.694vw;
+}
+
+.task37__file-button {
+	padding: 0.556vw 1.389vw;
+	border-radius: 0.694vw;
+	background: var(--background);
+	border: none;
+	font-size: 1.111vw;
+	cursor: pointer;
+}
+
+.task37__file-button:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+.task37__file-remove {
+	padding: 0.278vw 0.556vw;
+	border-radius: 0.694vw;
+	background: transparent;
+	border: none;
+	font-size: 1.111vw;
+	cursor: pointer;
+	color: var(--grey-text);
+}
+
+.task37__file-remove:hover {
+	color: #eb3131;
+}
+
 .task37__input_error,
 .task37__textarea_error,
 .task37__inline-input_error {

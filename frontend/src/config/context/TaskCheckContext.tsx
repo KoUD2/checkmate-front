@@ -32,6 +32,8 @@ export interface Task37FormData {
 	emailText: string
 	inlineInput: string
 	studentWork: string
+	solutionImageBase64?: string
+	solutionImageFileName?: string
 }
 
 export interface Task38FormData {
@@ -42,6 +44,8 @@ export interface Task38FormData {
 	studentWork: string
 	imageBase64?: string
 	imageFileName?: string
+	solutionImageBase64?: string
+	solutionImageFileName?: string
 }
 
 export type TaskFormData = Task37FormData | Task38FormData

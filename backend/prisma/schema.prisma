@@ -40,7 +40,8 @@ model Task {
   userId          String
   taskDescription String
   solution        String
-  imageBase64     String?
+  imageBase64          String?
+  solutionImageBase64  String?
   k1              Int?
   k2              Int?
   k3              Int?

@@ -104,6 +104,7 @@
 .task38__file-section {
 	display: flex;
 	align-items: center;
+	gap: 0.694vw;
 }
 
 .task38__file-button {
@@ -118,6 +119,20 @@
 .task38__file-button:disabled {
 	opacity: 0.6;
 	cursor: default;
+}
+
+.task38__file-remove {
+	padding: 0.278vw 0.556vw;
+	border-radius: 0.694vw;
+	background: transparent;
+	border: none;
+	font-size: 1.111vw;
+	cursor: pointer;
+	color: var(--grey-text);
+}
+
+.task38__file-remove:hover {
+	color: #eb3131;
 }
 
 .task38__results-section {

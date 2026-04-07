@@ -33,6 +33,9 @@ const Task38: FC<Props> = ({ onChecked }) => {
 	const [imageBase64, setImageBase64] = useState<string | undefined>(savedForm?.imageBase64)
 	const [imageFileName, setImageFileName] = useState(savedForm?.imageFileName ?? '')
 	const fileInputRef = useRef<HTMLInputElement>(null)
+	const [solutionImageBase64, setSolutionImageBase64] = useState<string | undefined>(savedForm?.solutionImageBase64)
+	const [solutionImageFileName, setSolutionImageFileName] = useState(savedForm?.solutionImageFileName ?? '')
+	const solutionFileInputRef = useRef<HTMLInputElement>(null)
 
 	const [errors, setErrors] = useState({ topic: false, studentWork: false })
 
@@ -60,10 +63,28 @@ const Task38: FC<Props> = ({ onChecked }) => {
 		reader.readAsDataURL(file)
 	}
 
+	const handleSolutionFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0]
+		if (!file) return
+		setSolutionImageFileName(file.name)
+		const reader = new FileReader()
+		reader.onload = () => {
+			const base64 = (reader.result as string).split(',')[1]
+			setSolutionImageBase64(base64)
+		}
+		reader.readAsDataURL(file)
+	}
+
+	const handleRemoveSolutionImage = () => {
+		setSolutionImageBase64(undefined)
+		setSolutionImageFileName('')
+		if (solutionFileInputRef.current) solutionFileInputRef.current.value = ''
+	}
+
 	const handleCheck = async () => {
-		const hasErrors = !topic.trim() || !studentWork.trim()
+		const hasErrors = !topic.trim() || (!studentWork.trim() && !solutionImageBase64)
 		if (hasErrors) {
-			setErrors({ topic: !topic.trim(), studentWork: !studentWork.trim() })
+			setErrors({ topic: !topic.trim(), studentWork: !studentWork.trim() && !solutionImageBase64 })
 			return
 		}
 
@@ -75,6 +96,8 @@ const Task38: FC<Props> = ({ onChecked }) => {
 			studentWork,
 			imageBase64,
 			imageFileName,
+			solutionImageBase64,
+			solutionImageFileName,
 		})
 
 		try {
@@ -90,6 +113,7 @@ const Task38: FC<Props> = ({ onChecked }) => {
 				taskDescription,
 				solution: studentWork,
 				...(imageBase64 ? { imageBase64 } : {}),
+				...(solutionImageBase64 ? { solutionImageBase64 } : {}),
 			})
 
 			const task = response.data?.data?.task
@@ -212,18 +236,45 @@ const Task38: FC<Props> = ({ onChecked }) => {
 
 			<div className={styles['task38__task-fields']}>
 				<SecondTitle text='Работа ученика' />
+				<div className={styles['task38__file-section']}>
+					<input
+						ref={solutionFileInputRef}
+						type='file'
+						accept='image/*'
+						style={{ display: 'none' }}
+						onChange={handleSolutionFileChange}
+						disabled={taskIsChecked || taskIsChecking}
+					/>
+					<button
+						type='button'
+						className={styles['task38__file-button']}
+						onClick={() => solutionFileInputRef.current?.click()}
+						disabled={taskIsChecked || taskIsChecking}
+					>
+						{solutionImageFileName || 'Загрузить фото ответа'}
+					</button>
+					{solutionImageBase64 && !taskIsChecked && !taskIsChecking && (
+						<button
+							type='button'
+							className={styles['task38__file-remove']}
+							onClick={handleRemoveSolutionImage}
+						>
+							✕
+						</button>
+					)}
+				</div>
 				<TextArea
-					placeholder='Введите текст работы'
+					placeholder={solutionImageBase64 ? 'Ответ будет прочитан с изображения' : 'Введите текст работы'}
 					className={cn(styles['task38__textarea'], {
 						[styles['task38__textarea_error']]: errors.studentWork,
-						[styles['task38__textarea_active']]: taskIsChecked || taskIsChecking,
+						[styles['task38__textarea_active']]: taskIsChecked || taskIsChecking || !!solutionImageBase64,
 					})}
 					value={studentWork}
 					onChange={value => {
 						setErrors(prev => ({ ...prev, studentWork: false }))
 						setStudentWork(value)
 					}}
-					readOnly={taskIsChecked || taskIsChecking}
+					readOnly={taskIsChecked || taskIsChecking || !!solutionImageBase64}
 				/>
 			</div>
 
