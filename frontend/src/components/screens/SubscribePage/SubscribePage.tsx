@@ -2,9 +2,9 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import paymentService from "@/services/payment.service";
-import { FC, useState } from "react";
-import MainTitle from "../../ui/MainTitle/MainTitle";
+import { FC, useEffect, useState } from "react";
 import styles from "./SubscribePage.module.css";
+import SocialConnect from "./ui/SocialConnect/SocialConnect";
 
 type Period = "month" | "year";
 
@@ -27,6 +27,26 @@ const SubscribePage: FC = () => {
   const [promoLoading, setPromoLoading] = useState(false);
   const [promoSuccess, setPromoSuccess] = useState<string | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
+  const [socialMessage, setSocialMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const social = params.get("social");
+    if (social === "success") {
+      setSocialMessage("Соцсеть подключена! Начислено 2 бесплатных проверки.");
+      refreshUser();
+      window.history.replaceState({}, "", "/subscribe");
+    } else if (social === "error") {
+      const reason = params.get("reason");
+      if (reason === "already_used") {
+        setSocialMessage("Этот аккаунт уже привязан к другому пользователю.");
+      } else {
+        setSocialMessage("Не удалось подключить соцсеть. Попробуйте ещё раз.");
+      }
+      window.history.replaceState({}, "", "/subscribe");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleBuy = async (plan: {
     name: string;
@@ -152,6 +172,23 @@ const SubscribePage: FC = () => {
           <div className={styles["promo-error"]}>{promoError}</div>
         )}
       </div>
+
+      <div className={styles.divider} />
+
+      <SocialConnect user={user} onMessage={setSocialMessage} />
+
+      {socialMessage && (
+        <div
+          className={
+            socialMessage.includes("подключена")
+              ? styles["promo-success"]
+              : styles["promo-error"]
+          }
+          style={{ width: "100%", maxWidth: "44vw" }}
+        >
+          {socialMessage}
+        </div>
+      )}
 
       <div className={styles.divider} />
 

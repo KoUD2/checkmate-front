@@ -5,6 +5,7 @@ import {
   Body,
   Req,
   Res,
+  Query,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -14,6 +15,7 @@ import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { TelegramAuthDto } from './dto/telegram-auth.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -93,5 +95,62 @@ export class AuthController {
     await this.authService.logout(userId);
     res.clearCookie(REFRESH_COOKIE);
     return { success: true, message: 'Вы успешно вышли' };
+  }
+
+  // ─── VK OAuth ─────────────────────────────────────────────────────────────
+
+  @Get('vk/init')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Инициация OAuth через ВКонтакте' })
+  async vkInit(@CurrentUser('id') userId: string) {
+    return this.authService.initVkOAuth(userId);
+  }
+
+  @Get('vk/callback')
+  @ApiOperation({ summary: 'Callback OAuth ВКонтакте' })
+  async vkCallback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ) {
+    const redirectUrl = await this.authService.handleVkCallback(code, state);
+    return res.redirect(redirectUrl);
+  }
+
+  // ─── Yandex OAuth ─────────────────────────────────────────────────────────
+
+  @Get('yandex/init')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Инициация OAuth через Яндекс' })
+  async yandexInit(@CurrentUser('id') userId: string) {
+    return this.authService.initYandexOAuth(userId);
+  }
+
+  @Get('yandex/callback')
+  @ApiOperation({ summary: 'Callback OAuth Яндекс' })
+  async yandexCallback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @Res() res: Response,
+  ) {
+    const redirectUrl = await this.authService.handleYandexCallback(code, state);
+    return res.redirect(redirectUrl);
+  }
+
+  // ─── Telegram ─────────────────────────────────────────────────────────────
+
+  @Post('telegram/connect')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Привязка Telegram аккаунта' })
+  async telegramConnect(
+    @CurrentUser('id') userId: string,
+    @Body() dto: TelegramAuthDto,
+  ) {
+    const result = await this.authService.connectTelegram(userId, dto);
+    return { success: true, data: result };
   }
 }

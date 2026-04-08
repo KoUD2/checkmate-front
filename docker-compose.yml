@@ -34,6 +34,13 @@ services:
       YOOKASSA_RETURN_URL: ${YOOKASSA_RETURN_URL}
       GEMINI_PROXY: ${GEMINI_PROXY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      VK_APP_ID: ${VK_APP_ID}
+      VK_APP_SECRET: ${VK_APP_SECRET}
+      VK_REDIRECT_URI: ${VK_REDIRECT_URI}
+      YANDEX_CLIENT_ID: ${YANDEX_CLIENT_ID}
+      YANDEX_CLIENT_SECRET: ${YANDEX_CLIENT_SECRET}
+      YANDEX_REDIRECT_URI: ${YANDEX_REDIRECT_URI}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
     ports:
       - "3001:3001"
 
@@ -42,6 +49,7 @@ services:
       context: ./frontend
       args:
         NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+        NEXT_PUBLIC_TELEGRAM_BOT_NAME: ${NEXT_PUBLIC_TELEGRAM_BOT_NAME}
     restart: unless-stopped
     depends_on:
       - backend
@@ -49,6 +57,7 @@ services:
       NODE_ENV: production
       BACKEND_URL: http://backend:3001
       NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+      NEXT_PUBLIC_TELEGRAM_BOT_NAME: ${NEXT_PUBLIC_TELEGRAM_BOT_NAME}
     ports:
       - "3000:3000"
 

@@ -11,6 +11,10 @@ export interface User {
   lastName: string;
   role: string;
   freeChecksLeft: number;
+  vkId: string | null;
+  telegramId: string | null;
+  yandexId: string | null;
+  socialBonusGranted: boolean;
   subscription?: {
     isActive: boolean;
     expiresAt: string | null;

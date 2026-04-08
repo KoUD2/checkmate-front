@@ -8,17 +8,21 @@ datasource db {
 }
 
 model User {
-  id             String         @id @default(uuid())
-  email          String         @unique
-  passwordHash   String
-  firstName      String
-  lastName       String
-  organization   String?
-  role           Role           @default(USER)
-  isActive       Boolean        @default(true)
-  freeChecksLeft Int            @default(2)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  id                 String         @id @default(uuid())
+  email              String         @unique
+  passwordHash       String
+  firstName          String
+  lastName           String
+  organization       String?
+  role               Role           @default(USER)
+  isActive           Boolean        @default(true)
+  freeChecksLeft     Int            @default(0)
+  vkId               String?        @unique
+  telegramId         String?        @unique
+  yandexId           String?        @unique
+  socialBonusGranted Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 
   tasks         Task[]
   subscription  Subscription?
@@ -135,4 +139,14 @@ model RefreshToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("refresh_tokens")
+}
+
+model OAuthState {
+  id        String   @id @default(uuid())
+  userId    String
+  provider  String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("oauth_states")
 }

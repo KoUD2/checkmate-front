@@ -1,0 +1,75 @@
+.section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.833vw;
+	width: 100%;
+	max-width: 44vw;
+}
+
+.title {
+	font-size: 1.528vw;
+	color: var(--active-text);
+	font-weight: 500;
+}
+
+.subtitle {
+	font-size: 1vw;
+	color: var(--grey-text);
+}
+
+.buttons {
+	display: flex;
+	gap: 0.694vw;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+.btn {
+	padding: 0.764vw 1.667vw;
+	border-radius: 0.694vw;
+	border: none;
+	font-size: 1.111vw;
+	font-family: inherit;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: opacity 0.15s;
+	color: #fff;
+}
+
+.btn:disabled {
+	cursor: default;
+	opacity: 0.7;
+}
+
+.btn_connected {
+	opacity: 0.55;
+	cursor: default;
+}
+
+.btn_vk {
+	background: #0077ff;
+}
+
+.btn_tg {
+	background: #2aabee;
+}
+
+.btn_yandex {
+	background: #fc3f1d;
+}
+
+.btn_vk:hover:not(:disabled),
+.btn_tg:hover:not(:disabled),
+.btn_yandex:hover:not(:disabled) {
+	opacity: 0.88;
+}
+
+.tg_wrapper {
+	display: flex;
+	align-items: center;
+}
+
+.tg_widget {
+	display: flex;
+	align-items: center;
+}
