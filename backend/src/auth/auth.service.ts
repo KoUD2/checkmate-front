@@ -132,13 +132,12 @@ export class AuthService {
     const appId = this.configService.get<string>('VK_APP_ID');
     const redirectUri = this.configService.get<string>('VK_REDIRECT_URI');
     const url =
-      `https://oauth.vk.com/authorize` +
+      `https://id.vk.com/oauth2/auth` +
       `?client_id=${appId}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code` +
-      `&scope=email` +
-      `&state=${state}` +
-      `&v=5.199`;
+      `&scope=vkid.personal_info` +
+      `&state=${state}`;
     return { url };
   }
 
@@ -154,15 +153,34 @@ export class AuthService {
 
     let vkUserId: string;
     try {
-      const tokenRes = await axios.get('https://oauth.vk.com/access_token', {
-        params: {
+      const tokenRes = await axios.post(
+        'https://id.vk.com/oauth2/token',
+        new URLSearchParams({
+          grant_type: 'authorization_code',
           client_id: appId,
           client_secret: appSecret,
           redirect_uri: redirectUri,
           code,
-        },
-      });
-      vkUserId = String(tokenRes.data.user_id);
+        }),
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+      );
+
+      // VK ID can return user_id directly or inside id_token (JWT)
+      if (tokenRes.data.user_id) {
+        vkUserId = String(tokenRes.data.user_id);
+      } else if (tokenRes.data.id_token) {
+        // Decode JWT payload (no verification needed — we trust VK's response)
+        const payload = JSON.parse(
+          Buffer.from(tokenRes.data.id_token.split('.')[1], 'base64url').toString(),
+        );
+        vkUserId = String(payload.sub || payload.user_id);
+      } else {
+        // Fallback: call user info
+        const infoRes = await axios.get('https://id.vk.com/oauth2/user_info', {
+          headers: { Authorization: `Bearer ${tokenRes.data.access_token}` },
+        });
+        vkUserId = String(infoRes.data.user?.user_id ?? infoRes.data.user_id);
+      }
     } catch {
       return `${frontendUrl}/subscribe?social=error&reason=vk`;
     }
