@@ -125,27 +125,20 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  // ─── VK OAuth (VK ID 2.0 + PKCE) ─────────────────────────────────────────
+  // ─── VK OAuth ─────────────────────────────────────────────────────────────
 
   async initVkOAuth(userId: string): Promise<{ url: string }> {
-    // Generate PKCE code_verifier and code_challenge
-    const codeVerifier = crypto.randomBytes(32).toString('base64url');
-    const codeChallenge = crypto
-      .createHash('sha256')
-      .update(codeVerifier)
-      .digest('base64url');
-
-    const state = await this.createOAuthState(userId, 'vk', codeVerifier);
+    const state = await this.createOAuthState(userId, 'vk');
     const appId = this.configService.get<string>('VK_APP_ID');
     const redirectUri = this.configService.get<string>('VK_REDIRECT_URI');
     const url =
-      `https://id.vk.com/oauth2/auth` +
+      `https://oauth.vk.com/authorize` +
       `?client_id=${appId}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code` +
+      `&scope=email` +
       `&state=${state}` +
-      `&code_challenge=${codeChallenge}` +
-      `&code_challenge_method=S256`;
+      `&v=5.199`;
     return { url };
   }
 
@@ -153,7 +146,7 @@ export class AuthService {
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
     const result = await this.consumeOAuthState(state, 'vk');
     if (!result) return `${frontendUrl}/subscribe?social=error&reason=state`;
-    const { userId, codeVerifier } = result;
+    const { userId } = result;
 
     const appId = this.configService.get<string>('VK_APP_ID');
     const appSecret = this.configService.get<string>('VK_APP_SECRET');
@@ -161,27 +154,15 @@ export class AuthService {
 
     let vkUserId: string;
     try {
-      const tokenRes = await axios.post(
-        'https://id.vk.com/oauth2/token',
-        new URLSearchParams({
-          grant_type: 'authorization_code',
+      const tokenRes = await axios.get('https://oauth.vk.com/access_token', {
+        params: {
           client_id: appId,
           client_secret: appSecret,
           redirect_uri: redirectUri,
           code,
-          ...(codeVerifier ? { code_verifier: codeVerifier } : {}),
-        }),
-        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
-      );
-      // VK ID 2.0 returns user info in the token response
-      vkUserId = String(tokenRes.data.user_id || tokenRes.data.sub);
-      if (!vkUserId || vkUserId === 'undefined') {
-        // Fallback: get user info
-        const infoRes = await axios.get('https://id.vk.com/oauth2/user_info', {
-          headers: { Authorization: `Bearer ${tokenRes.data.access_token}` },
-        });
-        vkUserId = String(infoRes.data.user?.user_id || infoRes.data.user_id);
-      }
+        },
+      });
+      vkUserId = String(tokenRes.data.user_id);
     } catch {
       return `${frontendUrl}/subscribe?social=error&reason=vk`;
     }
