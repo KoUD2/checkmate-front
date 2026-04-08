@@ -45,8 +45,9 @@ const SocialConnect: FC<Props> = ({ user, onMessage }) => {
         // Reload to refresh user state
         window.location.reload();
       } catch (err: unknown) {
-        const msg = (err as { response?: { data?: { message?: string } } })
-          ?.response?.data?.message;
+        const data = (err as { response?: { data?: { message?: string; error?: { message?: string } } } })
+          ?.response?.data;
+        const msg = data?.error?.message || data?.message;
         onMessage(msg || "Не удалось подключить Telegram. Попробуйте ещё раз.");
       } finally {
         setTgLoading(false);
