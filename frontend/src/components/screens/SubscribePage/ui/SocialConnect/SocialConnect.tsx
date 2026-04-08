@@ -27,7 +27,6 @@ interface TelegramUser {
 }
 
 const SocialConnect: FC<Props> = ({ user, onMessage }) => {
-  const [vkLoading, setVkLoading] = useState(false);
   const [yandexLoading, setYandexLoading] = useState(false);
   const [tgLoading, setTgLoading] = useState(false);
   const tgContainerRef = useRef<HTMLDivElement>(null);
@@ -74,17 +73,6 @@ const SocialConnect: FC<Props> = ({ user, onMessage }) => {
     };
   }, [onMessage]);
 
-  const handleVk = async () => {
-    setVkLoading(true);
-    try {
-      const res = await api.get<{ url: string }>("/auth/vk/init");
-      window.location.href = res.data.url;
-    } catch {
-      onMessage("Не удалось инициировать подключение ВКонтакте.");
-      setVkLoading(false);
-    }
-  };
-
   const handleYandex = async () => {
     setYandexLoading(true);
     try {
@@ -110,14 +98,6 @@ const SocialConnect: FC<Props> = ({ user, onMessage }) => {
         </div>
       )}
       <div className={styles.buttons}>
-        <button
-          className={`${styles.btn} ${styles.btn_vk} ${user?.vkId ? styles.btn_connected : ""}`}
-          onClick={handleVk}
-          disabled={vkLoading || !!user?.vkId}
-        >
-          {user?.vkId ? "ВКонтакте подключён" : vkLoading ? "Загрузка..." : "ВКонтакте"}
-        </button>
-
         <div className={styles.tg_wrapper}>
           {user?.telegramId ? (
             <button className={`${styles.btn} ${styles.btn_tg} ${styles.btn_connected}`} disabled>
