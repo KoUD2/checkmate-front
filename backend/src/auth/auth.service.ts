@@ -125,27 +125,35 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
-  // ─── VK OAuth ─────────────────────────────────────────────────────────────
+  // ─── VK OAuth (VK ID 2.0 + PKCE) ─────────────────────────────────────────
 
   async initVkOAuth(userId: string): Promise<{ url: string }> {
-    const state = await this.createOAuthState(userId, 'vk');
+    // Generate PKCE code_verifier and code_challenge
+    const codeVerifier = crypto.randomBytes(32).toString('base64url');
+    const codeChallenge = crypto
+      .createHash('sha256')
+      .update(codeVerifier)
+      .digest('base64url');
+
+    const state = await this.createOAuthState(userId, 'vk', codeVerifier);
     const appId = this.configService.get<string>('VK_APP_ID');
     const redirectUri = this.configService.get<string>('VK_REDIRECT_URI');
     const url =
-      `https://oauth.vk.com/authorize` +
+      `https://id.vk.com/oauth2/auth` +
       `?client_id=${appId}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code` +
-      `&scope=email` +
       `&state=${state}` +
-      `&v=5.199`;
+      `&code_challenge=${codeChallenge}` +
+      `&code_challenge_method=S256`;
     return { url };
   }
 
   async handleVkCallback(code: string, state: string): Promise<string> {
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
-    const userId = await this.consumeOAuthState(state, 'vk');
-    if (!userId) return `${frontendUrl}/subscribe?social=error&reason=state`;
+    const result = await this.consumeOAuthState(state, 'vk');
+    if (!result) return `${frontendUrl}/subscribe?social=error&reason=state`;
+    const { userId, codeVerifier } = result;
 
     const appId = this.configService.get<string>('VK_APP_ID');
     const appSecret = this.configService.get<string>('VK_APP_SECRET');
@@ -153,20 +161,31 @@ export class AuthService {
 
     let vkUserId: string;
     try {
-      const tokenRes = await axios.get('https://oauth.vk.com/access_token', {
-        params: {
+      const tokenRes = await axios.post(
+        'https://id.vk.com/oauth2/token',
+        new URLSearchParams({
+          grant_type: 'authorization_code',
           client_id: appId,
           client_secret: appSecret,
           redirect_uri: redirectUri,
           code,
-        },
-      });
-      vkUserId = String(tokenRes.data.user_id);
+          ...(codeVerifier ? { code_verifier: codeVerifier } : {}),
+        }),
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+      );
+      // VK ID 2.0 returns user info in the token response
+      vkUserId = String(tokenRes.data.user_id || tokenRes.data.sub);
+      if (!vkUserId || vkUserId === 'undefined') {
+        // Fallback: get user info
+        const infoRes = await axios.get('https://id.vk.com/oauth2/user_info', {
+          headers: { Authorization: `Bearer ${tokenRes.data.access_token}` },
+        });
+        vkUserId = String(infoRes.data.user?.user_id || infoRes.data.user_id);
+      }
     } catch {
       return `${frontendUrl}/subscribe?social=error&reason=vk`;
     }
 
-    // Check if this VK ID is already linked to another account
     const existing = await this.prisma.user.findUnique({ where: { vkId: vkUserId } });
     if (existing && existing.id !== userId) {
       return `${frontendUrl}/subscribe?social=error&reason=already_used`;
@@ -193,8 +212,9 @@ export class AuthService {
 
   async handleYandexCallback(code: string, state: string): Promise<string> {
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
-    const userId = await this.consumeOAuthState(state, 'yandex');
-    if (!userId) return `${frontendUrl}/subscribe?social=error&reason=state`;
+    const result = await this.consumeOAuthState(state, 'yandex');
+    if (!result) return `${frontendUrl}/subscribe?social=error&reason=state`;
+    const { userId } = result;
 
     const clientId = this.configService.get<string>('YANDEX_CLIENT_ID');
     const clientSecret = this.configService.get<string>('YANDEX_CLIENT_SECRET');
@@ -273,24 +293,26 @@ export class AuthService {
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
-  private async createOAuthState(userId: string, provider: string): Promise<string> {
-    // Clean up expired states
+  private async createOAuthState(userId: string, provider: string, codeVerifier?: string): Promise<string> {
     await this.prisma.oAuthState.deleteMany({
       where: { expiresAt: { lt: new Date() } },
     });
 
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 min
     const state = await this.prisma.oAuthState.create({
-      data: { id: uuidv4(), userId, provider, expiresAt },
+      data: { id: uuidv4(), userId, provider, codeVerifier, expiresAt },
     });
     return state.id;
   }
 
-  private async consumeOAuthState(stateId: string, provider: string): Promise<string | null> {
+  private async consumeOAuthState(
+    stateId: string,
+    provider: string,
+  ): Promise<{ userId: string; codeVerifier?: string } | null> {
     const state = await this.prisma.oAuthState.findUnique({ where: { id: stateId } });
     if (!state || state.provider !== provider || new Date() > state.expiresAt) return null;
     await this.prisma.oAuthState.delete({ where: { id: stateId } });
-    return state.userId;
+    return { userId: state.userId, codeVerifier: state.codeVerifier ?? undefined };
   }
 
   private async linkSocialAndGrantBonus(

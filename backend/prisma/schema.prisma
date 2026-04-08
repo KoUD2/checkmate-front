@@ -142,11 +142,12 @@ model RefreshToken {
 }
 
 model OAuthState {
-  id        String   @id @default(uuid())
-  userId    String
-  provider  String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  id           String   @id @default(uuid())
+  userId       String
+  provider     String
+  codeVerifier String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
 
   @@map("oauth_states")
 }
