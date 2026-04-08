@@ -69,7 +69,24 @@
 	align-items: center;
 }
 
-.tg_widget {
+.tg_overlay_wrapper {
+	position: relative;
+	display: inline-flex;
+}
+
+.tg_overlay_wrapper .btn {
+	position: relative;
+	z-index: 1;
+	pointer-events: none;
+}
+
+.tg_hidden {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	opacity: 0;
+	overflow: hidden;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 }

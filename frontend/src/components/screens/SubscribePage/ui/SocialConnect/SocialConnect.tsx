@@ -103,12 +103,13 @@ const SocialConnect: FC<Props> = ({ user, onMessage }) => {
             <button className={`${styles.btn} ${styles.btn_tg} ${styles.btn_connected}`} disabled>
               Telegram подключён
             </button>
-          ) : tgLoading ? (
-            <button className={`${styles.btn} ${styles.btn_tg}`} disabled>
-              Загрузка...
-            </button>
           ) : (
-            <div ref={tgContainerRef} className={styles.tg_widget} />
+            <div className={styles.tg_overlay_wrapper}>
+              <button className={`${styles.btn} ${styles.btn_tg}`} disabled={tgLoading}>
+                {tgLoading ? "Загрузка..." : "Telegram"}
+              </button>
+              <div ref={tgContainerRef} className={styles.tg_hidden} />
+            </div>
           )}
         </div>
 
