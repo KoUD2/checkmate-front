@@ -210,6 +210,18 @@ export class GeminiService {
       base64Data = audioBase64.split(',')[1];
     }
 
+    // Normalize MIME type to what Whisper actually accepts
+    const MIME_MAP: Record<string, string> = {
+      'audio/x-m4a': 'audio/mp4',
+      'audio/m4a': 'audio/mp4',
+      'audio/mp3': 'audio/mpeg',
+      'audio/x-wav': 'audio/wav',
+      'audio/wave': 'audio/wav',
+      'video/mp4': 'audio/mp4',
+      'video/webm': 'audio/webm',
+    };
+    const normalizedMime = MIME_MAP[mimeType] ?? mimeType;
+
     // Use original filename extension if provided (most reliable for Whisper)
     if (audioFileName) {
       const dotIdx = audioFileName.lastIndexOf('.');
@@ -217,11 +229,11 @@ export class GeminiService {
         filename = `recording${audioFileName.slice(dotIdx)}`;
       }
     } else {
-      const ext = mimeType.split('/')[1]?.split(';')[0] || 'webm';
+      const ext = normalizedMime.split('/')[1]?.split(';')[0] || 'webm';
       filename = `recording.${ext}`;
     }
 
-    console.log(`[Whisper] sending file: ${filename}, mimeType: ${mimeType}`);
+    console.log(`[Whisper] sending file: ${filename}, mimeType: ${normalizedMime}`);
 
     const audioBuffer = Buffer.from(base64Data, 'base64');
 
@@ -233,7 +245,7 @@ export class GeminiService {
       const dispatcher = proxyUrl ? new ProxyAgent(proxyUrl) : new Agent();
 
       const form = new UndiciFormData();
-      const blob = new Blob([audioBuffer], { type: mimeType });
+      const blob = new Blob([audioBuffer], { type: normalizedMime });
       form.append('file', blob, filename);
       form.append('model', 'whisper-1');
       form.append('language', 'en');
