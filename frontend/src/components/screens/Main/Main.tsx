@@ -12,7 +12,7 @@ import styles from './Main.module.css'
 
 interface TaskItem {
 	id: string
-	type: 'TASK37' | 'TASK38'
+	type: 'TASK37' | 'TASK38' | 'TASK39'
 	solution: string
 	totalScore: number | null
 	createdAt: string
@@ -68,7 +68,7 @@ const Main: FC = () => {
 	}
 
 	const taskTitle = (type: TaskItem['type']) =>
-		type === 'TASK37' ? 'Задание 37' : 'Задание 38'
+		type === 'TASK37' ? 'Задание 37' : type === 'TASK39' ? 'Задание 39' : 'Задание 38'
 
 	return (
 		<div className={styles['main']}>
