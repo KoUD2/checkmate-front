@@ -1,8 +1,7 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import OpenAI from "openai";
-import axios from "axios";
-import * as FormData from "form-data";
+import { ProxyAgent, Agent, fetch as undiciFetch } from "undici";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -209,35 +208,30 @@ export class GeminiService {
       const apiKey = this.configService.get<string>('OPENAI_API_KEY');
       const proxyUrl = this.configService.get<string>('GEMINI_PROXY');
 
-      const form = new FormData();
-      form.append('file', audioBuffer, { filename: 'recording.webm', contentType: 'audio/webm' });
+      const dispatcher = proxyUrl ? new ProxyAgent(proxyUrl) : new Agent();
+
+      const form = new (globalThis as any).FormData();
+      const blob = new Blob([audioBuffer], { type: 'audio/webm' });
+      form.append('file', blob, 'recording.webm');
       form.append('model', 'whisper-1');
       form.append('language', 'en');
 
-      const axiosConfig: any = {
-        headers: {
-          ...form.getHeaders(),
-          Authorization: `Bearer ${apiKey}`,
-        },
-      };
-      if (proxyUrl) {
-        const url = new URL(proxyUrl);
-        axiosConfig.proxy = {
-          protocol: url.protocol.replace(':', ''),
-          host: url.hostname,
-          port: parseInt(url.port, 10),
-          ...(url.username ? { auth: { username: url.username, password: url.password } } : {}),
-        };
+      const res = await undiciFetch('https://api.openai.com/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: form,
+        dispatcher,
+      } as any);
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Whisper API error ${res.status}: ${errText}`);
       }
 
-      const res = await axios.post(
-        'https://api.openai.com/v1/audio/transcriptions',
-        form,
-        axiosConfig,
-      );
-      transcription = res.data?.text ?? '';
+      const data = await res.json() as any;
+      transcription = data.text ?? '';
     } catch (err) {
-      console.error('[Whisper] transcription failed:', err?.response?.data ?? err);
+      console.error('[Whisper] transcription failed:', err);
       throw new InternalServerErrorException('Ошибка транскрипции аудио. Попробуйте позже.');
     }
 
