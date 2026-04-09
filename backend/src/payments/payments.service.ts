@@ -1,7 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+import { ReferralsService } from '../referrals/referrals.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentStatus } from '@prisma/client';
 import axios from 'axios';
@@ -11,12 +12,14 @@ const YOOKASSA_API = 'https://api.yookassa.ru/v3';
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger = new Logger(PaymentsService.name);
   private shopId: string;
   private secretKey: string;
 
   constructor(
     private prisma: PrismaService,
     private subscriptionsService: SubscriptionsService,
+    private referralsService: ReferralsService,
     private configService: ConfigService,
   ) {
     this.shopId = this.configService.get<string>('YOOKASSA_SHOP_ID') || '';
@@ -140,6 +143,9 @@ export class PaymentsService {
         where: { id: payment.userId },
         data: { freeChecksLeft: { increment: payment.checksToAdd } },
       });
+      this.referralsService.processReferralBonus(payment.userId).catch((err) =>
+        this.logger.error(`Referral bonus error for user ${payment.userId}: ${err?.message}`),
+      );
       return { status: 'succeeded', alreadyProcessed: false };
     }
 
@@ -175,6 +181,9 @@ export class PaymentsService {
         where: { id: payment.userId },
         data: { freeChecksLeft: { increment: payment.checksToAdd } },
       });
+      this.referralsService.processReferralBonus(payment.userId).catch((err) =>
+        this.logger.error(`Referral bonus error for user ${payment.userId}: ${err?.message}`),
+      );
     }
 
     if (event === 'payment.canceled') {

@@ -29,7 +29,8 @@ interface AuthContextType {
     email: string,
     firstName: string,
     lastName: string,
-    password: string
+    password: string,
+    referredByCode?: string,
   ) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -125,12 +126,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     email: string,
     firstName: string,
     lastName: string,
-    password: string
+    password: string,
+    referredByCode?: string,
   ) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await authService.signup(email, firstName, lastName, password);
+      const data = await authService.signup(email, firstName, lastName, password, undefined, referredByCode);
       if (data.user) setUser(data.user);
       router.push("/");
     } catch (err: unknown) {

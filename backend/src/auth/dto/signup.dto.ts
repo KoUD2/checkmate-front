@@ -35,4 +35,10 @@ export class SignupDto {
   @IsString()
   @MaxLength(200)
   organization?: string;
+
+  @ApiPropertyOptional({ example: 'abc12345' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  referredByCode?: string;
 }

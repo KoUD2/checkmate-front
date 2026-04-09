@@ -1,0 +1,154 @@
+.page {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.944vw;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2.083vw;
+  width: 44vw;
+}
+
+.title {
+  font-size: 2.083vw;
+  font-weight: 600;
+  color: var(--active-text);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 1.111vw;
+  color: var(--grey-text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Section ── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.833vw;
+}
+
+.section-title {
+  font-size: 1.528vw;
+  font-weight: 500;
+  color: var(--active-text);
+}
+
+.placeholder {
+  font-size: 1.111vw;
+  color: var(--grey-text);
+}
+
+/* ── Link row ── */
+.link-row {
+  display: flex;
+  gap: 0.694vw;
+}
+
+.link-input {
+  flex: 1;
+  padding: 0.764vw 1.111vw;
+  border-radius: 0.694vw;
+  border: none;
+  background: var(--background);
+  font-size: 1.111vw;
+  font-family: inherit;
+  outline: none;
+  color: var(--active-text);
+}
+
+.copy-button {
+  padding: 0.764vw 1.667vw;
+  border-radius: 0.694vw;
+  border: none;
+  background: var(--active);
+  color: var(--light-color);
+  font-size: 1.111vw;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.copy-button:hover {
+  opacity: 0.9;
+}
+
+/* ── Stats ── */
+.stats {
+  display: flex;
+  gap: 1.389vw;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.278vw;
+  padding: 1.389vw 1.944vw;
+  background: var(--background);
+  border-radius: 1.111vw;
+  min-width: 8vw;
+}
+
+.stat__value {
+  font-size: 2.778vw;
+  font-weight: 700;
+  color: var(--active-text);
+  line-height: 1;
+}
+
+.stat__label {
+  font-size: 0.972vw;
+  color: var(--grey-text);
+}
+
+/* ── Milestones ── */
+.milestones {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.694vw;
+}
+
+.milestone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.417vw;
+  padding: 1.111vw 1.389vw;
+  background: var(--background);
+  border-radius: 1.111vw;
+  position: relative;
+  opacity: 0.6;
+}
+
+.milestone_current {
+  opacity: 1;
+  outline: 2px solid var(--active);
+}
+
+.milestone_reached {
+  opacity: 1;
+}
+
+.milestone__count {
+  font-size: 1.111vw;
+  font-weight: 500;
+  color: var(--active-text);
+}
+
+.milestone__bonus {
+  font-size: 1.25vw;
+  font-weight: 700;
+  color: var(--active);
+}
+
+.milestone__check {
+  position: absolute;
+  top: 0.556vw;
+  right: 0.694vw;
+  font-size: 1.111vw;
+  color: #4caf50;
+}

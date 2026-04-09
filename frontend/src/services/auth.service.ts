@@ -4,12 +4,13 @@ class AuthService {
     firstName: string,
     lastName: string,
     password: string,
-    organization?: string
+    organization?: string,
+    referredByCode?: string,
   ) {
     const response = await fetch("/api-auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, firstName, lastName, password, organization }),
+      body: JSON.stringify({ email, firstName, lastName, password, organization, referredByCode }),
     });
 
     const data = await response.json();

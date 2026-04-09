@@ -33,6 +33,16 @@ export class AuthService {
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
+    const referralCode = crypto.randomBytes(5).toString('hex');
+
+    // Validate referredByCode if provided
+    let referredByCode: string | undefined;
+    if (dto.referredByCode) {
+      const referrer = await this.prisma.user.findUnique({
+        where: { referralCode: dto.referredByCode },
+      });
+      if (referrer) referredByCode = dto.referredByCode;
+    }
 
     const user = await this.prisma.user.create({
       data: {
@@ -41,6 +51,8 @@ export class AuthService {
         firstName: dto.firstName,
         lastName: dto.lastName,
         organization: dto.organization,
+        referralCode,
+        referredByCode,
       },
     });
 

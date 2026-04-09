@@ -9,6 +9,7 @@ import { GeminiModule } from './gemini/gemini.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
+import { ReferralsModule } from './referrals/referrals.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AdminModule } from './admin/admin.module';
     SubscriptionsModule,
     PaymentsModule,
     AdminModule,
+    ReferralsModule,
   ],
 })
 export class AppModule {}

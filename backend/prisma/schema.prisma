@@ -21,16 +21,33 @@ model User {
   telegramId         String?        @unique
   yandexId           String?        @unique
   socialBonusGranted Boolean        @default(false)
+  referralCode       String?        @unique
+  referredByCode     String?
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 
-  tasks         Task[]
-  subscription  Subscription?
-  refreshTokens RefreshToken[]
-  promoUsages   PromoUsage[]
-  payments      Payment[]
+  tasks           Task[]
+  subscription    Subscription?
+  refreshTokens   RefreshToken[]
+  promoUsages     PromoUsage[]
+  payments        Payment[]
+  referralBonuses ReferralBonus[] @relation("ReferrerBonuses")
+  referredBonus   ReferralBonus?  @relation("RefereeBonuses")
 
   @@map("users")
+}
+
+model ReferralBonus {
+  id            String   @id @default(cuid())
+  referrerId    String
+  refereeId     String   @unique
+  checksAwarded Int
+  createdAt     DateTime @default(now())
+
+  referrer User @relation("ReferrerBonuses", fields: [referrerId], references: [id], onDelete: Cascade)
+  referee  User @relation("RefereeBonuses", fields: [refereeId], references: [id], onDelete: Cascade)
+
+  @@map("referral_bonuses")
 }
 
 enum Role {

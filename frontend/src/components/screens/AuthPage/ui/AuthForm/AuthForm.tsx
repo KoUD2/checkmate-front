@@ -3,12 +3,13 @@
 import ActiveButton from '@/components/ui/ActiveButton/ActiveButton'
 import { useAuth } from '@/hooks/useAuth'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { ChangeEvent, FC, FormEvent, useState } from 'react'
 import styles from './AuthForm.module.css'
 
 const AuthForm: FC = () => {
 	const path = usePathname()
+	const searchParams = useSearchParams()
 	const { login, signup, loading, error } = useAuth()
 	const isRegister = path === '/register'
 
@@ -35,7 +36,8 @@ const AuthForm: FC = () => {
 					setFormError('Все поля обязательны для заполнения')
 					return
 				}
-				await signup(formData.email, formData.firstName, formData.lastName, formData.password)
+				const refCode = searchParams.get('ref') ?? undefined
+				await signup(formData.email, formData.firstName, formData.lastName, formData.password, refCode)
 			} else {
 				if (!formData.email || !formData.password) {
 					setFormError('Email и пароль обязательны')
