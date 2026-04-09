@@ -30,16 +30,6 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   const checksLabel = () => {
     if (!user) return null;
-    if (user.subscription?.isActive && user.subscription.expiresAt) {
-      const date = new Date(user.subscription.expiresAt).toLocaleDateString(
-        "ru-RU",
-        {
-          day: "2-digit",
-          month: "2-digit",
-        },
-      );
-      return `подписка до ${date}`;
-    }
     return pluralChecks(user.freeChecksLeft);
   };
 
