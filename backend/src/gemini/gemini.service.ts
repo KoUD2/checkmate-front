@@ -4,6 +4,11 @@ import OpenAI from "openai";
 import { ProxyAgent, Agent, fetch as undiciFetch, FormData as UndiciFormData } from "undici";
 import * as fs from "fs";
 import * as path from "path";
+import { execFile } from "child_process";
+import { promisify } from "util";
+import * as os from "os";
+
+const execFileAsync = promisify(execFile);
 
 export interface GeminiTask37Result {
   k1: number;
@@ -233,8 +238,26 @@ export class GeminiService {
       filename = `recording.${ext}`;
     }
 
-    const audioBuffer = Buffer.from(base64Data, 'base64');
-    console.log(`[Whisper] sending file: ${filename}, mimeType: ${normalizedMime}, bufferBytes: ${audioBuffer.length}, header: ${audioBuffer.slice(0, 16).toString('hex')}`);
+    let audioBuffer = Buffer.from(base64Data, 'base64');
+    const brand = audioBuffer.slice(8, 12).toString('ascii');
+    console.log(`[Whisper] sending file: ${filename}, mimeType: ${normalizedMime}, bufferBytes: ${audioBuffer.length}, brand: ${brand}`);
+
+    // Convert 3GPP files (iPhone voice memos) to wav via ffmpeg
+    if (brand.startsWith('3gp') || brand === 'isom' && normalizedMime !== 'audio/webm') {
+      try {
+        const tmpIn = path.join(os.tmpdir(), `audio_in_${Date.now()}`);
+        const tmpOut = path.join(os.tmpdir(), `audio_out_${Date.now()}.wav`);
+        fs.writeFileSync(tmpIn, audioBuffer);
+        await execFileAsync('ffmpeg', ['-y', '-i', tmpIn, '-ar', '16000', '-ac', '1', tmpOut]);
+        audioBuffer = fs.readFileSync(tmpOut);
+        fs.unlinkSync(tmpIn);
+        fs.unlinkSync(tmpOut);
+        filename = 'recording.wav';
+        console.log(`[Whisper] converted to wav, newSize: ${audioBuffer.length}`);
+      } catch (convErr) {
+        console.error('[Whisper] ffmpeg conversion failed:', convErr);
+      }
+    }
 
     let transcription = '';
     try {
