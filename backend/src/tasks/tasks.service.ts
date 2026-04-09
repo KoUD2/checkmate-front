@@ -99,7 +99,7 @@ export class TasksService {
   async submitTask39(userId: string, dto: CreateTask39Dto) {
     await this.checkAccess(userId);
 
-    const result = await this.gemini.checkTask39(dto.taskText, dto.audioBase64);
+    const result = await this.gemini.checkTask39(dto.taskText, dto.audioBase64, dto.audioFileName);
 
     const [task] = await this.prisma.$transaction([
       this.prisma.task.create({

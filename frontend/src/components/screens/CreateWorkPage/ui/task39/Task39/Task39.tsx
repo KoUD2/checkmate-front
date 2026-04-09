@@ -176,7 +176,7 @@ const Task39: FC<Props> = ({ onChecked }) => {
 			startCheck('39', { kind: 'task39', taskText: currentTaskText })
 			setPhase('done')
 			try {
-				const response = await api.post('/tasks/39', { taskText: currentTaskText, audioBase64: base64 })
+				const response = await api.post('/tasks/39', { taskText: currentTaskText, audioBase64: base64, audioFileName: uploadedFile?.name })
 				const task = response.data?.data?.task
 				if (task) {
 					completeCheck({

@@ -195,8 +195,8 @@ export class GeminiService {
   async checkTask39(
     taskText: string,
     audioBase64: string,
+    audioFileName?: string,
   ): Promise<GeminiTask39Result> {
-    // Strip data URI prefix if present
     let mimeType = 'audio/webm';
     let filename = 'recording.webm';
     let base64Data = audioBase64;
@@ -206,11 +206,22 @@ export class GeminiService {
       const match = prefix.match(/data:([^;]+)/);
       if (match) {
         mimeType = match[1];
-        const ext = mimeType.split('/')[1]?.split(';')[0] || 'webm';
-        filename = `recording.${ext}`;
       }
       base64Data = audioBase64.split(',')[1];
     }
+
+    // Use original filename extension if provided (most reliable for Whisper)
+    if (audioFileName) {
+      const dotIdx = audioFileName.lastIndexOf('.');
+      if (dotIdx !== -1) {
+        filename = `recording${audioFileName.slice(dotIdx)}`;
+      }
+    } else {
+      const ext = mimeType.split('/')[1]?.split(';')[0] || 'webm';
+      filename = `recording.${ext}`;
+    }
+
+    console.log(`[Whisper] sending file: ${filename}, mimeType: ${mimeType}`);
 
     const audioBuffer = Buffer.from(base64Data, 'base64');
 
