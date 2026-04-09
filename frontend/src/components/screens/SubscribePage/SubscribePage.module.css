@@ -1,9 +1,15 @@
 .page {
 	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 2.083vw;
+	justify-content: center;
 	margin-top: 1.944vw;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2.083vw;
+	width: 66vw;
 }
 
 /* ── Tabs ── */
@@ -34,10 +40,9 @@
 /* ── Plan cards ── */
 .plans {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 1fr 1fr 1fr;
 	gap: 1.389vw;
 	width: 100%;
-	max-width: 44vw;
 }
 
 .card {

@@ -34,19 +34,21 @@ export class PaymentsService {
 
     const userEmail = await this.getUserEmail(userId);
     const idempotenceKey = uuidv4();
+    const days = dto.daysToAdd ?? 0;
+    const description = `Пакет проверок CheckMate: ${dto.checksToAdd} проверок`;
 
     // paymentId будет добавлен после создания платежа в YooKassa
     const payload = {
       amount: { value: dto.amount.toFixed(2), currency: 'RUB' },
       confirmation: { type: 'redirect', return_url: baseReturnUrl },
-      description: `Подписка CheckMate на ${dto.daysToAdd} дней`,
-      metadata: { userId, daysToAdd: String(dto.daysToAdd), checksToAdd: String(dto.checksToAdd) },
+      description,
+      metadata: { userId, daysToAdd: String(days), checksToAdd: String(dto.checksToAdd) },
       capture: true,
       receipt: {
         customer: { email: userEmail },
         items: [
           {
-            description: `Подписка CheckMate на ${dto.daysToAdd} дней`,
+            description,
             quantity: '1.000',
             amount: { value: dto.amount.toFixed(2), currency: 'RUB' },
             vat_code: 1,
@@ -80,7 +82,7 @@ export class PaymentsService {
         yookassaId: payment.id,
         status: PaymentStatus.PENDING,
         amount: dto.amount,
-        daysToAdd: dto.daysToAdd,
+        daysToAdd: days,
         checksToAdd: dto.checksToAdd,
       },
     });
@@ -131,7 +133,9 @@ export class PaymentsService {
         where: { yookassaId },
         data: { status: PaymentStatus.SUCCEEDED },
       });
-      await this.subscriptionsService.addDaysToSubscription(payment.userId, payment.daysToAdd);
+      if (payment.daysToAdd > 0) {
+        await this.subscriptionsService.addDaysToSubscription(payment.userId, payment.daysToAdd);
+      }
       await this.prisma.user.update({
         where: { id: payment.userId },
         data: { freeChecksLeft: { increment: payment.checksToAdd } },
@@ -164,7 +168,9 @@ export class PaymentsService {
         where: { yookassaId },
         data: { status: PaymentStatus.SUCCEEDED },
       });
-      await this.subscriptionsService.addDaysToSubscription(payment.userId, payment.daysToAdd);
+      if (payment.daysToAdd > 0) {
+        await this.subscriptionsService.addDaysToSubscription(payment.userId, payment.daysToAdd);
+      }
       await this.prisma.user.update({
         where: { id: payment.userId },
         data: { freeChecksLeft: { increment: payment.checksToAdd } },

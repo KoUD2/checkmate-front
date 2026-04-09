@@ -6,22 +6,16 @@ import { FC, useEffect, useState } from "react";
 import styles from "./SubscribePage.module.css";
 import SocialConnect from "./ui/SocialConnect/SocialConnect";
 
-type Period = "month" | "year";
-
-const PLANS = {
-  month: [
-    { name: "Plus", price: 549, checks: 50, days: 30 },
-    { name: "Pro", price: 2099, checks: 200, days: 30 },
-  ],
-  year: [
-    { name: "Plus", price: 6499, checks: 600, days: 365 },
-    { name: "Pro", price: 25999, checks: 2400, days: 365 },
-  ],
-};
+const PLANS = [
+  { name: "Lite", price: 149, checks: 10 },
+  { name: "Plus", price: 549, checks: 50 },
+  { name: "Pro", price: 1449, checks: 200 },
+  { name: "Ultra", price: 3990, checks: 600 },
+  { name: "Mega", price: 14490, checks: 2400 },
+];
 
 const SubscribePage: FC = () => {
   const { user, refreshUser } = useAuth();
-  const [period, setPeriod] = useState<Period>("month");
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [promoCode, setPromoCode] = useState("");
   const [promoLoading, setPromoLoading] = useState(false);
@@ -48,18 +42,11 @@ const SubscribePage: FC = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleBuy = async (plan: {
-    name: string;
-    price: number;
-    checks: number;
-    days: number;
-  }) => {
-    const key = `${plan.name}-${period}`;
-    setLoadingPlan(key);
+  const handleBuy = async (plan: { name: string; price: number; checks: number }) => {
+    setLoadingPlan(plan.name);
     try {
       const { confirmationUrl } = await paymentService.createPayment(
         plan.price,
-        plan.days,
         plan.checks,
       );
       window.open(confirmationUrl, "_blank");
@@ -89,56 +76,31 @@ const SubscribePage: FC = () => {
     }
   };
 
-  const plans = PLANS[period];
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return "—";
-    return new Date(dateStr).toLocaleDateString("ru-RU");
-  };
-
   return (
     <div className={styles.page}>
-      <div className={styles.tabs}>
-        <button
-          className={`${styles.tab} ${period === "month" ? styles.tab_active : ""}`}
-          onClick={() => setPeriod("month")}
-        >
-          Месяц
-        </button>
-        <button
-          className={`${styles.tab} ${period === "year" ? styles.tab_active : ""}`}
-          onClick={() => setPeriod("year")}
-        >
-          Год
-        </button>
-      </div>
-
+      <div className={styles.container}>
       <div className={styles.plans}>
-        {plans.map((plan) => {
-          const key = `${plan.name}-${period}`;
+        {PLANS.map((plan) => {
           const isPro = plan.name === "Pro";
           return (
             <div
-              key={key}
+              key={plan.name}
               className={`${styles.card} ${isPro ? styles.card_pro : ""}`}
             >
               <div className={styles.card__name}>{plan.name}</div>
               <div className={styles["card__price-row"]}>
                 <span className={styles.card__price}>
-                  {plan.price.toLocaleString("ru-RU")}
+                  {String(plan.price).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0")}
                 </span>
                 <span className={styles.card__currency}>₽</span>
-                <span className={styles.card__period}>
-                  / {period === "month" ? "мес" : "год"}
-                </span>
               </div>
               <div className={styles.card__checks}>{plan.checks} проверок</div>
               <button
                 className={styles.card__button}
                 onClick={() => handleBuy(plan)}
-                disabled={loadingPlan === key}
+                disabled={loadingPlan === plan.name}
               >
-                {loadingPlan === key ? "Загрузка..." : "Оформить"}
+                {loadingPlan === plan.name ? "Загрузка..." : "Оформить"}
               </button>
             </div>
           );
@@ -198,14 +160,7 @@ const SubscribePage: FC = () => {
           {user?.freeChecksLeft ?? 0}
         </span>
       </div>
-      {user?.subscription?.isActive && (
-        <div className={styles.status}>
-          Подписка активна до:{" "}
-          <span className={styles.status__value}>
-            {formatDate(user.subscription.expiresAt ?? null)}
-          </span>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

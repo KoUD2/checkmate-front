@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsPositive, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNumber, IsOptional, IsPositive, Min } from 'class-validator';
 
 export class CreatePaymentDto {
   @ApiProperty({ example: 299, description: 'Сумма в рублях' })
@@ -7,10 +7,11 @@ export class CreatePaymentDto {
   @IsPositive()
   amount: number;
 
-  @ApiProperty({ example: 30, description: 'Количество дней подписки' })
+  @ApiPropertyOptional({ example: 0, description: 'Количество дней подписки (0 = бессрочный пакет)' })
+  @IsOptional()
   @IsNumber()
-  @Min(1)
-  daysToAdd: number;
+  @Min(0)
+  daysToAdd?: number;
 
   @ApiProperty({ example: 50, description: 'Количество проверок' })
   @IsNumber()
