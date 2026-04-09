@@ -30,6 +30,7 @@ const Task39: FC<Props> = ({ onChecked }) => {
 	const isThisTask = taskType === '39' || taskType === null
 
 	const [taskText, setTaskText] = useState('')
+	const taskTextRef = useRef('')
 	const [textError, setTextError] = useState(false)
 	const [phase, setPhase] = useState<Phase>('input')
 	const [secondsLeft, setSecondsLeft] = useState(PREP_SECONDS)
@@ -75,6 +76,7 @@ const Task39: FC<Props> = ({ onChecked }) => {
 	useEffect(() => () => stopTimer(), [stopTimer])
 
 	const handleStartPreparation = () => {
+		taskTextRef.current = taskText
 		if (!taskText.trim()) {
 			setTextError(true)
 			return
@@ -119,13 +121,14 @@ const Task39: FC<Props> = ({ onChecked }) => {
 			reader.onload = async () => {
 				const dataUrl = reader.result as string
 				const base64 = dataUrl.split(',')[1]
+				const currentTaskText = taskTextRef.current
 
-				startCheck('39', { kind: 'task39', taskText })
+				startCheck('39', { kind: 'task39', taskText: currentTaskText })
 				setPhase('done')
 
 				try {
 					const response = await api.post('/tasks/39', {
-						taskText,
+						taskText: currentTaskText,
 						audioBase64: base64,
 					})
 					const task = response.data?.data?.task
@@ -153,7 +156,7 @@ const Task39: FC<Props> = ({ onChecked }) => {
 
 		recorder.stop()
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [stopTimer, startCheck, completeCheck, failCheck, onChecked, refreshUser, taskText])
+	}, [stopTimer, startCheck, completeCheck, failCheck, onChecked, refreshUser])
 
 	const formatTime = (s: number) => {
 		const m = Math.floor(s / 60)
