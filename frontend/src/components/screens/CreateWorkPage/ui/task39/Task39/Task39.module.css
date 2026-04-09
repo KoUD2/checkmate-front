@@ -151,3 +151,64 @@
 .task39__textarea_error::placeholder {
 	color: #eb3131;
 }
+
+.task39__mode-tabs {
+	display: flex;
+	gap: 0.556vw;
+}
+
+.task39__mode-tab {
+	padding: 0.556vw 1.389vw;
+	border-radius: 0.694vw;
+	border: 0.139vw solid var(--border, #e0e0e0);
+	background: transparent;
+	font-size: 1.111vw;
+	font-weight: 500;
+	color: var(--grey-text);
+	cursor: pointer;
+	transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.task39__mode-tab:hover {
+	border-color: var(--active);
+	color: var(--active);
+}
+
+.task39__mode-tab_active {
+	background: var(--active);
+	border-color: var(--active);
+	color: #fff;
+}
+
+.task39__upload-area {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.task39__file-button {
+	align-self: flex-start;
+	padding: 0.694vw 1.667vw;
+	border-radius: 0.694vw;
+	border: 0.139vw solid var(--active);
+	background: transparent;
+	color: var(--active);
+	font-size: 1.111vw;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.15s, color 0.15s;
+}
+
+.task39__file-button:hover {
+	background: var(--active);
+	color: #fff;
+}
+
+.task39__file-name {
+	font-size: 1.111vw;
+	color: var(--grey-text);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 40vw;
+}

@@ -34,6 +34,9 @@ const Task39: FC<Props> = ({ onChecked }) => {
 	const [textError, setTextError] = useState(false)
 	const [phase, setPhase] = useState<Phase>('input')
 	const [secondsLeft, setSecondsLeft] = useState(PREP_SECONDS)
+	const [mode, setMode] = useState<'record' | 'upload'>('record')
+	const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null)
@@ -158,6 +161,44 @@ const Task39: FC<Props> = ({ onChecked }) => {
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [stopTimer, startCheck, completeCheck, failCheck, onChecked, refreshUser])
 
+	const handleUploadAndSubmit = () => {
+		if (!uploadedFile || !taskText.trim()) {
+			if (!taskText.trim()) setTextError(true)
+			return
+		}
+		setTextError(false)
+		taskTextRef.current = taskText
+		const reader = new FileReader()
+		reader.onload = async () => {
+			const base64 = (reader.result as string).split(',')[1]
+			const currentTaskText = taskTextRef.current
+			startCheck('39', { kind: 'task39', taskText: currentTaskText })
+			setPhase('done')
+			try {
+				const response = await api.post('/tasks/39', { taskText: currentTaskText, audioBase64: base64 })
+				const task = response.data?.data?.task
+				if (task) {
+					completeCheck({
+						kind: 'task39',
+						k1: task.k1 ?? 0,
+						totalScore: task.totalScore ?? 0,
+						feedback: task.feedback ?? { k1: '' },
+						transcription: task.transcription ?? '',
+					})
+					onChecked?.()
+					refreshUser()
+				}
+			} catch (err: unknown) {
+				const message =
+					(err as { response?: { data?: { error?: { message?: string } } } })
+						?.response?.data?.error?.message || 'Ошибка при проверке'
+				failCheck(message)
+				setPhase('input')
+			}
+		}
+		reader.readAsDataURL(uploadedFile)
+	}
+
 	const formatTime = (s: number) => {
 		const m = Math.floor(s / 60)
 		const sec = s % 60
@@ -170,10 +211,25 @@ const Task39: FC<Props> = ({ onChecked }) => {
 	if (phase === 'input' && !taskIsChecking && !taskIsChecked) {
 		return (
 			<div className={styles['task39']}>
+				<div className={styles['task39__mode-tabs']}>
+					<button
+						className={cn(styles['task39__mode-tab'], { [styles['task39__mode-tab_active']]: mode === 'record' })}
+						onClick={() => { setMode('record'); setUploadedFile(null) }}
+					>
+						Записать
+					</button>
+					<button
+						className={cn(styles['task39__mode-tab'], { [styles['task39__mode-tab_active']]: mode === 'upload' })}
+						onClick={() => { setMode('upload'); setUploadedFile(null) }}
+					>
+						Загрузить аудио
+					</button>
+				</div>
 				<div className={styles['task39__section']}>
 					<p className={styles['task39__phase-hint']}>
-						Вставьте текст задания для чтения вслух, затем нажмите «Начать подготовку».
-						У вас будет 1:30 на чтение про себя и 1:30 на чтение вслух.
+						{mode === 'record'
+							? 'Вставьте текст задания для чтения вслух, затем нажмите «Начать подготовку». У вас будет 1:30 на чтение про себя и 1:30 на чтение вслух.'
+							: 'Вставьте текст задания и загрузите аудиозапись вашего чтения для проверки.'}
 					</p>
 					<TextArea
 						className={cn(styles['task39__text-area'], {
@@ -185,7 +241,32 @@ const Task39: FC<Props> = ({ onChecked }) => {
 					/>
 				</div>
 				{checkError && <p style={{ color: 'red', margin: '8px 0' }}>{checkError}</p>}
-				<ActiveButton text='Начать подготовку' onClick={handleStartPreparation} />
+				{mode === 'record' ? (
+					<ActiveButton text='Начать подготовку' onClick={handleStartPreparation} />
+				) : (
+					<div className={styles['task39__upload-area']}>
+						<input
+							ref={fileInputRef}
+							type='file'
+							accept='audio/*'
+							style={{ display: 'none' }}
+							onChange={e => setUploadedFile(e.target.files?.[0] ?? null)}
+						/>
+						<button
+							className={styles['task39__file-button']}
+							onClick={() => fileInputRef.current?.click()}
+						>
+							Выбрать файл
+						</button>
+						{uploadedFile && (
+							<span className={styles['task39__file-name']}>{uploadedFile.name}</span>
+						)}
+						<ActiveButton
+							text='Отправить на проверку'
+							onClick={handleUploadAndSubmit}
+						/>
+					</div>
+				)}
 			</div>
 		)
 	}
