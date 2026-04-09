@@ -15,10 +15,11 @@ import styles from './TaskDetailPage.module.css'
 
 interface Task {
 	id: string
-	type: 'TASK37' | 'TASK38'
+	type: 'TASK37' | 'TASK38' | 'TASK39'
 	taskDescription: string
 	solution: string
 	imageBase64: string | null
+	transcription: string | null
 	k1: number
 	k2: number
 	k3: number
@@ -81,14 +82,17 @@ export default function TaskDetailPage() {
 	if (error || !task) return <div className={styles['page']}><BackButton /><p className={styles['status']}>{error || 'Задание не найдено'}</p></div>
 
 	const isTask37 = task.type === 'TASK37'
+	const isTask39 = task.type === 'TASK39'
 	const task37 = isTask37 ? parseTask37Description(task.taskDescription) : null
-	const task38 = !isTask37 ? parseTask38Description(task.taskDescription) : null
+	const task38 = task.type === 'TASK38' ? parseTask38Description(task.taskDescription) : null
+
+	const titleMap = { TASK37: 'Задание 37', TASK38: 'Задание 38', TASK39: 'Задание 39' }
 
 	return (
 		<div className={styles['page']}>
 			<BackButton />
 			<div className={styles['content']}>
-				<MainTitle text={isTask37 ? 'Задание 37' : 'Задание 38'} />
+				<MainTitle text={titleMap[task.type]} />
 
 				<div className={styles['section']}>
 					<SecondTitle text='Условия задания' />
@@ -128,7 +132,17 @@ export default function TaskDetailPage() {
 						</div>
 					)}
 
-					{!isTask37 && task38 && (
+					{isTask39 && (
+						<div className={styles['task-fields']}>
+							<TextArea
+								value={task.taskDescription}
+								readOnly
+								className={styles['textarea']}
+							/>
+						</div>
+					)}
+
+					{task.type === 'TASK38' && task38 && (
 						<div className={styles['task-fields']}>
 							<div className={styles['instructions']}>
 								<p className={styles['instruction-text']}>
@@ -178,14 +192,27 @@ export default function TaskDetailPage() {
 					)}
 				</div>
 
-				<div className={styles['section']}>
-					<SecondTitle text='Работа ученика' />
-					<TextArea
-						value={task.solution}
-						readOnly
-						className={styles['textarea--student']}
-					/>
-				</div>
+				{!isTask39 && (
+					<div className={styles['section']}>
+						<SecondTitle text='Работа ученика' />
+						<TextArea
+							value={task.solution}
+							readOnly
+							className={styles['textarea--student']}
+						/>
+					</div>
+				)}
+
+				{isTask39 && task.transcription && (
+					<div className={styles['section']}>
+						<SecondTitle text='Транскрипция' />
+						<TextArea
+							value={task.transcription}
+							readOnly
+							className={styles['textarea--student']}
+						/>
+					</div>
+				)}
 
 				<div className={styles['section']}>
 					<SecondTitle text='Оценки' />
@@ -196,6 +223,8 @@ export default function TaskDetailPage() {
 								<Criteria maxMark={2} criteriaNumber='К2' criteriaDescription='Организация текста' value={task.k2} readonly />
 								<Criteria maxMark={2} criteriaNumber='К3' criteriaDescription='Языковое оформление текста' value={task.k3} readonly />
 							</>
+						) : isTask39 ? (
+							<Criteria maxMark={1} criteriaNumber='К1' criteriaDescription='Фонетическая сторона речи' value={task.k1} readonly />
 						) : (
 							<>
 								<Criteria maxMark={3} criteriaNumber='К1' criteriaDescription='Решение коммуникативной задачи' value={task.k1} readonly />
