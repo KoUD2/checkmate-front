@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { FC } from 'react'
+import { FC, Suspense } from 'react'
 import AuthImage from '../../../shared/images/AuthImage.svg'
 import styles from './AuthPage.module.css'
 import AuthForm from './ui/AuthForm/AuthForm'
@@ -15,7 +15,9 @@ const AuthPage: FC = () => {
 					draggable={false}
 					className={styles['auth-page__image']}
 				/>
-				<AuthForm />
+				<Suspense>
+					<AuthForm />
+				</Suspense>
 			</div>
 		</div>
 	)
