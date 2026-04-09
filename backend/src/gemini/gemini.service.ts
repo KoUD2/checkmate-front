@@ -197,9 +197,20 @@ export class GeminiService {
     audioBase64: string,
   ): Promise<GeminiTask39Result> {
     // Strip data URI prefix if present
-    const base64Data = audioBase64.includes(',')
-      ? audioBase64.split(',')[1]
-      : audioBase64;
+    let mimeType = 'audio/webm';
+    let filename = 'recording.webm';
+    let base64Data = audioBase64;
+
+    if (audioBase64.includes(',')) {
+      const prefix = audioBase64.split(',')[0];
+      const match = prefix.match(/data:([^;]+)/);
+      if (match) {
+        mimeType = match[1];
+        const ext = mimeType.split('/')[1]?.split(';')[0] || 'webm';
+        filename = `recording.${ext}`;
+      }
+      base64Data = audioBase64.split(',')[1];
+    }
 
     const audioBuffer = Buffer.from(base64Data, 'base64');
 
@@ -211,8 +222,8 @@ export class GeminiService {
       const dispatcher = proxyUrl ? new ProxyAgent(proxyUrl) : new Agent();
 
       const form = new UndiciFormData();
-      const blob = new Blob([audioBuffer], { type: 'audio/webm' });
-      form.append('file', blob, 'recording.webm');
+      const blob = new Blob([audioBuffer], { type: mimeType });
+      form.append('file', blob, filename);
       form.append('model', 'whisper-1');
       form.append('language', 'en');
 

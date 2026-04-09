@@ -170,7 +170,8 @@ const Task39: FC<Props> = ({ onChecked }) => {
 		taskTextRef.current = taskText
 		const reader = new FileReader()
 		reader.onload = async () => {
-			const base64 = (reader.result as string).split(',')[1]
+			// Send full data URI so backend can detect the actual MIME type
+			const base64 = reader.result as string
 			const currentTaskText = taskTextRef.current
 			startCheck('39', { kind: 'task39', taskText: currentTaskText })
 			setPhase('done')
