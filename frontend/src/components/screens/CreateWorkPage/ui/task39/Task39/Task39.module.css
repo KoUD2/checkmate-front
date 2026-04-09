@@ -169,7 +169,7 @@
 	transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.task39__mode-tab:hover {
+.task39__mode-tab:hover:not(.task39__mode-tab_active) {
 	border-color: var(--active);
 	color: var(--active);
 }
