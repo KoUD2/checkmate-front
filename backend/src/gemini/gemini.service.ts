@@ -1,8 +1,7 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 
 export interface GeminiTask37Result {
@@ -203,14 +202,11 @@ export class GeminiService {
 
     const audioBuffer = Buffer.from(base64Data, 'base64');
 
-    // Write to temp file for Whisper upload
-    const tmpFile = path.join(os.tmpdir(), `checkmate_audio_${Date.now()}.webm`);
-    fs.writeFileSync(tmpFile, audioBuffer);
-
     let transcription = '';
     try {
+      const audioFile = await toFile(audioBuffer, 'recording.webm', { type: 'audio/webm' });
       const whisperResult = await this.openai.audio.transcriptions.create({
-        file: fs.createReadStream(tmpFile) as any,
+        file: audioFile,
         model: 'whisper-1',
         language: 'en',
       });
@@ -218,8 +214,6 @@ export class GeminiService {
     } catch (err) {
       console.error('[Whisper] transcription failed:', err);
       throw new InternalServerErrorException('Ошибка транскрипции аудио. Попробуйте позже.');
-    } finally {
-      try { fs.unlinkSync(tmpFile); } catch {}
     }
 
     if (!transcription.trim()) {
