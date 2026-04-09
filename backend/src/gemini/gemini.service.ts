@@ -1,6 +1,8 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import OpenAI, { toFile } from "openai";
+import OpenAI from "openai";
+import axios from "axios";
+import * as FormData from "form-data";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -204,15 +206,38 @@ export class GeminiService {
 
     let transcription = '';
     try {
-      const audioFile = await toFile(audioBuffer, 'recording.webm', { type: 'audio/webm' });
-      const whisperResult = await this.openai.audio.transcriptions.create({
-        file: audioFile,
-        model: 'whisper-1',
-        language: 'en',
-      });
-      transcription = whisperResult.text ?? '';
+      const apiKey = this.configService.get<string>('OPENAI_API_KEY');
+      const proxyUrl = this.configService.get<string>('GEMINI_PROXY');
+
+      const form = new FormData();
+      form.append('file', audioBuffer, { filename: 'recording.webm', contentType: 'audio/webm' });
+      form.append('model', 'whisper-1');
+      form.append('language', 'en');
+
+      const axiosConfig: any = {
+        headers: {
+          ...form.getHeaders(),
+          Authorization: `Bearer ${apiKey}`,
+        },
+      };
+      if (proxyUrl) {
+        const url = new URL(proxyUrl);
+        axiosConfig.proxy = {
+          protocol: url.protocol.replace(':', ''),
+          host: url.hostname,
+          port: parseInt(url.port, 10),
+          ...(url.username ? { auth: { username: url.username, password: url.password } } : {}),
+        };
+      }
+
+      const res = await axios.post(
+        'https://api.openai.com/v1/audio/transcriptions',
+        form,
+        axiosConfig,
+      );
+      transcription = res.data?.text ?? '';
     } catch (err) {
-      console.error('[Whisper] transcription failed:', err);
+      console.error('[Whisper] transcription failed:', err?.response?.data ?? err);
       throw new InternalServerErrorException('Ошибка транскрипции аудио. Попробуйте позже.');
     }
 
