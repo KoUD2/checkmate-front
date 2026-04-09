@@ -233,7 +233,7 @@ export class GeminiService {
       filename = `recording.${ext}`;
     }
 
-    console.log(`[Whisper] sending file: ${filename}, mimeType: ${normalizedMime}`);
+    console.log(`[Whisper] sending file: ${filename}, mimeType: ${normalizedMime}, base64len: ${base64Data?.length}, bufferBytes: ${Buffer.from(base64Data ?? '', 'base64').length}`);
 
     const audioBuffer = Buffer.from(base64Data, 'base64');
 
