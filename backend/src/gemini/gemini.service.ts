@@ -245,7 +245,7 @@ export class GeminiService {
       const dispatcher = proxyUrl ? new ProxyAgent(proxyUrl) : new Agent();
 
       const form = new UndiciFormData();
-      const blob = new Blob([audioBuffer], { type: normalizedMime });
+      const blob = new Blob([audioBuffer], { type: 'application/octet-stream' });
       form.append('file', blob, filename);
       form.append('model', 'whisper-1');
       form.append('language', 'en');
