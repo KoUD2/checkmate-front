@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import OpenAI from "openai";
-import { ProxyAgent, Agent, fetch as undiciFetch } from "undici";
+import { ProxyAgent, Agent, fetch as undiciFetch, FormData as UndiciFormData } from "undici";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -210,7 +210,7 @@ export class GeminiService {
 
       const dispatcher = proxyUrl ? new ProxyAgent(proxyUrl) : new Agent();
 
-      const form = new (globalThis as any).FormData();
+      const form = new UndiciFormData();
       const blob = new Blob([audioBuffer], { type: 'audio/webm' });
       form.append('file', blob, 'recording.webm');
       form.append('model', 'whisper-1');
