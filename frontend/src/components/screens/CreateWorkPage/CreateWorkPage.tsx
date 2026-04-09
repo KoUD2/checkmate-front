@@ -9,12 +9,13 @@ import styles from './CreateWorkPage.module.css'
 import TaskNumber from './ui/TaskNumber/TaskNumber'
 import Task37 from './ui/task37/Task37/Task37'
 import Task38 from './ui/task38/Task38/Task38'
+import Task39 from './ui/task39/Task39/Task39'
 
 const CreateWorkPage = (): JSX.Element => {
 	const { taskType, isChecked: ctxChecked } = useTaskCheck()
 
 	// Restore task type from context if there's an ongoing/completed check
-	const initialTask = (taskType === '38.1' || taskType === '38.2') ? taskType : '37'
+	const initialTask = (taskType === '38.1' || taskType === '38.2' || taskType === '39') ? taskType : '37'
 	const [task, setTask] = useState<string>(initialTask)
 	const [isChecked, setIsChecked] = useState(ctxChecked)
 
@@ -47,6 +48,11 @@ const CreateWorkPage = (): JSX.Element => {
 								isActive={task === '38.2'}
 								onClick={() => handleTaskChange('38.2')}
 							/>
+							<TaskNumber
+								text='39'
+								isActive={task === '39'}
+								onClick={() => handleTaskChange('39')}
+							/>
 						</div>
 					</div>
 				)}
@@ -55,6 +61,8 @@ const CreateWorkPage = (): JSX.Element => {
 					<SecondTitle text='Условия задания' />
 					{task === '37'
 						? <Task37 onChecked={() => setIsChecked(true)} onReset={() => setIsChecked(false)} />
+						: task === '39'
+						? <Task39 onChecked={() => setIsChecked(true)} onReset={() => setIsChecked(false)} />
 						: <Task38 onChecked={() => setIsChecked(true)} onReset={() => setIsChecked(false)} />
 					}
 				</div>

@@ -46,6 +46,8 @@ model Task {
   solution        String
   imageBase64          String?
   solutionImageBase64  String?
+  audioBase64          String?
+  transcription        String?
   k1              Int?
   k2              Int?
   k3              Int?
@@ -64,6 +66,7 @@ model Task {
 enum TaskType {
   TASK37
   TASK38
+  TASK39
 }
 
 model Subscription {

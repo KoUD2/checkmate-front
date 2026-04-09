@@ -11,6 +11,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger'
 import { TasksService } from './tasks.service';
 import { CreateTask37Dto } from './dto/create-task37.dto';
 import { CreateTask38Dto } from './dto/create-task38.dto';
+import { CreateTask39Dto } from './dto/create-task39.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
@@ -38,6 +39,16 @@ export class TasksController {
     @Body() dto: CreateTask38Dto,
   ) {
     const task = await this.tasksService.submitTask38(userId, dto);
+    return { success: true, data: { task } };
+  }
+
+  @Post('39')
+  @ApiOperation({ summary: 'Отправить задание 39 (чтение вслух)' })
+  async submitTask39(
+    @CurrentUser('id') userId: string,
+    @Body() dto: CreateTask39Dto,
+  ) {
+    const task = await this.tasksService.submitTask39(userId, dto);
     return { success: true, data: { task } };
   }
 

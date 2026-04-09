@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import OpenAI from "openai";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 
 export interface GeminiTask37Result {
@@ -22,6 +23,13 @@ export interface GeminiTask38Result {
   k5: number;
   totalScore: number;
   feedback: { k1: string; k2: string; k3: string; k4: string; k5: string };
+}
+
+export interface GeminiTask39Result {
+  k1: number;
+  totalScore: number;
+  feedback: { k1: string };
+  transcription: string;
 }
 
 @Injectable()
@@ -181,6 +189,69 @@ export class GeminiService {
       k1, k2, k3, k4, k5,
       totalScore: k1 + k2 + k3 + k4 + k5,
       feedback: { k1: k1Response, k2: k2Response, k3: k3Response, k4: k4Response, k5: k5Response },
+    };
+  }
+
+  async checkTask39(
+    taskText: string,
+    audioBase64: string,
+  ): Promise<GeminiTask39Result> {
+    // Strip data URI prefix if present
+    const base64Data = audioBase64.includes(',')
+      ? audioBase64.split(',')[1]
+      : audioBase64;
+
+    const audioBuffer = Buffer.from(base64Data, 'base64');
+
+    // Write to temp file for Whisper upload
+    const tmpFile = path.join(os.tmpdir(), `checkmate_audio_${Date.now()}.webm`);
+    fs.writeFileSync(tmpFile, audioBuffer);
+
+    let transcription = '';
+    try {
+      const whisperResult = await this.openai.audio.transcriptions.create({
+        file: fs.createReadStream(tmpFile) as any,
+        model: 'whisper-1',
+        language: 'en',
+      });
+      transcription = whisperResult.text ?? '';
+    } catch (err) {
+      console.error('[Whisper] transcription failed:', err);
+      throw new InternalServerErrorException('Ошибка транскрипции аудио. Попробуйте позже.');
+    } finally {
+      try { fs.unlinkSync(tmpFile); } catch {}
+    }
+
+    if (!transcription.trim()) {
+      return {
+        k1: 0,
+        totalScore: 0,
+        feedback: {
+          k1: 'Аудиозапись не содержит распознаваемой речи. Выставляется 0 баллов.',
+        },
+        transcription: '',
+      };
+    }
+
+    const userContent = `<original_text>\n${this.sanitize(taskText)}\n</original_text>\n\n<transcription>\n${this.sanitize(transcription)}\n</transcription>`;
+    const usage = { prompt: 0, completion: 0 };
+    const readPrompt = (name: string) => fs.readFileSync(path.join(this.promptsDir, name), 'utf-8');
+
+    const k1Response = await this.callOpenAI(
+      this.securityPreamble + '\n\n' + readPrompt('prompt39_1.txt'),
+      userContent,
+      usage,
+    );
+
+    const k1 = Math.min(1, this.extractScore(k1Response));
+
+    console.log(`[Tokens] task39: prompt=${usage.prompt} completion=${usage.completion} total=${usage.prompt + usage.completion}`);
+
+    return {
+      k1,
+      totalScore: k1,
+      feedback: { k1: k1Response },
+      transcription,
     };
   }
 

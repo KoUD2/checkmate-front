@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { GeminiService } from '../gemini/gemini.service';
 import { CreateTask37Dto } from './dto/create-task37.dto';
 import { CreateTask38Dto } from './dto/create-task38.dto';
+import { CreateTask39Dto } from './dto/create-task39.dto';
 
 @Injectable()
 export class TasksService {
@@ -82,6 +83,34 @@ export class TasksService {
           k3: result.k3,
           k4: result.k4,
           k5: result.k5,
+          totalScore: result.totalScore,
+          feedback: result.feedback as any,
+        },
+      }),
+      this.prisma.user.update({
+        where: { id: userId },
+        data: { freeChecksLeft: { decrement: 1 } },
+      }),
+    ]);
+
+    return task;
+  }
+
+  async submitTask39(userId: string, dto: CreateTask39Dto) {
+    await this.checkAccess(userId);
+
+    const result = await this.gemini.checkTask39(dto.taskText, dto.audioBase64);
+
+    const [task] = await this.prisma.$transaction([
+      this.prisma.task.create({
+        data: {
+          type: TaskType.TASK39,
+          userId,
+          taskDescription: dto.taskText,
+          solution: result.transcription,
+          audioBase64: dto.audioBase64,
+          transcription: result.transcription,
+          k1: result.k1,
           totalScore: result.totalScore,
           feedback: result.feedback as any,
         },

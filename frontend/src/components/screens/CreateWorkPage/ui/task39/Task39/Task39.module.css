@@ -1,0 +1,153 @@
+.task39 {
+	display: flex;
+	flex-direction: column;
+	gap: 2.083vw;
+	width: 61.597vw;
+}
+
+.task39__section {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.task39__text-area {
+	height: 20vw;
+}
+
+.task39__reading-text {
+	padding: 1.667vw;
+	background: var(--background);
+	border-radius: 1.389vw;
+	font-size: 1.25vw;
+	line-height: 1.8;
+	white-space: pre-wrap;
+}
+
+.task39__timer-block {
+	display: flex;
+	align-items: center;
+	gap: 1.389vw;
+}
+
+.task39__timer {
+	font-size: 2.083vw;
+	font-weight: 700;
+	color: var(--active);
+	min-width: 5vw;
+}
+
+.task39__timer_warning {
+	color: #eb3131;
+}
+
+.task39__timer-label {
+	font-size: 1.25vw;
+	color: var(--grey-text);
+}
+
+.task39__recording-indicator {
+	display: flex;
+	align-items: center;
+	gap: 0.694vw;
+	font-size: 1.111vw;
+	color: #eb3131;
+	font-weight: 600;
+}
+
+.task39__recording-dot {
+	width: 0.694vw;
+	height: 0.694vw;
+	border-radius: 50%;
+	background: #eb3131;
+	animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.2; }
+}
+
+.task39__buttons {
+	display: flex;
+	gap: 1.389vw;
+	align-items: center;
+}
+
+.task39__stop-button {
+	padding: 0.833vw 2.083vw;
+	border-radius: 0.694vw;
+	background: #eb3131;
+	color: #fff;
+	border: none;
+	font-size: 1.111vw;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.task39__stop-button:hover {
+	opacity: 0.85;
+}
+
+.task39__transcription {
+	padding: 1.389vw;
+	background: var(--background);
+	border-radius: 1.389vw;
+	font-size: 1.111vw;
+	line-height: 1.6;
+	color: var(--grey-text);
+	white-space: pre-wrap;
+}
+
+.task39__results-section {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.task39__marks {
+	width: 51.25vw;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.389vw;
+}
+
+.task39__feedback {
+	display: flex;
+	flex-direction: column;
+	gap: 1.389vw;
+}
+
+.task39__feedback-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.417vw;
+	padding: 1.389vw;
+	background: var(--background);
+	border-radius: 1.389vw;
+}
+
+.task39__feedback-label {
+	font-size: 1.25vw;
+	font-weight: 600;
+	color: var(--active);
+}
+
+.task39__feedback-text {
+	font-size: 1.111vw;
+	line-height: 1.6;
+	white-space: pre-wrap;
+}
+
+.task39__phase-hint {
+	font-size: 1.111vw;
+	color: var(--grey-text);
+}
+
+.task39__textarea_error {
+	border: 0.139vw solid #eb3131;
+}
+
+.task39__textarea_error::placeholder {
+	color: #eb3131;
+}
