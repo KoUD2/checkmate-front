@@ -46,7 +46,7 @@ const AdminCharts: FC = () => {
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="day" tickFormatter={fmt} tick={{ fontSize: 11 }} interval={4} />
             <YAxis tick={{ fontSize: 11 }} width={55} />
-            <Tooltip formatter={(v: number) => [`${v.toLocaleString('ru-RU')} ₽`, 'Выручка']} labelFormatter={fmt} />
+            <Tooltip formatter={(v) => [`${Number(v).toLocaleString('ru-RU')} ₽`, 'Выручка']} labelFormatter={fmt} />
             <Line type="monotone" dataKey="value" stroke="#c9622f" strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
@@ -59,7 +59,7 @@ const AdminCharts: FC = () => {
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="day" tickFormatter={fmt} tick={{ fontSize: 11 }} interval={4} />
             <YAxis tick={{ fontSize: 11 }} width={35} allowDecimals={false} />
-            <Tooltip formatter={(v: number) => [v, 'Регистраций']} labelFormatter={fmt} />
+            <Tooltip formatter={(v) => [Number(v), 'Регистраций']} labelFormatter={fmt} />
             <Bar dataKey="value" fill="#c9622f" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
@@ -72,7 +72,7 @@ const AdminCharts: FC = () => {
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
             <YAxis type="category" dataKey="name" tick={{ fontSize: 12 }} width={45} />
-            <Tooltip formatter={(v: number) => [v, 'Продаж']} />
+            <Tooltip formatter={(v) => [Number(v), 'Продаж']} />
             <Bar dataKey="count" fill="#c9622f" radius={[0, 3, 3, 0]} />
           </BarChart>
         </ResponsiveContainer>
@@ -85,7 +85,7 @@ const AdminCharts: FC = () => {
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="type" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} width={35} allowDecimals={false} />
-            <Tooltip formatter={(v: number) => [v, 'Заданий']} />
+            <Tooltip formatter={(v) => [Number(v), 'Заданий']} />
             <Bar dataKey="count" fill="#c9622f" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
