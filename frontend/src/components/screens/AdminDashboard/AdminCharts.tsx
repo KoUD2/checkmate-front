@@ -26,7 +26,7 @@ interface ChartsData {
   salesByPackage: PackagePoint[]
 }
 
-const fmt = (day: string) => day.slice(5) // MM-DD
+const fmtDay = (day: unknown) => String(day).slice(5) // MM-DD
 
 const AdminCharts: FC = () => {
   const [data, setData] = useState<ChartsData | null>(null)
@@ -44,9 +44,9 @@ const AdminCharts: FC = () => {
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={data.revenueByDay}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="day" tickFormatter={fmt} tick={{ fontSize: 11 }} interval={4} />
+            <XAxis dataKey="day" tickFormatter={fmtDay} tick={{ fontSize: 11 }} interval={4} />
             <YAxis tick={{ fontSize: 11 }} width={55} />
-            <Tooltip formatter={(v) => [`${Number(v).toLocaleString('ru-RU')} ₽`, 'Выручка']} labelFormatter={fmt} />
+            <Tooltip formatter={(v) => [`${Number(v).toLocaleString('ru-RU')} ₽`, 'Выручка']} />
             <Line type="monotone" dataKey="value" stroke="#c9622f" strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
@@ -57,9 +57,9 @@ const AdminCharts: FC = () => {
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={data.usersByDay}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="day" tickFormatter={fmt} tick={{ fontSize: 11 }} interval={4} />
+            <XAxis dataKey="day" tickFormatter={fmtDay} tick={{ fontSize: 11 }} interval={4} />
             <YAxis tick={{ fontSize: 11 }} width={35} allowDecimals={false} />
-            <Tooltip formatter={(v) => [Number(v), 'Регистраций']} labelFormatter={fmt} />
+            <Tooltip formatter={(v) => [Number(v), 'Регистраций']} />
             <Bar dataKey="value" fill="#c9622f" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
