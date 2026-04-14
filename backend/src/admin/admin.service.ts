@@ -82,6 +82,29 @@ export class AdminService {
     return { promos, total, page, totalPages: Math.ceil(total / limit) };
   }
 
+  async listPayments(page = 1, limit = 20) {
+    const skip = (page - 1) * limit;
+    const [payments, total] = await Promise.all([
+      this.prisma.payment.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          yookassaId: true,
+          status: true,
+          amount: true,
+          checksToAdd: true,
+          createdAt: true,
+          user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        },
+      }),
+      this.prisma.payment.count(),
+    ]);
+
+    return { payments, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
   async getStats() {
     const [totalUsers, totalTasks, totalPayments, revenueAgg] = await Promise.all([
       this.prisma.user.count(),

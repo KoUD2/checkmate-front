@@ -57,6 +57,15 @@ export class AdminController {
     return { success: true, data: result };
   }
 
+  @Get('payments')
+  @ApiOperation({ summary: 'Все платежи' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async listPayments(@Query('page') page = 1, @Query('limit') limit = 20) {
+    const result = await this.adminService.listPayments(+page, +limit);
+    return { success: true, data: result };
+  }
+
   @Get('stats')
   @ApiOperation({ summary: 'Общая статистика' })
   async getStats() {

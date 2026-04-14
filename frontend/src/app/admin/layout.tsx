@@ -9,6 +9,7 @@ import styles from './AdminLayout.module.css'
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard' },
   { href: '/admin/users', label: 'Пользователи' },
+  { href: '/admin/payments', label: 'Платежи' },
   { href: '/admin/promos', label: 'Промокоды' },
   { href: '/admin/tasks', label: 'Задания' },
 ]
