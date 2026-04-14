@@ -3,7 +3,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 import Link from "next/link";
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, useState } from "react";
 import Logo from "../../../shared/images/A_Logo.svg";
 import styles from "./MainLayout.module.css";
 
@@ -18,6 +18,7 @@ function getInitials(name: string | undefined): string {
 
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const { user } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const pluralChecks = (n: number) => {
     const mod10 = n % 10;
@@ -37,36 +38,60 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <div className={styles["main-layout-container"]}>
-      <header className={styles["main-layout"]}>
-        <Link href="/">
-          <div className={styles["main-layout__logo-container"]}>
-            <Image
-              src={Logo}
-              alt="Логотип"
-              className={styles["main-layout__logo"]}
-            />
-          </div>
-        </Link>
-        <div className={styles["main-layout__right"]}>
-          {user?.role === 'ADMIN' && (
-            <Link href="/admin" className={styles["main-layout__checks"]}>
-              Админка
-            </Link>
-          )}
-          {user && (
-            <Link href="/referral" className={styles["main-layout__checks"]}>
-              Пригласить друга
-            </Link>
-          )}
-          {label && (
-            <Link href="/subscribe" className={styles["main-layout__checks"]}>
-              {label}
-            </Link>
-          )}
-          <div className={styles["main-layout__greeting"]}>
-            {user ? getInitials(`${user.firstName} ${user.lastName}`) : ""}
+      <header>
+        <div className={styles["main-layout"]}>
+          <Link href="/">
+            <div className={styles["main-layout__logo-container"]}>
+              <Image
+                src={Logo}
+                alt="Логотип"
+                className={styles["main-layout__logo"]}
+              />
+            </div>
+          </Link>
+          <div className={styles["main-layout__right"]}>
+            {user?.role === 'ADMIN' && (
+              <Link href="/admin" className={styles["main-layout__checks"]}>
+                Админка
+              </Link>
+            )}
+            {user && (
+              <Link href="/referral" className={styles["main-layout__checks"]}>
+                Пригласить друга
+              </Link>
+            )}
+            {label && (
+              <Link href="/subscribe" className={styles["main-layout__checks"]}>
+                {label}
+              </Link>
+            )}
+            <div className={styles["main-layout__greeting"]}>
+              {user ? getInitials(`${user.firstName} ${user.lastName}`) : ""}
+            </div>
+            <button
+              className={styles["main-layout__burger"]}
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="Меню"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
           </div>
         </div>
+        {menuOpen && (
+          <nav className={styles["main-layout__mobile-nav"]}>
+            {user?.role === 'ADMIN' && (
+              <Link href="/admin" onClick={() => setMenuOpen(false)}>Админка</Link>
+            )}
+            {user && (
+              <Link href="/referral" onClick={() => setMenuOpen(false)}>Пригласить друга</Link>
+            )}
+            {label && (
+              <Link href="/subscribe" onClick={() => setMenuOpen(false)}>{label}</Link>
+            )}
+          </nav>
+        )}
       </header>
       <main>{children}</main>
     </div>

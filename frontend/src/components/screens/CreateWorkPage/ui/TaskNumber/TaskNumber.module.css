@@ -41,3 +41,25 @@
 .task-number__text_isActive {
 	color: var(--active);
 }
+
+@media (max-width: 768px) {
+  .task-number {
+    padding: 12px;
+    border-radius: 12px;
+    gap: 8px;
+  }
+
+  .task-number__wrapper-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .task-number__icon-image {
+    width: 8px;
+    height: 7px;
+  }
+
+  .task-number__text {
+    font-size: 15px;
+  }
+}

@@ -20,3 +20,17 @@
 .button-next__image_isBack {
 	transform: rotate(180deg);
 }
+
+@media (max-width: 768px) {
+  .button-next {
+    width: 52px;
+    height: 44px;
+    padding: 12px 16px;
+    border-radius: 10px;
+  }
+
+  .button-next__image {
+    width: 12px;
+    height: 10px;
+  }
+}

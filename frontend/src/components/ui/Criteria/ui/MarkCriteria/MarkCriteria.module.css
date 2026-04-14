@@ -61,3 +61,36 @@
 	cursor: default;
 	justify-content: center;
 }
+
+@media (max-width: 768px) {
+  .mark-criteria {
+    width: 44px;
+    border-radius: 10px;
+  }
+
+  .mark-criteria__button {
+    width: 44px;
+    height: 36px;
+    padding: 6px 8px;
+    border-radius: 10px;
+  }
+
+  .mark-criteria__selected-mark {
+    font-size: 15px;
+  }
+
+  .mark-criteria__dropdown {
+    width: 24px;
+    gap: 6px;
+  }
+
+  .mark-criteria__dropdown-item {
+    font-size: 14px;
+    height: 20px;
+  }
+
+  .mark-criteria__arrow {
+    width: 10px;
+    height: 6px;
+  }
+}

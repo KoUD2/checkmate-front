@@ -41,3 +41,28 @@
 	width: 38.036vw;
 	height: auto;
 }
+
+@media (max-width: 768px) {
+  .button-file {
+    width: 100%;
+  }
+
+  .button-file__upload-button {
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 15px;
+    gap: 8px;
+  }
+
+  .button-file__text {
+    font-size: 15px;
+  }
+
+  .button-file__image {
+    width: 100%;
+  }
+
+  .button-file__image-container {
+    margin-bottom: 12px;
+  }
+}

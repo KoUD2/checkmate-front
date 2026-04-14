@@ -47,3 +47,25 @@
 	width: 0.903vw;
 	height: 0.625vw;
 }
+
+@media (max-width: 768px) {
+  .task-card {
+    padding: 16px;
+    border-radius: 12px;
+    gap: 8px;
+  }
+
+  .task-card__title {
+    font-size: 16px;
+  }
+
+  .task-card__approved {
+    width: 28px;
+    height: 28px;
+  }
+
+  .task-card__approved-icon {
+    width: 12px;
+    height: 8px;
+  }
+}

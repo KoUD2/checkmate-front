@@ -24,3 +24,15 @@
   color: var(--active-text, #1a1a1a);
   margin-bottom: 16px;
 }
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .chart {
+    padding: 14px 14px 8px;
+  }
+}

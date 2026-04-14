@@ -147,3 +147,17 @@
   font-size: 13px;
   color: var(--grey-text, #666);
 }
+
+@media (max-width: 768px) {
+  .page {
+    overflow-x: auto;
+  }
+
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .table {
+    min-width: 500px;
+  }
+}

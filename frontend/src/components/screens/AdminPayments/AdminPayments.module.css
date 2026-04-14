@@ -106,3 +106,13 @@
   font-size: 13px;
   color: var(--grey-text, #666);
 }
+
+@media (max-width: 768px) {
+  .page {
+    overflow-x: auto;
+  }
+
+  .table {
+    min-width: 600px;
+  }
+}

@@ -17,3 +17,16 @@
 .type-criteria__description {
 	font-size: 1.25vw;
 }
+
+@media (max-width: 768px) {
+  .type-criteria {
+    padding: 8px 12px;
+    border-radius: 10px;
+    gap: 6px;
+  }
+
+  .type-criteria__number,
+  .type-criteria__description {
+    font-size: 13px;
+  }
+}

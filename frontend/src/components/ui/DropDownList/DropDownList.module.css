@@ -19,3 +19,20 @@
 	width: 0.833vw;
 	height: 0.417vw;
 }
+
+@media (max-width: 768px) {
+  .dropdown-list {
+    padding: 10px 14px;
+    border-radius: 10px;
+    gap: 16px;
+  }
+
+  .dropdown-list__text {
+    font-size: 15px;
+  }
+
+  .dropdown-list__arrow {
+    width: 12px;
+    height: 6px;
+  }
+}

@@ -22,3 +22,25 @@
 	align-items: center;
 	gap: 1.389vw;
 }
+
+@media (max-width: 768px) {
+  .create-work-page {
+    flex-direction: column;
+    gap: 32px;
+    margin-top: 20px;
+  }
+
+  .create-work-page__content {
+    width: 100%;
+    gap: 24px;
+  }
+
+  .create-work-page__section {
+    gap: 16px;
+  }
+
+  .create-work-page__task-types {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}

@@ -182,3 +182,86 @@
 .task38__button-back {
 	margin-top: 0;
 }
+
+@media (max-width: 768px) {
+  .task38 {
+    width: 100%;
+    gap: 24px;
+  }
+
+  .task38__instruction-text,
+  .task38__plan-text,
+  .task38__plan-item {
+    font-size: 15px;
+  }
+
+  .task38__inline-input {
+    width: 120px;
+    height: 36px;
+    font-size: 15px;
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+
+  .task38__task-fields {
+    gap: 16px;
+  }
+
+  .task38__student-work {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .task38__step-icon {
+    width: 100%;
+    height: 4px;
+  }
+
+  .task38__textarea {
+    height: 200px;
+  }
+
+  .task38__step-text {
+    font-size: 13px;
+  }
+
+  .task38__plan-list {
+    padding-left: 16px;
+    margin-left: 8px;
+  }
+
+  .task38__marks {
+    width: 100%;
+    gap: 12px;
+  }
+
+  .task38__feedback-item {
+    padding: 14px;
+    border-radius: 12px;
+    gap: 6px;
+  }
+
+  .task38__feedback-label {
+    font-size: 14px;
+  }
+
+  .task38__feedback-text {
+    font-size: 14px;
+  }
+
+  .task38__file-section {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .task38__file-button {
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  .task38__file-remove {
+    font-size: 13px;
+    padding: 4px 8px;
+  }
+}

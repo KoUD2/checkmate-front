@@ -70,3 +70,31 @@
 	text-underline-offset: auto;
 	text-underline-position: from-font;
 }
+
+@media (max-width: 768px) {
+  .auth-form__content {
+    gap: 28px;
+  }
+
+  .auth-form__title {
+    font-size: 24px;
+  }
+
+  .auth-form__subtitle {
+    font-size: 14px;
+  }
+
+  .auth-form__input {
+    width: 100%;
+    font-size: 16px;
+    padding: 8px 0;
+  }
+
+  .auth-form__inputs {
+    gap: 20px;
+  }
+
+  .auth-form__login-text-link {
+    font-size: 13px;
+  }
+}

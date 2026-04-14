@@ -152,3 +152,85 @@
   font-size: 1.111vw;
   color: #4caf50;
 }
+
+@media (max-width: 768px) {
+  .page {
+    margin-top: 20px;
+  }
+
+  .container {
+    width: 100%;
+    gap: 24px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  .section-title {
+    font-size: 17px;
+  }
+
+  .placeholder {
+    font-size: 14px;
+  }
+
+  .link-row {
+    gap: 8px;
+  }
+
+  .link-input,
+  .copy-button {
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+
+  .stats {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .stat {
+    padding: 14px 18px;
+    border-radius: 12px;
+    min-width: 100px;
+    flex: 1;
+  }
+
+  .stat__value {
+    font-size: 28px;
+  }
+
+  .stat__label {
+    font-size: 12px;
+  }
+
+  .milestones {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .milestone {
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .milestone__count {
+    font-size: 14px;
+  }
+
+  .milestone__bonus {
+    font-size: 15px;
+  }
+
+  .milestone__check {
+    top: 8px;
+    right: 10px;
+    font-size: 13px;
+  }
+}

@@ -39,3 +39,17 @@
   color: var(--grey-text, #666);
   margin-top: 4px;
 }
+
+@media (max-width: 768px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .cardValue {
+    font-size: 24px;
+  }
+}

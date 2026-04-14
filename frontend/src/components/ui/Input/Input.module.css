@@ -18,3 +18,16 @@
 	border: none;
 	outline: none;
 }
+
+@media (max-width: 768px) {
+  .input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .input__text,
+  .input__field {
+    font-size: 16px;
+  }
+}

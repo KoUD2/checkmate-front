@@ -90,3 +90,28 @@
 	align-items: center;
 	justify-content: center;
 }
+
+@media (max-width: 768px) {
+  .section {
+    max-width: 100%;
+    gap: 10px;
+  }
+
+  .title {
+    font-size: 17px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+  }
+
+  .buttons {
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+}

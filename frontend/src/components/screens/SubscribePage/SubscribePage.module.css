@@ -205,3 +205,90 @@
 	color: var(--active-text);
 	font-weight: 600;
 }
+
+@media (max-width: 768px) {
+  .page {
+    margin-top: 20px;
+    justify-content: flex-start;
+  }
+
+  .container {
+    width: 100%;
+    gap: 24px;
+  }
+
+  .tabs {
+    max-width: 100%;
+    gap: 8px;
+  }
+
+  .tab {
+    padding: 8px 20px;
+    font-size: 14px;
+    border-radius: 50px;
+  }
+
+  .plans {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card {
+    padding: 20px;
+    border-radius: 16px;
+    gap: 12px;
+  }
+
+  .card__name {
+    font-size: 16px;
+  }
+
+  .card__price {
+    font-size: 36px;
+  }
+
+  .card__currency {
+    font-size: 20px;
+  }
+
+  .card__period,
+  .card__checks {
+    font-size: 13px;
+  }
+
+  .card__button {
+    padding: 12px 0;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+
+  .divider {
+    max-width: 100%;
+  }
+
+  .promo-section {
+    max-width: 100%;
+    gap: 10px;
+  }
+
+  .promo-title {
+    font-size: 17px;
+  }
+
+  .promo-input,
+  .promo-button {
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+
+  .promo-success,
+  .promo-error {
+    font-size: 13px;
+  }
+
+  .status {
+    font-size: 14px;
+    max-width: 100%;
+  }
+}

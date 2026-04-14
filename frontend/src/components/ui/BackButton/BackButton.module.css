@@ -16,3 +16,15 @@
 	width: 0.976vw;
 	height: 0.833vw;
 }
+
+@media (max-width: 768px) {
+  .back-button {
+    font-size: 15px;
+    gap: 6px;
+  }
+
+  .back-button__icon {
+    width: 14px;
+    height: 12px;
+  }
+}

@@ -16,3 +16,20 @@
 	width: 28.819vw;
 	height: 28.819vw;
 }
+
+@media (max-width: 768px) {
+  .auth-page {
+    height: auto;
+    padding: 32px 0;
+    align-items: flex-start;
+  }
+
+  .auth-page__content-main {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .auth-page__image {
+    display: none;
+  }
+}

@@ -9,3 +9,15 @@
 .reserved-field__text {
 	font-size: 1.389vw;
 }
+
+@media (max-width: 768px) {
+  .reserved-field {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .reserved-field__text {
+    font-size: 15px;
+  }
+}

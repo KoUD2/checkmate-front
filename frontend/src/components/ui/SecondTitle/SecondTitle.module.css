@@ -2,3 +2,9 @@
 	color: var(--active-text);
 	font-size: 1.944vw;
 }
+
+@media (max-width: 768px) {
+  .second-title {
+    font-size: 18px;
+  }
+}

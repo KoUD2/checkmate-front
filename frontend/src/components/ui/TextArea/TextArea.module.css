@@ -160,3 +160,32 @@
 	display: flex;
 	justify-content: flex-start;
 }
+
+@media (max-width: 768px) {
+  .textarea {
+    padding: 12px;
+    border-radius: 12px;
+    height: 150px;
+    font-size: 16px;
+  }
+
+  .editableDiv {
+    font-size: 16px;
+  }
+
+  .commentPopup {
+    width: 240px;
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .commentInput {
+    font-size: 14px;
+  }
+
+  .popupActions button {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 4px;
+  }
+}
