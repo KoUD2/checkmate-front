@@ -56,4 +56,20 @@ export class AdminController {
     const result = await this.adminService.listPromos(+page, +limit);
     return { success: true, data: result };
   }
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Общая статистика' })
+  async getStats() {
+    const stats = await this.adminService.getStats();
+    return { success: true, data: stats };
+  }
+
+  @Get('tasks')
+  @ApiOperation({ summary: 'Все задания пользователей' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async listTasks(@Query('page') page = 1, @Query('limit') limit = 20) {
+    const result = await this.adminService.listTasks(+page, +limit);
+    return { success: true, data: result };
+  }
 }

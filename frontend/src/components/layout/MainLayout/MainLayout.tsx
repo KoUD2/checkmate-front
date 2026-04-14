@@ -48,6 +48,11 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
           </div>
         </Link>
         <div className={styles["main-layout__right"]}>
+          {user?.role === 'ADMIN' && (
+            <Link href="/admin" className={styles["main-layout__checks"]}>
+              Админка
+            </Link>
+          )}
           {user && (
             <Link href="/referral" className={styles["main-layout__checks"]}>
               Пригласить друга

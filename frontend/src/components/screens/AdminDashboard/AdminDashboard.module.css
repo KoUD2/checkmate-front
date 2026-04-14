@@ -1,0 +1,41 @@
+.page {
+  max-width: 900px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--active-text, #1a1a1a);
+  margin-bottom: 24px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e5e5e5;
+}
+
+.cardLabel {
+  font-size: 13px;
+  color: var(--grey-text, #666);
+  margin-bottom: 8px;
+}
+
+.cardValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--active-text, #1a1a1a);
+}
+
+.cardSub {
+  font-size: 13px;
+  color: var(--grey-text, #666);
+  margin-top: 4px;
+}

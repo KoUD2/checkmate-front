@@ -81,4 +81,44 @@ export class AdminService {
 
     return { promos, total, page, totalPages: Math.ceil(total / limit) };
   }
+
+  async getStats() {
+    const [totalUsers, totalTasks, totalPayments, revenueAgg] = await Promise.all([
+      this.prisma.user.count(),
+      this.prisma.task.count(),
+      this.prisma.payment.count({ where: { status: 'SUCCEEDED' } }),
+      this.prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { status: 'SUCCEEDED' },
+      }),
+    ]);
+
+    return {
+      totalUsers,
+      totalTasks,
+      totalPayments,
+      totalRevenue: Number(revenueAgg._sum.amount ?? 0),
+    };
+  }
+
+  async listTasks(page = 1, limit = 20) {
+    const skip = (page - 1) * limit;
+    const [tasks, total] = await Promise.all([
+      this.prisma.task.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          type: true,
+          totalScore: true,
+          createdAt: true,
+          user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        },
+      }),
+      this.prisma.task.count(),
+    ]);
+
+    return { tasks, total, page, totalPages: Math.ceil(total / limit) };
+  }
 }
