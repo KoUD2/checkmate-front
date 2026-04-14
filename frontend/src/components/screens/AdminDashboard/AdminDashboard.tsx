@@ -2,6 +2,7 @@
 
 import api from '@/shared/utils/api'
 import { FC, useEffect, useState } from 'react'
+import AdminCharts from './AdminCharts'
 import styles from './AdminDashboard.module.css'
 
 interface Stats {
@@ -41,6 +42,7 @@ const AdminDashboard: FC = () => {
           </div>
         </div>
       </div>
+      <AdminCharts />
     </div>
   )
 }

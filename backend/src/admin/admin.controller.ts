@@ -73,6 +73,13 @@ export class AdminController {
     return { success: true, data: stats };
   }
 
+  @Get('charts')
+  @ApiOperation({ summary: 'Данные для графиков (последние 30 дней)' })
+  async getCharts() {
+    const data = await this.adminService.getCharts();
+    return { success: true, data };
+  }
+
   @Get('tasks')
   @ApiOperation({ summary: 'Все задания пользователей' })
   @ApiQuery({ name: 'page', required: false, type: Number })

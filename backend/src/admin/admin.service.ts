@@ -124,6 +124,73 @@ export class AdminService {
     };
   }
 
+  async getCharts() {
+    const since = new Date();
+    since.setDate(since.getDate() - 30);
+
+    const [payments, users, tasks] = await Promise.all([
+      this.prisma.payment.findMany({
+        where: { status: 'SUCCEEDED', createdAt: { gte: since } },
+        select: { amount: true, checksToAdd: true, createdAt: true },
+      }),
+      this.prisma.user.findMany({
+        where: { createdAt: { gte: since } },
+        select: { createdAt: true },
+      }),
+      this.prisma.task.findMany({
+        where: { createdAt: { gte: since } },
+        select: { type: true, createdAt: true },
+      }),
+    ]);
+
+    const toDay = (d: Date) => d.toISOString().slice(0, 10);
+
+    // Выручка по дням
+    const revenueMap: Record<string, number> = {};
+    for (const p of payments) {
+      const day = toDay(p.createdAt);
+      revenueMap[day] = (revenueMap[day] ?? 0) + Number(p.amount);
+    }
+
+    // Регистрации по дням
+    const usersMap: Record<string, number> = {};
+    for (const u of users) {
+      const day = toDay(u.createdAt);
+      usersMap[day] = (usersMap[day] ?? 0) + 1;
+    }
+
+    // Заполняем все 30 дней (в т.ч. нули)
+    const days: string[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push(toDay(d));
+    }
+
+    const revenueByDay = days.map(day => ({ day, value: revenueMap[day] ?? 0 }));
+    const usersByDay = days.map(day => ({ day, value: usersMap[day] ?? 0 }));
+
+    // Задания по типу
+    const taskTypeMap: Record<string, number> = {};
+    for (const t of tasks) {
+      taskTypeMap[t.type] = (taskTypeMap[t.type] ?? 0) + 1;
+    }
+    const tasksByType = Object.entries(taskTypeMap).map(([type, count]) => ({ type, count }));
+
+    // Продажи по пакетам
+    const packageMap: Record<number, number> = {};
+    for (const p of payments) {
+      packageMap[p.checksToAdd] = (packageMap[p.checksToAdd] ?? 0) + 1;
+    }
+    const PACKAGE_NAMES: Record<number, string> = { 10: 'Lite', 50: 'Plus', 200: 'Pro', 600: 'Ultra', 2400: 'Mega' };
+    const salesByPackage = Object.entries(packageMap).map(([checks, count]) => ({
+      name: PACKAGE_NAMES[Number(checks)] ?? `${checks} проверок`,
+      count,
+    }));
+
+    return { revenueByDay, usersByDay, tasksByType, salesByPackage };
+  }
+
   async listTasks(page = 1, limit = 20) {
     const skip = (page - 1) * limit;
     const [tasks, total] = await Promise.all([
