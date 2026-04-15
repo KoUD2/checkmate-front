@@ -41,7 +41,7 @@ const SocialConnect: FC<Props> = ({ user, onMessage }) => {
       setTgLoading(true);
       try {
         await api.post("/auth/telegram/connect", tgUser);
-        onMessage("Соцсеть подключена! Начислено 2 бесплатных проверки.");
+        onMessage("Соцсеть подключена! Начислено 3 бесплатных проверки.");
         // Reload to refresh user state
         window.location.reload();
       } catch (err: unknown) {
@@ -90,7 +90,7 @@ const SocialConnect: FC<Props> = ({ user, onMessage }) => {
       <div className={styles.title}>
         {bonusGranted
           ? "Соцсеть подключена — бонус получен"
-          : "Подключи соцсеть и получи 2 бесплатных проверки"}
+          : "Подключи соцсеть и получи 3 бесплатных проверки"}
       </div>
       {!bonusGranted && (
         <div className={styles.subtitle}>

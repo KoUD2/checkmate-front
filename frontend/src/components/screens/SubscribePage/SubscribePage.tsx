@@ -27,7 +27,7 @@ const SubscribePage: FC = () => {
     const params = new URLSearchParams(window.location.search);
     const social = params.get("social");
     if (social === "success") {
-      setSocialMessage("Соцсеть подключена! Начислено 2 бесплатных проверки.");
+      setSocialMessage("Соцсеть подключена! Начислено 3 бесплатных проверки.");
       refreshUser();
       window.history.replaceState({}, "", "/subscribe");
     } else if (social === "error") {

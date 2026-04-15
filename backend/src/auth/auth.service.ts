@@ -14,7 +14,7 @@ import * as crypto from 'crypto';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
-const SOCIAL_BONUS_CHECKS = 2;
+const SOCIAL_BONUS_CHECKS = 3;
 
 @Injectable()
 export class AuthService {
