@@ -46,7 +46,11 @@ export class GeminiService {
   constructor(private configService: ConfigService) {
     const apiKey = this.configService.get<string>("OPENAI_API_KEY");
     this.openai = new OpenAI({ apiKey });
-    this.promptsDir = path.join(__dirname, "prompts");
+    const distPromptsDir = path.join(__dirname, "prompts");
+    const srcPromptsDir = path.join(process.cwd(), "src", "gemini", "prompts");
+    this.promptsDir = fs.existsSync(path.join(distPromptsDir, "security_preamble.txt"))
+      ? distPromptsDir
+      : srcPromptsDir;
     this.securityPreamble = fs.readFileSync(
       path.join(this.promptsDir, "security_preamble.txt"),
       "utf-8",
