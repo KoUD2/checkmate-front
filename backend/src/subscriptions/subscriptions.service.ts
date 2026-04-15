@@ -76,14 +76,7 @@ export class SubscriptionsService {
     const existing = await this.prisma.subscription.findUnique({ where: { userId } });
 
     const now = new Date();
-    let newExpiry: Date;
-
-    if (existing?.isActive && existing.expiresAt && existing.expiresAt > now) {
-      newExpiry = new Date(existing.expiresAt);
-    } else {
-      newExpiry = new Date(now);
-    }
-
+    const newExpiry = new Date(now);
     newExpiry.setDate(newExpiry.getDate() + days);
 
     await this.prisma.subscription.upsert({

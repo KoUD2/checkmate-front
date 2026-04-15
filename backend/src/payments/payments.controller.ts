@@ -7,6 +7,8 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
@@ -41,6 +43,19 @@ export class PaymentsController {
     @CurrentUser('id') userId: string,
   ) {
     const result = await this.paymentsService.verifyPayment(paymentId, userId);
+    return { success: true, data: result };
+  }
+
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'История платежей текущего пользователя' })
+  async getMyPayments(
+    @CurrentUser('id') userId: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+  ) {
+    const result = await this.paymentsService.getMyPayments(userId, page, limit);
     return { success: true, data: result };
   }
 

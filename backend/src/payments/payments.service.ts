@@ -194,6 +194,20 @@ export class PaymentsService {
     }
   }
 
+  async getMyPayments(userId: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const [payments, total] = await Promise.all([
+      this.prisma.payment.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.payment.count({ where: { userId } }),
+    ]);
+    return { payments, total, totalPages: Math.ceil(total / limit) };
+  }
+
   private async getUserEmail(userId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     return user?.email ?? 'unknown@example.com';

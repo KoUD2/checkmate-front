@@ -192,6 +192,109 @@
 	font-size: 1vw;
 }
 
+/* ── History tab ── */
+.history-empty {
+  font-size: 1.111vw;
+  color: var(--grey-text);
+}
+
+.history-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-radius: 0.833vw;
+  border: 1px solid #e5e5e5;
+  overflow: hidden;
+  border-collapse: collapse;
+  background: var(--card-bg, #fff);
+}
+
+.history-table th {
+  background: #f9f9f9;
+  padding: 0.694vw 1.111vw;
+  text-align: left;
+  font-size: 0.764vw;
+  font-weight: 600;
+  color: var(--grey-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.history-table td {
+  padding: 0.833vw 1.111vw;
+  font-size: 0.972vw;
+  color: var(--active-text);
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.history-table tr:last-child td {
+  border-bottom: none;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.139vw 0.556vw;
+  border-radius: 0.278vw;
+  font-size: 0.833vw;
+  font-weight: 600;
+}
+
+.badgeSucceeded {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badgePending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.badgeCanceled {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+.history-amount {
+  font-weight: 700;
+}
+
+.history-dash {
+  color: var(--grey-text);
+}
+
+.history-pagination {
+  display: flex;
+  gap: 0.556vw;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.history-page-btn {
+  padding: 0.417vw 0.833vw;
+  border-radius: 0.417vw;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  font-size: 0.972vw;
+  cursor: pointer;
+  color: var(--active-text);
+}
+
+.history-page-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.history-page-info {
+  font-size: 0.903vw;
+  color: var(--grey-text);
+}
+
 /* ── Status ── */
 .status {
 	font-size: 1.111vw;
@@ -289,5 +392,44 @@
   .status {
     font-size: 14px;
     max-width: 100%;
+  }
+
+  .history-empty {
+    font-size: 14px;
+  }
+
+  .history-table {
+    min-width: 480px;
+    border-radius: 12px;
+  }
+
+  .history-table th {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .history-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .badge {
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .history-pagination {
+    gap: 8px;
+  }
+
+  .history-page-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .history-page-info {
+    font-size: 13px;
   }
 }
