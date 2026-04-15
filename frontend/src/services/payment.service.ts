@@ -1,10 +1,10 @@
 import api from '@/shared/utils/api'
 
 const paymentService = {
-  async createPayment(amount: number, checksToAdd: number) {
+  async createPayment(amount: number, checksToAdd: number, daysToAdd: number) {
     const res = await api.post<{ data: { paymentId: string; confirmationUrl: string } }>(
       '/payments/create',
-      { amount, checksToAdd },
+      { amount, checksToAdd, daysToAdd },
     )
     return res.data.data
   },

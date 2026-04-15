@@ -88,4 +88,5 @@ export class AdminController {
     const result = await this.adminService.listTasks(+page, +limit);
     return { success: true, data: result };
   }
+
 }

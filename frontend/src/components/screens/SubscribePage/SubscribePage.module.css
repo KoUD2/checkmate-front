@@ -86,7 +86,6 @@
 .card__period {
 	font-size: 1.111vw;
 	color: var(--grey-text);
-	margin-left: 0.278vw;
 }
 
 .card__checks {

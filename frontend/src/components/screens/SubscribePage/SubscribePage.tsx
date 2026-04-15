@@ -7,11 +7,11 @@ import styles from "./SubscribePage.module.css";
 import SocialConnect from "./ui/SocialConnect/SocialConnect";
 
 const PLANS = [
-  { name: "Lite", price: 149, checks: 10 },
-  { name: "Plus", price: 549, checks: 50 },
-  { name: "Pro", price: 1449, checks: 200 },
-  { name: "Ultra", price: 3990, checks: 600 },
-  { name: "Mega", price: 14490, checks: 2400 },
+  { name: "Lite", price: 149, checks: 10, days: 14 },
+  { name: "Plus", price: 549, checks: 50, days: 30 },
+  { name: "Pro", price: 1449, checks: 200, days: 60 },
+  { name: "Ultra", price: 3990, checks: 600, days: 90 },
+  { name: "Mega", price: 14490, checks: 2400, days: 365 },
 ];
 
 const SubscribePage: FC = () => {
@@ -42,12 +42,13 @@ const SubscribePage: FC = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleBuy = async (plan: { name: string; price: number; checks: number }) => {
+  const handleBuy = async (plan: { name: string; price: number; checks: number; days: number }) => {
     setLoadingPlan(plan.name);
     try {
       const { confirmationUrl } = await paymentService.createPayment(
         plan.price,
         plan.checks,
+        plan.days,
       );
       window.open(confirmationUrl, "_blank");
     } catch {
@@ -95,6 +96,7 @@ const SubscribePage: FC = () => {
                 <span className={styles.card__currency}>₽</span>
               </div>
               <div className={styles.card__checks}>{plan.checks} проверок</div>
+              <div className={styles.card__period}>{plan.days} дней</div>
               <button
                 className={styles.card__button}
                 onClick={() => handleBuy(plan)}
@@ -160,6 +162,18 @@ const SubscribePage: FC = () => {
           {user?.freeChecksLeft ?? 0}
         </span>
       </div>
+      {user?.subscription?.isActive && user.subscription.expiresAt && (
+        <div className={styles.status}>
+          Подписка активна до:{" "}
+          <span className={styles.status__value}>
+            {new Date(user.subscription.expiresAt).toLocaleDateString("ru-RU", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </span>
+        </div>
+      )}
       </div>
     </div>
   );
