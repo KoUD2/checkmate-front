@@ -48,6 +48,11 @@
   opacity: 0.75;
 }
 
+.main-layout__checks--accent {
+  background: var(--active);
+  color: var(--light-color);
+}
+
 .main-layout__greeting {
   width: 3.819vw;
   height: 3.819vw;

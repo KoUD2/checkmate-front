@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Not authenticated
         setUser(null);
-        if (!PUBLIC_PATHS.has(pathname) && pathname !== "/" && pathname !== "/create-work" && pathname !== "/subscribe" && !pathname.startsWith("/payment")) {
+        if (!PUBLIC_PATHS.has(pathname) && pathname !== "/" && pathname !== "/create-work" && pathname !== "/subscribe" && !pathname.startsWith("/payment") && !pathname.startsWith("/resources")) {
           router.push("/login");
         }
       } finally {

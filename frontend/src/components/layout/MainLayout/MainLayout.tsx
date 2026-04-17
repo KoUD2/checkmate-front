@@ -3,7 +3,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 import Link from "next/link";
-import { FC, PropsWithChildren, useState } from "react";
+import { FC, PropsWithChildren, useEffect, useState } from "react";
 import Logo from "../../../shared/images/A_Logo.svg";
 import styles from "./MainLayout.module.css";
 
@@ -19,6 +19,9 @@ function getInitials(name: string | undefined): string {
 const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   const pluralChecks = (n: number) => {
     const mod10 = n % 10;
@@ -68,9 +71,20 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                 {label}
               </Link>
             )}
-            <div className={styles["main-layout__greeting"]}>
-              {user ? getInitials(`${user.firstName} ${user.lastName}`) : ""}
-            </div>
+            {mounted && (user ? (
+              <div className={styles["main-layout__greeting"]}>
+                {getInitials(`${user.firstName} ${user.lastName}`)}
+              </div>
+            ) : (
+              <>
+                <Link href="/login" className={styles["main-layout__checks"]}>
+                  Войти
+                </Link>
+                <Link href="/register" className={`${styles["main-layout__checks"]} ${styles["main-layout__checks--accent"]}`}>
+                  Регистрация
+                </Link>
+              </>
+            ))}
             <button
               className={styles["main-layout__burger"]}
               onClick={() => setMenuOpen((v) => !v)}
@@ -93,6 +107,12 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             )}
             {label && (
               <Link href="/subscribe" onClick={() => setMenuOpen(false)}>{label}</Link>
+            )}
+            {!user && (
+              <>
+                <Link href="/login" onClick={() => setMenuOpen(false)}>Войти</Link>
+                <Link href="/register" onClick={() => setMenuOpen(false)}>Регистрация</Link>
+              </>
             )}
           </nav>
         )}

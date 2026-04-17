@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
 const PUBLIC_PAGES = new Set(['/login', '/register'])
+const PUBLIC_PREFIXES = ['/resources']
 
 export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl
@@ -17,7 +18,8 @@ export function middleware(request: NextRequest) {
 	}
 
 	// Если на защищённой странице без токена — на логин
-	if (!PUBLIC_PAGES.has(pathname) && !hasToken) {
+	const isPublicPrefix = PUBLIC_PREFIXES.some(p => pathname.startsWith(p))
+	if (!PUBLIC_PAGES.has(pathname) && !isPublicPrefix && !hasToken) {
 		return NextResponse.redirect(new URL('/login', request.url))
 	}
 
