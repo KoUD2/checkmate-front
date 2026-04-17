@@ -4,8 +4,11 @@ import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 import Link from "next/link";
 import { FC, PropsWithChildren, useEffect, useState } from "react";
+import SocialBonusPopup from "../../ui/SocialBonusPopup/SocialBonusPopup";
 import Logo from "../../../shared/images/A_Logo.svg";
 import styles from "./MainLayout.module.css";
+
+const SOCIAL_BONUS_POPUP_KEY = "socialBonusPopupDismissed";
 
 function getInitials(name: string | undefined): string {
   if (!name) return "";
@@ -20,8 +23,21 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
   const { user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showBonusPopup, setShowBonusPopup] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (user && !user.socialBonusGranted) {
+      const dismissed = localStorage.getItem(SOCIAL_BONUS_POPUP_KEY);
+      if (!dismissed) setShowBonusPopup(true);
+    }
+  }, [user]);
+
+  const handleCloseBonusPopup = () => {
+    localStorage.setItem(SOCIAL_BONUS_POPUP_KEY, "1");
+    setShowBonusPopup(false);
+  };
 
   const pluralChecks = (n: number) => {
     const mod10 = n % 10;
@@ -118,6 +134,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
         )}
       </header>
       <main>{children}</main>
+      {showBonusPopup && <SocialBonusPopup onClose={handleCloseBonusPopup} />}
     </div>
   );
 };
