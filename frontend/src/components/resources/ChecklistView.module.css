@@ -1,0 +1,139 @@
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 1.389vw;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 0.833vw;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--active-background);
+  border-radius: 2.778vw;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--active);
+  border-radius: 2.778vw;
+  transition: width 0.3s;
+}
+
+.progress-label {
+  font-size: 0.972vw;
+  font-weight: 600;
+  color: var(--grey-text);
+  white-space: nowrap;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.556vw;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.833vw;
+  padding: 1.042vw 1.25vw;
+  background: var(--background);
+  border-radius: 0.833vw;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  user-select: none;
+}
+
+.item:hover {
+  opacity: 0.8;
+}
+
+.item_checked {
+  opacity: 0.6;
+}
+
+.checkbox {
+  width: 1.389vw;
+  height: 1.389vw;
+  min-width: 1.389vw;
+  border: 2px solid var(--active-background);
+  border-radius: 0.347vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.1vw;
+  transition: background 0.12s, border-color 0.12s;
+  background: #fff;
+}
+
+.item_checked .checkbox {
+  background: var(--active);
+  border-color: var(--active);
+}
+
+.check {
+  color: #fff;
+  font-size: 0.764vw;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.item_content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.208vw;
+}
+
+.item_text {
+  font-size: 1.042vw;
+  color: var(--active-text);
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.item_checked .item_text {
+  text-decoration: line-through;
+  color: var(--grey-text);
+}
+
+.item_hint {
+  font-size: 0.903vw;
+  color: var(--grey-text);
+}
+
+@media (max-width: 768px) {
+  .checklist { gap: 14px; }
+
+  .progress-label { font-size: 13px; }
+
+  .list { gap: 6px; }
+
+  .item {
+    padding: 12px 14px;
+    border-radius: 10px;
+    gap: 10px;
+  }
+
+  .checkbox {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border-radius: 5px;
+    margin-top: 1px;
+  }
+
+  .check { font-size: 11px; }
+
+  .item_text { font-size: 14px; }
+
+  .item_hint { font-size: 12px; }
+}

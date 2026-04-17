@@ -1,0 +1,130 @@
+.template {
+  display: flex;
+  flex-direction: column;
+  gap: 1.944vw;
+}
+
+.section_label {
+  font-size: 0.833vw;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--grey-text);
+}
+
+.body_block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.833vw;
+}
+
+.body_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.body {
+  background: var(--background);
+  border-radius: 0.833vw;
+  padding: 1.389vw 1.667vw;
+  font-size: 1.042vw;
+  line-height: 1.75;
+  color: var(--active-text);
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-weight: 400;
+  margin: 0;
+}
+
+.phrases {
+  display: flex;
+  flex-direction: column;
+  gap: 0.972vw;
+}
+
+.phrase_list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.556vw;
+}
+
+.phrase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.111vw;
+  padding: 1.042vw 1.25vw;
+  background: var(--background);
+  border-radius: 0.833vw;
+}
+
+.phrase_inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.208vw;
+}
+
+.phrase_label {
+  font-size: 0.764vw;
+  font-weight: 700;
+  color: var(--grey-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.phrase_text {
+  font-size: 1.042vw;
+  color: var(--active-text);
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.copy_btn {
+  padding: 0.486vw 1.042vw;
+  border: none;
+  border-radius: 0.556vw;
+  background: var(--active-button);
+  font-size: 0.903vw;
+  font-weight: 600;
+  color: var(--active);
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.copy_btn:hover { opacity: 0.8; }
+
+@media (max-width: 768px) {
+  .template { gap: 20px; }
+
+  .section_label { font-size: 11px; }
+
+  .body {
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .phrases { gap: 10px; }
+
+  .phrase_list { gap: 6px; }
+
+  .phrase {
+    padding: 12px 14px;
+    border-radius: 10px;
+    gap: 10px;
+  }
+
+  .phrase_label { font-size: 10px; }
+
+  .phrase_text { font-size: 14px; }
+
+  .copy_btn {
+    padding: 6px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+  }
+}

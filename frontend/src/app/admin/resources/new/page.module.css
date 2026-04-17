@@ -1,0 +1,29 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.back {
+  font-size: 13px;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.12s;
+}
+
+.back:hover {
+  color: #111827;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}

@@ -171,3 +171,27 @@ model OAuthState {
 
   @@map("oauth_states")
 }
+
+model Resource {
+  id             String       @id @default(cuid())
+  slug           String       @unique
+  type           ResourceType
+  title          String
+  description    String
+  content        Json
+  published      Boolean      @default(false)
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("resources")
+}
+
+enum ResourceType {
+  ARTICLE
+  CHECKLIST
+  TRAINER
+  TEMPLATE
+}

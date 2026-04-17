@@ -55,6 +55,9 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
                 Админка
               </Link>
             )}
+            <Link href="/resources" className={styles["main-layout__checks"]}>
+              Полезное
+            </Link>
             {user && (
               <Link href="/referral" className={styles["main-layout__checks"]}>
                 Пригласить друга
@@ -84,6 +87,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
             {user?.role === 'ADMIN' && (
               <Link href="/admin" onClick={() => setMenuOpen(false)}>Админка</Link>
             )}
+            <Link href="/resources" onClick={() => setMenuOpen(false)}>Полезное</Link>
             {user && (
               <Link href="/referral" onClick={() => setMenuOpen(false)}>Пригласить друга</Link>
             )}
