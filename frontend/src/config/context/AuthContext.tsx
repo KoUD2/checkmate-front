@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await authService.signup(email, firstName, lastName, password, undefined, referredByCode);
       if (data.user) setUser(data.user);
-      router.push("/");
+      window.location.href = "/";
     } catch (err: unknown) {
       const msg = (err as Error).message || "Ошибка регистрации";
       setError(msg);
@@ -150,7 +150,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await authService.login(email, password);
       if (data.user) setUser(data.user);
-      router.push("/");
+      window.location.href = "/";
     } catch (err: unknown) {
       const msg = (err as Error).message || "Неверный email или пароль";
       setError(msg);
