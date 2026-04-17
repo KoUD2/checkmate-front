@@ -77,7 +77,7 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               </div>
             ) : (
               <>
-                <Link href="/login" className={styles["main-layout__checks"]}>
+                <Link href="/login" className={`${styles["main-layout__checks"]} ${styles["main-layout__checks--login"]}`}>
                   Войти
                 </Link>
                 <Link href="/register" className={`${styles["main-layout__checks"]} ${styles["main-layout__checks--accent"]}`}>
