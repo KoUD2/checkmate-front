@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next'
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://checkmateai.ru'
 
-async function fetchAllResources(): Promise<{ slug: string; updatedAt: string }[]> {
+async function fetchAllResources(): Promise<{ slug: string; createdAt: string }[]> {
   try {
     const res = await fetch(`${BACKEND_URL}/resources?limit=1000`, {
       cache: 'no-store',
