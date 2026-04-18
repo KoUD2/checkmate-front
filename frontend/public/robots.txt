@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://checkmateai.ru/sitemap.xml
+Sitemap: https://app.checkmateai.ru/sitemap.xml
