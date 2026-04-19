@@ -67,8 +67,13 @@ const Main: FC = () => {
 		return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`
 	}
 
-	const taskTitle = (type: TaskItem['type']) =>
-		type === 'TASK37' ? 'Задание 37' : type === 'TASK39' ? 'Задание 39' : 'Задание 38'
+	const taskTitle = (type: TaskItem['type']) => {
+		if (type === 'TASK37') return 'Задание 37'
+		if (type === 'TASK38') return 'Задание 38'
+		if (type === 'TASK39') return 'Задание 39'
+		if (type === 'TASK40') return 'Задание 40'
+		return type
+	}
 
 	return (
 		<div className={styles['main']}>

@@ -37,6 +37,16 @@ export interface GeminiTask39Result {
   transcription: string;
 }
 
+export interface GeminiTask40Result {
+  k1: number;
+  k2: number;
+  k3: number;
+  k4: number;
+  totalScore: number;
+  feedback: { k1: string; k2: string; k3: string; k4: string };
+  transcription: string;
+}
+
 @Injectable()
 export class GeminiService {
   private openai: OpenAI;
@@ -409,6 +419,142 @@ export class GeminiService {
         await new Promise((r) => setTimeout(r, 5000 * (attempt + 1)));
       }
     }
+  }
+
+  async checkTask40(
+    audioBase64: string,
+    audioFileName?: string,
+    questions?: string[],
+  ): Promise<GeminiTask40Result> {
+    let mimeType = 'audio/webm';
+    let filename = 'recording.webm';
+    let base64Data = audioBase64;
+
+    if (audioBase64.includes(',')) {
+      const prefix = audioBase64.split(',')[0];
+      const match = prefix.match(/data:([^;]+)/);
+      if (match) mimeType = match[1];
+      base64Data = audioBase64.split(',')[1];
+    }
+
+    const MIME_MAP: Record<string, string> = {
+      'audio/x-m4a': 'audio/mp4',
+      'audio/m4a': 'audio/mp4',
+      'audio/mp3': 'audio/mpeg',
+      'audio/x-wav': 'audio/wav',
+      'audio/wave': 'audio/wav',
+      'video/mp4': 'audio/mp4',
+      'video/webm': 'audio/webm',
+    };
+    const normalizedMime = MIME_MAP[mimeType] ?? mimeType;
+
+    if (audioFileName) {
+      const dotIdx = audioFileName.lastIndexOf('.');
+      if (dotIdx !== -1) filename = `recording${audioFileName.slice(dotIdx)}`;
+    } else {
+      const ext = normalizedMime.split('/')[1]?.split(';')[0] || 'webm';
+      filename = `recording.${ext}`;
+    }
+
+    let audioBuffer = Buffer.from(base64Data, 'base64');
+    const brand = audioBuffer.slice(8, 12).toString('ascii');
+    console.log(`[Whisper task40] file: ${filename}, mime: ${normalizedMime}, bytes: ${audioBuffer.length}, brand: ${brand}`);
+
+    if (brand.startsWith('3gp') || brand === 'isom' && normalizedMime !== 'audio/webm') {
+      try {
+        const tmpIn = path.join(os.tmpdir(), `audio40_in_${Date.now()}`);
+        const tmpOut = path.join(os.tmpdir(), `audio40_out_${Date.now()}.wav`);
+        fs.writeFileSync(tmpIn, audioBuffer);
+        await execFileAsync('ffmpeg', ['-y', '-i', tmpIn, '-ar', '16000', '-ac', '1', tmpOut]);
+        audioBuffer = fs.readFileSync(tmpOut);
+        fs.unlinkSync(tmpIn);
+        fs.unlinkSync(tmpOut);
+        filename = 'recording.wav';
+      } catch (convErr) {
+        console.error('[Whisper task40] ffmpeg conversion failed:', convErr);
+      }
+    }
+
+    let transcription = '';
+    try {
+      const apiKey = this.configService.get<string>('OPENAI_API_KEY');
+      const proxyUrl = this.configService.get<string>('GEMINI_PROXY');
+      const dispatcher = proxyUrl ? new ProxyAgent(proxyUrl) : new Agent();
+
+      const form = new UndiciFormData();
+      const blob = new Blob([audioBuffer], { type: 'application/octet-stream' });
+      form.append('file', blob, filename);
+      form.append('model', 'whisper-1');
+      form.append('language', 'en');
+
+      const res = await undiciFetch('https://api.openai.com/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: form,
+        dispatcher,
+      } as any);
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Whisper API error ${res.status}: ${errText}`);
+      }
+
+      const data = await res.json() as any;
+      transcription = data.text ?? '';
+    } catch (err) {
+      console.error('[Whisper task40] transcription failed:', err);
+      throw new InternalServerErrorException('Ошибка транскрипции аудио. Попробуйте позже.');
+    }
+
+    if (!transcription.trim()) {
+      return {
+        k1: 0, k2: 0, k3: 0, k4: 0,
+        totalScore: 0,
+        feedback: { k1: 'Аудиозапись не содержит распознаваемой речи.', k2: '', k3: '', k4: '' },
+        transcription: '',
+      };
+    }
+
+    const topicsBlock = questions && questions.length > 0
+      ? questions.map((q, i) => `${i + 1}. ${this.sanitize(q)}`).join('\n')
+      : '1. (не указано)\n2. (не указано)\n3. (не указано)\n4. (не указано)';
+    const userContent = `<task_topics>\n${topicsBlock}\n</task_topics>\n\n<transcription>\n${this.sanitize(transcription)}\n</transcription>`;
+    const usage = { prompt: 0, completion: 0 };
+    const readPrompt = (name: string) => fs.readFileSync(path.join(this.promptsDir, name), 'utf-8');
+
+    const response = await this.callOpenAI(
+      this.securityPreamble + '\n\n' + readPrompt('prompt40_1.txt'),
+      userContent,
+      usage,
+    );
+
+    const k1 = this.extractKScore(response, 1);
+    const k2 = this.extractKScore(response, 2);
+    const k3 = this.extractKScore(response, 3);
+    const k4 = this.extractKScore(response, 4);
+
+    console.log(`[Tokens] task40: prompt=${usage.prompt} completion=${usage.completion} total=${usage.prompt + usage.completion}`);
+
+    return {
+      k1, k2, k3, k4,
+      totalScore: k1 + k2 + k3 + k4,
+      feedback: { k1: response, k2: '', k3: '', k4: '' },
+      transcription,
+    };
+  }
+
+  private extractKScore(text: string, k: number): number {
+    // Match patterns like "К1 ...: ... Балл: 1" or "K1 ...: ... Score: 1"
+    const patterns = [
+      new RegExp(`К${k}[^\\n]*Балл:\\s*(\\d)`, 'i'),
+      new RegExp(`K${k}[^\\n]*Балл:\\s*(\\d)`, 'i'),
+      new RegExp(`К${k}[^\\n]*Score:\\s*(\\d)`, 'i'),
+    ];
+    for (const p of patterns) {
+      const m = text.match(p);
+      if (m) return Math.min(1, parseInt(m[1], 10));
+    }
+    return 0;
   }
 
   private extractScore(text: string): number {

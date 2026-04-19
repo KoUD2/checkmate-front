@@ -15,7 +15,7 @@ import styles from './TaskDetailPage.module.css'
 
 interface Task {
 	id: string
-	type: 'TASK37' | 'TASK38' | 'TASK39'
+	type: 'TASK37' | 'TASK38' | 'TASK39' | 'TASK40'
 	taskDescription: string
 	solution: string
 	imageBase64: string | null
@@ -83,10 +83,11 @@ export default function TaskDetailPage() {
 
 	const isTask37 = task.type === 'TASK37'
 	const isTask39 = task.type === 'TASK39'
+	const isTask40 = task.type === 'TASK40'
 	const task37 = isTask37 ? parseTask37Description(task.taskDescription) : null
 	const task38 = task.type === 'TASK38' ? parseTask38Description(task.taskDescription) : null
 
-	const titleMap = { TASK37: 'Задание 37', TASK38: 'Задание 38', TASK39: 'Задание 39' }
+	const titleMap = { TASK37: 'Задание 37', TASK38: 'Задание 38', TASK39: 'Задание 39', TASK40: 'Задание 40' }
 
 	return (
 		<div className={styles['page']}>
@@ -142,6 +143,23 @@ export default function TaskDetailPage() {
 						</div>
 					)}
 
+					{isTask40 && (
+						<div className={styles['task-fields']}>
+							<p style={{ fontSize: '18px', lineHeight: '1.6', margin: 0 }}>
+								You are considering using the in home tutoring service and you&apos;d like to get more information. In 1.5 minutes you are to ask four direct questions to find out the following.
+							</p>
+							<div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+								{task.taskDescription.split('\n').filter(Boolean).map((line, i) => (
+									<div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px' }}>
+										<span style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'var(--active)', color: '#fff', fontSize: '14px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</span>
+										<span>{line.replace(/^\d+\.\s*/, '')}</span>
+									</div>
+								))}
+							</div>
+							<p style={{ fontSize: '18px', color: 'var(--grey-text)', margin: 0 }}>You have 20 seconds to ask each question.</p>
+						</div>
+					)}
+
 					{task.type === 'TASK38' && task38 && (
 						<div className={styles['task-fields']}>
 							<div className={styles['instructions']}>
@@ -192,7 +210,7 @@ export default function TaskDetailPage() {
 					)}
 				</div>
 
-				{!isTask39 && (
+				{!isTask39 && !isTask40 && (
 					<div className={styles['section']}>
 						<SecondTitle text='Работа ученика' />
 						<TextArea
@@ -203,7 +221,7 @@ export default function TaskDetailPage() {
 					</div>
 				)}
 
-				{isTask39 && task.transcription && (
+				{(isTask39 || isTask40) && task.transcription && (
 					<div className={styles['section']}>
 						<SecondTitle text='Транскрипция' />
 						<TextArea
@@ -225,6 +243,13 @@ export default function TaskDetailPage() {
 							</>
 						) : isTask39 ? (
 							<Criteria maxMark={1} criteriaNumber='К1' criteriaDescription='Фонетическая сторона речи' value={task.k1} readonly />
+						) : isTask40 ? (
+							<>
+								<Criteria maxMark={1} criteriaNumber='К1' criteriaDescription='Вопрос 1' value={task.k1} readonly />
+								<Criteria maxMark={1} criteriaNumber='К2' criteriaDescription='Вопрос 2' value={task.k2} readonly />
+								<Criteria maxMark={1} criteriaNumber='К3' criteriaDescription='Вопрос 3' value={task.k3} readonly />
+								<Criteria maxMark={1} criteriaNumber='К4' criteriaDescription='Вопрос 4' value={task.k4 ?? 0} readonly />
+							</>
 						) : (
 							<>
 								<Criteria maxMark={3} criteriaNumber='К1' criteriaDescription='Решение коммуникативной задачи' value={task.k1} readonly />
@@ -245,7 +270,6 @@ export default function TaskDetailPage() {
 							{Object.entries(task.feedback).map(([key, text]) =>
 								text ? (
 									<div key={key} className={styles['feedback__item']}>
-										<p className={styles['feedback__label']}>{key.toUpperCase()}</p>
 										<p className={styles['feedback__text']}>{text.replace(/\*/g, '')}</p>
 									</div>
 								) : null

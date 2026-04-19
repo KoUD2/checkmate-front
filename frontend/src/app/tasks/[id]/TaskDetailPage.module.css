@@ -134,7 +134,7 @@
 .feedback__label {
 	font-size: 1.25vw;
 	font-weight: 600;
-	color: var(--active);
+	color: var(--text);
 }
 
 .feedback__text {
