@@ -5,6 +5,6 @@ export interface ITaskNumber
 		HTMLAttributes<HTMLButtonElement>,
 		HTMLButtonElement
 	> {
-	text: '37' | '38.1' | '38.2' | '39'
+	text: '37' | '38.1' | '38.2' | '39' | '40'
 	isActive: boolean
 }
