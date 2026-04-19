@@ -84,6 +84,7 @@ enum TaskType {
   TASK37
   TASK38
   TASK39
+  TASK40
 }
 
 model Subscription {
