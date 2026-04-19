@@ -195,7 +195,26 @@ export class TasksService {
   }
 
   async getTask(userId: string, taskId: string) {
-    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    const task = await this.prisma.task.findUnique({
+      where: { id: taskId },
+      select: {
+        id: true,
+        type: true,
+        userId: true,
+        taskDescription: true,
+        solution: true,
+        imageBase64: true,
+        transcription: true,
+        k1: true,
+        k2: true,
+        k3: true,
+        k4: true,
+        k5: true,
+        totalScore: true,
+        feedback: true,
+        createdAt: true,
+      },
+    });
     if (!task) throw new NotFoundException('Задание не найдено');
     if (task.userId !== userId) throw new ForbiddenException('Нет доступа');
     return task;
