@@ -12,7 +12,7 @@ import styles from './Main.module.css'
 
 interface TaskItem {
 	id: string
-	type: 'TASK37' | 'TASK38' | 'TASK39'
+	type: 'TASK37' | 'TASK38' | 'TASK39' | 'TASK40' | 'TASK41'
 	solution: string
 	totalScore: number | null
 	createdAt: string
@@ -72,6 +72,7 @@ const Main: FC = () => {
 		if (type === 'TASK38') return 'Задание 38'
 		if (type === 'TASK39') return 'Задание 39'
 		if (type === 'TASK40') return 'Задание 40'
+		if (type === 'TASK41') return 'Задание 41'
 		return type
 	}
 
