@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, FC } from 'react'
 
-export type TaskType = '37' | '38.1' | '38.2' | '39' | '40'
+export type TaskType = '37' | '38.1' | '38.2' | '39' | '40' | '41'
 
 export interface Task37Result {
 	kind: 'task37'
@@ -43,7 +43,19 @@ export interface Task40Result {
 	transcription: string
 }
 
-export type TaskResult = Task37Result | Task38Result | Task39Result | Task40Result
+export interface Task41Result {
+	kind: 'task41'
+	k1: number
+	k2: number
+	k3: number
+	k4: number
+	k5: number
+	totalScore: number
+	feedback: { k1: string; k2: string; k3: string; k4: string; k5: string }
+	transcription: string
+}
+
+export type TaskResult = Task37Result | Task38Result | Task39Result | Task40Result | Task41Result
 
 export interface Task37FormData {
 	kind: 'task37'
@@ -77,7 +89,11 @@ export interface Task40FormData {
 	imageBase64?: string
 }
 
-export type TaskFormData = Task37FormData | Task38FormData | Task39FormData | Task40FormData
+export interface Task41FormData {
+	kind: 'task41'
+}
+
+export type TaskFormData = Task37FormData | Task38FormData | Task39FormData | Task40FormData | Task41FormData
 
 interface TaskCheckState {
 	isChecking: boolean
