@@ -13,6 +13,7 @@ import { CreateTask37Dto } from './dto/create-task37.dto';
 import { CreateTask38Dto } from './dto/create-task38.dto';
 import { CreateTask39Dto } from './dto/create-task39.dto';
 import { CreateTask40Dto } from './dto/create-task40.dto';
+import { CreateTask41Dto } from './dto/create-task41.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
@@ -60,6 +61,23 @@ export class TasksController {
     @Body() dto: CreateTask40Dto,
   ) {
     const task = await this.tasksService.submitTask40(userId, dto);
+    return { success: true, data: { task } };
+  }
+
+  @Post('tts')
+  @ApiOperation({ summary: 'Синтез речи через OpenAI TTS' })
+  async synthesizeSpeech(@Body() dto: { text: string }) {
+    const audioBase64 = await this.tasksService.synthesizeSpeech(dto.text);
+    return { success: true, data: { audioBase64 } };
+  }
+
+  @Post('41')
+  @ApiOperation({ summary: 'Отправить задание 41 (условный диалог-интервью)' })
+  async submitTask41(
+    @CurrentUser('id') userId: string,
+    @Body() dto: CreateTask41Dto,
+  ) {
+    const task = await this.tasksService.submitTask41(userId, dto);
     return { success: true, data: { task } };
   }
 

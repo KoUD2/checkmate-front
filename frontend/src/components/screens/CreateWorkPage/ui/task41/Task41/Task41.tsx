@@ -57,6 +57,9 @@ const Task41: FC<Props> = ({ onChecked }) => {
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null)
 	const audioChunksRef = useRef<Blob[]>([])
 
+	// TTS audio cache: text → base64 mp3 (pre-generated during preparation)
+	const audioCacheRef = useRef<Record<string, string>>({})
+
 	// Snapshot of task data captured at prep-start, used throughout recording
 	const recordDataRef = useRef({ introText: '', questions: ['', '', '', '', ''] })
 
@@ -79,36 +82,30 @@ const Task41: FC<Props> = ({ onChecked }) => {
 	// ─── TTS ─────────────────────────────────────────────────────────────────
 
 	const ttsSpeak = useCallback((text: string, onEnd: () => void) => {
-		if (typeof window === 'undefined' || !window.speechSynthesis) { onEnd(); return }
-		const synth = window.speechSynthesis
-		synth.cancel()
+		const cached = audioCacheRef.current[text]
+		const b64 = cached ?? null
 
-		const doSpeak = () => {
-			const u = new SpeechSynthesisUtterance(text)
-			u.lang = 'en-US'
-			u.rate = 0.9
-			const voices = synth.getVoices()
-			const enVoice = voices.find(v => v.lang.startsWith('en'))
-			if (enVoice) u.voice = enVoice
-			u.onend = onEnd
-			u.onerror = (e: SpeechSynthesisErrorEvent) => {
-				if (e.error !== 'interrupted' && e.error !== 'canceled') onEnd()
-			}
-			synth.speak(u)
-			// Chrome bug: synthesis can get paused after cancel
-			setTimeout(() => { if (synth.paused) synth.resume() }, 100)
+		const playB64 = (base64: string) => {
+			const audio = new Audio(`data:audio/mpeg;base64,${base64}`)
+			audio.onended = onEnd
+			audio.onerror = () => onEnd()
+			audio.play().catch(() => onEnd())
 		}
 
-		// Chrome loads voices asynchronously — wait if not ready yet
-		const voices = synth.getVoices()
-		if (voices.length > 0) {
-			setTimeout(doSpeak, 50) // brief pause after cancel() — Chrome requires it
+		if (b64) {
+			playB64(b64)
 		} else {
-			const handler = () => {
-				synth.removeEventListener('voiceschanged', handler)
-				setTimeout(doSpeak, 50)
-			}
-			synth.addEventListener('voiceschanged', handler)
+			api.post('/tasks/tts', { text })
+				.then(res => {
+					const base64 = res.data?.data?.audioBase64
+					if (base64) {
+						audioCacheRef.current[text] = base64
+						playB64(base64)
+					} else {
+						onEnd()
+					}
+				})
+				.catch(() => onEnd())
 		}
 	}, [])
 
@@ -208,15 +205,33 @@ const Task41: FC<Props> = ({ onChecked }) => {
 
 	// ─── Start recording ─────────────────────────────────────────────────────
 
-	const handleStartRecording = useCallback(async () => {
+	const handleStartRecording = useCallback(() => {
 		if (prepTimerRef.current) { clearInterval(prepTimerRef.current); prepTimerRef.current = null }
 
-		// ① Start TTS chain SYNCHRONOUSLY (before any await) so it runs in user-gesture context
 		setPhase('recording')
 		setRecordStage('intro')
 		setCurrentQuestion(0)
 
-		const kickOffTTS = () => {
+		// Called after intro TTS ends — acquire mic HERE so it doesn't overlap with TTS playback
+		const kickOffTTS = async () => {
+			// ② Acquire mic after intro is done (no dialog interrupts TTS)
+			try {
+				const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+				const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+					? 'audio/webm;codecs=opus'
+					: 'audio/mp4'
+				const recorder = new MediaRecorder(stream, { mimeType })
+				audioChunksRef.current = []
+				recorder.ondataavailable = e => { if (e.data.size > 0) audioChunksRef.current.push(e.data) }
+				recorder.start(1000)
+				mediaRecorderRef.current = recorder
+			} catch {
+				window.speechSynthesis?.cancel()
+				setPhase('input')
+				failCheck('Не удалось получить доступ к микрофону. Разрешите доступ и попробуйте снова.')
+				return
+			}
+
 			setCurrentQuestion(0)
 			setRecordStage('q-speaking')
 			ttsSpeak(recordDataRef.current.questions[0], () => {
@@ -224,29 +239,12 @@ const Task41: FC<Props> = ({ onChecked }) => {
 			})
 		}
 
+		// ① Play intro TTS first — mic is NOT yet active
 		const intro = recordDataRef.current.introText
 		if (intro) {
 			ttsSpeak(intro, kickOffTTS)
 		} else {
 			kickOffTTS()
-		}
-
-		// ② Acquire mic (async) — TTS is already running
-		try {
-			const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-			const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-				? 'audio/webm;codecs=opus'
-				: 'audio/mp4'
-			const recorder = new MediaRecorder(stream, { mimeType })
-			audioChunksRef.current = []
-			recorder.ondataavailable = e => { if (e.data.size > 0) audioChunksRef.current.push(e.data) }
-			recorder.start(1000)
-			mediaRecorderRef.current = recorder
-		} catch {
-			window.speechSynthesis?.cancel()
-			if (answerTimerRef.current) { clearInterval(answerTimerRef.current); answerTimerRef.current = null }
-			setPhase('input')
-			failCheck('Не удалось получить доступ к микрофону. Разрешите доступ и попробуйте снова.')
 		}
 	}, [ttsSpeak, failCheck])
 
@@ -264,6 +262,22 @@ const Task41: FC<Props> = ({ onChecked }) => {
 		setFormError('')
 		// Snapshot data NOW so it's available throughout recording
 		recordDataRef.current = { introText: introText.trim(), questions: [...questions] }
+
+		// Pre-generate all TTS audio in background during preparation (90 sec is plenty)
+		const textsToCache = [
+			...(introText.trim() ? [introText.trim()] : []),
+			...questions,
+			OUTRO_TEXT,
+		]
+		audioCacheRef.current = {}
+		textsToCache.forEach(text => {
+			api.post('/tasks/tts', { text })
+				.then(res => {
+					const base64 = res.data?.data?.audioBase64
+					if (base64) audioCacheRef.current[text] = base64
+				})
+				.catch(() => {})
+		})
 
 		setPhase('preparation')
 		prepSecondsRef.current = PREP_SECONDS
