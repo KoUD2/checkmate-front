@@ -12,6 +12,7 @@ import { CreateTask38Dto } from './dto/create-task38.dto';
 import { CreateTask39Dto } from './dto/create-task39.dto';
 import { CreateTask40Dto } from './dto/create-task40.dto';
 import { CreateTask41Dto } from './dto/create-task41.dto';
+import { CreateTask42Dto } from './dto/create-task42.dto';
 
 @Injectable()
 export class TasksService {
@@ -198,6 +199,42 @@ export class TasksService {
     return task;
   }
 
+  async submitTask42(userId: string, dto: CreateTask42Dto) {
+    await this.checkAccess(userId);
+
+    const result = await this.gemini.checkTask42(dto.audioBase64, dto.audioFileName, dto.taskText, dto.bullets, dto.image1Base64, dto.image2Base64);
+
+    const taskDescription = dto.taskText
+      ? dto.taskText + (dto.bullets && dto.bullets.length > 0 ? '\n' + dto.bullets.map((b, i) => `${i + 1}. ${b}`).join('\n') : '')
+      : "Man's best friends";
+
+    const [task] = await this.prisma.$transaction([
+      this.prisma.task.create({
+        data: {
+          type: TaskType.TASK42,
+          userId,
+          taskDescription,
+          solution: result.transcription,
+          audioBase64: dto.audioBase64,
+          image1Base64: dto.image1Base64,
+          image2Base64: dto.image2Base64,
+          transcription: result.transcription,
+          k1: result.k1,
+          k2: result.k2,
+          k3: result.k3,
+          totalScore: result.totalScore,
+          feedback: result.feedback as any,
+        },
+      }),
+      this.prisma.user.update({
+        where: { id: userId },
+        data: { freeChecksLeft: { decrement: 1 } },
+      }),
+    ]);
+
+    return task;
+  }
+
   async getHistory(userId: string, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
     const [tasks, total] = await Promise.all([
@@ -241,6 +278,8 @@ export class TasksService {
         taskDescription: true,
         solution: true,
         imageBase64: true,
+        image1Base64: true,
+        image2Base64: true,
         transcription: true,
         k1: true,
         k2: true,

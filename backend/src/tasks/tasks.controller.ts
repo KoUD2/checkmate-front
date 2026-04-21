@@ -14,6 +14,7 @@ import { CreateTask38Dto } from './dto/create-task38.dto';
 import { CreateTask39Dto } from './dto/create-task39.dto';
 import { CreateTask40Dto } from './dto/create-task40.dto';
 import { CreateTask41Dto } from './dto/create-task41.dto';
+import { CreateTask42Dto } from './dto/create-task42.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 
@@ -78,6 +79,16 @@ export class TasksController {
     @Body() dto: CreateTask41Dto,
   ) {
     const task = await this.tasksService.submitTask41(userId, dto);
+    return { success: true, data: { task } };
+  }
+
+  @Post('42')
+  @ApiOperation({ summary: 'Отправить задание 42 (монологическое высказывание — Man\'s best friends)' })
+  async submitTask42(
+    @CurrentUser('id') userId: string,
+    @Body() dto: CreateTask42Dto,
+  ) {
+    const task = await this.tasksService.submitTask42(userId, dto);
     return { success: true, data: { task } };
   }
 

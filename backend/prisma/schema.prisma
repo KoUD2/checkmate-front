@@ -63,6 +63,8 @@ model Task {
   solution        String
   imageBase64          String?
   solutionImageBase64  String?
+  image1Base64         String?
+  image2Base64         String?
   audioBase64          String?
   transcription        String?
   k1              Int?
@@ -86,6 +88,7 @@ enum TaskType {
   TASK39
   TASK40
   TASK41
+  TASK42
 }
 
 model Subscription {

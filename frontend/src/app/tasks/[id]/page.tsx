@@ -15,10 +15,12 @@ import styles from "./TaskDetailPage.module.css";
 
 interface Task {
   id: string;
-  type: "TASK37" | "TASK38" | "TASK39" | "TASK40";
+  type: "TASK37" | "TASK38" | "TASK39" | "TASK40" | "TASK41" | "TASK42";
   taskDescription: string;
   solution: string;
   imageBase64: string | null;
+  image1Base64: string | null;
+  image2Base64: string | null;
   transcription: string | null;
   k1: number;
   k2: number;
@@ -97,6 +99,8 @@ export default function TaskDetailPage() {
   const isTask37 = task.type === "TASK37";
   const isTask39 = task.type === "TASK39";
   const isTask40 = task.type === "TASK40";
+  const isTask41 = task.type === "TASK41";
+  const isTask42 = task.type === "TASK42";
   const task37 = isTask37 ? parseTask37Description(task.taskDescription) : null;
   const task38 =
     task.type === "TASK38"
@@ -108,6 +112,8 @@ export default function TaskDetailPage() {
     TASK38: "Задание 38",
     TASK39: "Задание 39",
     TASK40: "Задание 40",
+    TASK41: "Задание 41",
+    TASK42: "Задание 42",
   };
 
   return (
@@ -221,6 +227,55 @@ export default function TaskDetailPage() {
             </div>
           )}
 
+          {isTask41 && task.taskDescription && (
+            <div className={styles["task-fields"]}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {task.taskDescription.split("\n").filter(Boolean).map((line, i) => (
+                  <p key={i} style={{ fontSize: "18px", lineHeight: "1.6", margin: 0 }}>{line}</p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isTask42 && task.taskDescription && (() => {
+            const lines = task.taskDescription.split("\n").filter(Boolean);
+            const intro = lines.filter(l => !l.match(/^\d+\./));
+            const bullets = lines.filter(l => l.match(/^\d+\./)).map(l => l.replace(/^\d+\.\s*/, ""));
+            return (
+              <div className={styles["task-fields"]}>
+                {intro.map((line, i) => (
+                  <p key={i} className={styles["instruction-text"]}>{line}</p>
+                ))}
+                {bullets.length > 0 && (
+                  <ul className={styles["plan-list"]} style={{ listStyle: "none", paddingLeft: 0, marginLeft: 0 }}>
+                    {bullets.map((b, i) => (
+                      <li key={i} className={styles["plan-item"]} style={{ display: "flex", gap: "0.694vw", marginBottom: "0.556vw" }}>
+                        <span style={{ color: "var(--active)", fontWeight: 700, flexShrink: 0 }}>—</span>
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {(task.image1Base64 || task.image2Base64) && (
+                  <div style={{ display: "flex", gap: "1.5vw", marginTop: "1vw" }}>
+                    {task.image1Base64 && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.4vw", alignItems: "center" }}>
+                        <span style={{ fontSize: "14px", color: "var(--grey-text)" }}>Фото 1</span>
+                        <img src={`data:image/jpeg;base64,${task.image1Base64}`} alt="Фото 1" style={{ maxWidth: "280px", borderRadius: "8px" }} />
+                      </div>
+                    )}
+                    {task.image2Base64 && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.4vw", alignItems: "center" }}>
+                        <span style={{ fontSize: "14px", color: "var(--grey-text)" }}>Фото 2</span>
+                        <img src={`data:image/jpeg;base64,${task.image2Base64}`} alt="Фото 2" style={{ maxWidth: "280px", borderRadius: "8px" }} />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
           {task.type === "TASK38" && task38 && (
             <div className={styles["task-fields"]}>
               <div className={styles["instructions"]}>
@@ -298,7 +353,7 @@ export default function TaskDetailPage() {
           )}
         </div>
 
-        {!isTask39 && !isTask40 && (
+        {!isTask39 && !isTask40 && !isTask41 && !isTask42 && (
           <div className={styles["section"]}>
             <SecondTitle text="Работа ученика" />
             <TextArea
@@ -309,7 +364,7 @@ export default function TaskDetailPage() {
           </div>
         )}
 
-        {(isTask39 || isTask40) && task.transcription && (
+        {(isTask39 || isTask40 || isTask41 || isTask42) && task.transcription && (
           <div className={styles["section"]}>
             <SecondTitle text="Транскрипция" />
             <TextArea
@@ -385,6 +440,20 @@ export default function TaskDetailPage() {
                   value={task.k4 ?? 0}
                   readonly
                 />
+              </>
+            ) : isTask41 ? (
+              <>
+                <Criteria maxMark={1} criteriaNumber="К1" criteriaDescription="Ответ 1" value={task.k1} readonly />
+                <Criteria maxMark={1} criteriaNumber="К2" criteriaDescription="Ответ 2" value={task.k2} readonly />
+                <Criteria maxMark={1} criteriaNumber="К3" criteriaDescription="Ответ 3" value={task.k3} readonly />
+                <Criteria maxMark={1} criteriaNumber="К4" criteriaDescription="Ответ 4" value={task.k4 ?? 0} readonly />
+                <Criteria maxMark={1} criteriaNumber="К5" criteriaDescription="Ответ 5" value={task.k5 ?? 0} readonly />
+              </>
+            ) : isTask42 ? (
+              <>
+                <Criteria maxMark={4} criteriaNumber="К1" criteriaDescription="Решение коммуникативной задачи" value={task.k1} readonly />
+                <Criteria maxMark={3} criteriaNumber="К2" criteriaDescription="Организация высказывания" value={task.k2} readonly />
+                <Criteria maxMark={3} criteriaNumber="К3" criteriaDescription="Языковое оформление" value={task.k3} readonly />
               </>
             ) : (
               <>

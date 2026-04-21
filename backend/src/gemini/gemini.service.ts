@@ -58,6 +58,15 @@ export interface GeminiTask41Result {
   transcription: string;
 }
 
+export interface GeminiTask42Result {
+  k1: number;
+  k2: number;
+  k3: number;
+  totalScore: number;
+  feedback: { k1: string; k2: string; k3: string };
+  transcription: string;
+}
+
 @Injectable()
 export class GeminiService {
   private openai: OpenAI;
@@ -687,6 +696,147 @@ export class GeminiService {
       k1, k2, k3, k4, k5,
       totalScore: k1 + k2 + k3 + k4 + k5,
       feedback: { k1: response, k2: '', k3: '', k4: '', k5: '' },
+      transcription,
+    };
+  }
+
+  async checkTask42(
+    audioBase64: string,
+    audioFileName?: string,
+    taskText?: string,
+    bullets?: string[],
+    image1Base64?: string,
+    image2Base64?: string,
+  ): Promise<GeminiTask42Result> {
+    let mimeType = 'audio/webm';
+    let filename = 'recording.webm';
+    let base64Data = audioBase64;
+
+    if (audioBase64.includes(',')) {
+      const prefix = audioBase64.split(',')[0];
+      const match = prefix.match(/data:([^;]+)/);
+      if (match) mimeType = match[1];
+      base64Data = audioBase64.split(',')[1];
+    }
+
+    const MIME_MAP: Record<string, string> = {
+      'audio/x-m4a': 'audio/mp4',
+      'audio/m4a': 'audio/mp4',
+      'audio/mp3': 'audio/mpeg',
+      'audio/x-wav': 'audio/wav',
+      'audio/wave': 'audio/wav',
+      'video/mp4': 'audio/mp4',
+      'video/webm': 'audio/webm',
+    };
+    const normalizedMime = MIME_MAP[mimeType] ?? mimeType;
+
+    if (audioFileName) {
+      const dotIdx = audioFileName.lastIndexOf('.');
+      if (dotIdx !== -1) filename = `recording${audioFileName.slice(dotIdx)}`;
+    } else {
+      const ext = normalizedMime.split('/')[1]?.split(';')[0] || 'webm';
+      filename = `recording.${ext}`;
+    }
+
+    let audioBuffer = Buffer.from(base64Data, 'base64');
+    const brand = audioBuffer.slice(8, 12).toString('ascii');
+    console.log(`[Whisper task42] file: ${filename}, mime: ${normalizedMime}, bytes: ${audioBuffer.length}, brand: ${brand}`);
+
+    if (brand.startsWith('3gp') || brand === 'isom' && normalizedMime !== 'audio/webm') {
+      try {
+        const tmpIn = path.join(os.tmpdir(), `audio42_in_${Date.now()}`);
+        const tmpOut = path.join(os.tmpdir(), `audio42_out_${Date.now()}.wav`);
+        fs.writeFileSync(tmpIn, audioBuffer);
+        await execFileAsync('ffmpeg', ['-y', '-i', tmpIn, '-ar', '16000', '-ac', '1', tmpOut]);
+        audioBuffer = fs.readFileSync(tmpOut);
+        fs.unlinkSync(tmpIn);
+        fs.unlinkSync(tmpOut);
+        filename = 'recording.wav';
+      } catch (convErr) {
+        console.error('[Whisper task42] ffmpeg conversion failed:', convErr);
+      }
+    }
+
+    let transcription = '';
+    try {
+      const apiKey = this.configService.get<string>('OPENAI_API_KEY');
+      const proxyUrl = this.configService.get<string>('GEMINI_PROXY');
+      const dispatcher = proxyUrl ? new ProxyAgent(proxyUrl) : new Agent();
+
+      const form = new UndiciFormData();
+      const blob = new Blob([audioBuffer], { type: 'application/octet-stream' });
+      form.append('file', blob, filename);
+      form.append('model', 'whisper-1');
+      form.append('language', 'en');
+
+      const res = await undiciFetch('https://api.openai.com/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${apiKey}` },
+        body: form,
+        dispatcher,
+      } as any);
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Whisper API error ${res.status}: ${errText}`);
+      }
+
+      const data = await res.json() as any;
+      transcription = data.text ?? '';
+    } catch (err) {
+      console.error('[Whisper task42] transcription failed:', err);
+      throw new InternalServerErrorException('Ошибка транскрипции аудио. Попробуйте позже.');
+    }
+
+    if (!transcription.trim()) {
+      return {
+        k1: 0, k2: 0, k3: 0,
+        totalScore: 0,
+        feedback: { k1: 'Аудиозапись не содержит распознаваемой речи.', k2: '', k3: '' },
+        transcription: '',
+      };
+    }
+
+    const taskTextBlock = taskText
+      ? `<task_text>\n${this.sanitize(taskText)}\n</task_text>\n\n`
+      : '';
+    const bulletsBlock = bullets && bullets.length > 0
+      ? `<bullets>\n${bullets.map((b, i) => `${i + 1}. ${this.sanitize(b)}`).join('\n')}\n</bullets>\n\n`
+      : '';
+    const userContent = `${taskTextBlock}${bulletsBlock}<transcription>\n${this.sanitize(transcription)}\n</transcription>`;
+    const usage = { prompt: 0, completion: 0 };
+    const readPrompt = (name: string) => fs.readFileSync(path.join(this.promptsDir, name), 'utf-8');
+
+    const images = [image1Base64, image2Base64].filter((img): img is string => !!img?.trim());
+    const resp1 = images.length > 0
+      ? await this.callOpenAIWithImage(this.securityPreamble + '\n\n' + readPrompt('prompt42_1.txt'), userContent, images, usage)
+      : await this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt('prompt42_1.txt'), userContent, usage);
+    const k1 = Math.min(4, this.extractScore(resp1));
+
+    if (k1 === 0) {
+      console.log(`[Tokens] task42 (k1=0, skipped k2/k3): prompt=${usage.prompt} completion=${usage.completion} total=${usage.prompt + usage.completion}`);
+      return {
+        k1: 0, k2: 0, k3: 0,
+        totalScore: 0,
+        feedback: { k1: resp1, k2: '', k3: '' },
+        transcription,
+      };
+    }
+
+    const [resp2, resp3] = await Promise.all([
+      this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt('prompt42_2.txt'), userContent, usage),
+      this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt('prompt42_3.txt'), userContent, usage),
+    ]);
+
+    const k2 = Math.min(3, this.extractScore(resp2));
+    const k3 = Math.min(3, this.extractScore(resp3));
+
+    console.log(`[Tokens] task42: prompt=${usage.prompt} completion=${usage.completion} total=${usage.prompt + usage.completion}`);
+
+    return {
+      k1, k2, k3,
+      totalScore: k1 + k2 + k3,
+      feedback: { k1: resp1, k2: resp2, k3: resp3 },
       transcription,
     };
   }
