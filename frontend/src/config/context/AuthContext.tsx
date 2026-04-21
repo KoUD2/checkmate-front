@@ -134,8 +134,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await authService.signup(email, firstName, lastName, password, undefined, referredByCode);
       if (data.user) setUser(data.user);
-      if (typeof window !== "undefined" && Array.isArray((window as any)._tmr)) {
-        (window as any)._tmr.push({ type: "reachGoal", id: "3755767", goal: "registration" });
+      if (typeof window !== "undefined") {
+        (window as any)._tmr = (window as any)._tmr || [];
+        (window as any)._tmr.push({ type: "reachGoal", id: 3755767, goal: "registration" });
       }
       window.location.href = "/";
     } catch (err: unknown) {
