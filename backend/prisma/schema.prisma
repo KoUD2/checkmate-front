@@ -16,7 +16,7 @@ model User {
   organization       String?
   role               Role           @default(USER)
   isActive           Boolean        @default(true)
-  freeChecksLeft     Int            @default(0)
+  freeChecksLeft     Int            @default(3)
   vkId               String?        @unique
   telegramId         String?        @unique
   yandexId           String?        @unique
@@ -85,6 +85,7 @@ enum TaskType {
   TASK38
   TASK39
   TASK40
+  TASK41
 }
 
 model Subscription {
