@@ -564,16 +564,21 @@ export class GeminiService {
   }
 
   private extractKScore(text: string, k: number): number {
-    // Match patterns like "К1 ...: ... Балл: 1" or "K1 ...: ... Score: 1"
-    const patterns = [
-      new RegExp(`К${k}[^\\n]*Балл:\\s*(\\d)`, 'i'),
-      new RegExp(`K${k}[^\\n]*Балл:\\s*(\\d)`, 'i'),
-      new RegExp(`К${k}[^\\n]*Score:\\s*(\\d)`, 'i'),
-    ];
-    for (const p of patterns) {
-      const m = text.match(p);
-      if (m) return Math.min(1, parseInt(m[1], 10));
-    }
+    // Extract the section for criterion K{k} (up to K{k+1}, "Итого", or end of text)
+    // Using [\s\S] to match across newlines — fixes cases where "Балл:" is on a separate line
+    const sectionRe = new RegExp(
+      `[КK]${k}\\b[\\s\\S]*?(?=[КK]${k + 1}\\b|Итого|$)`,
+      'i',
+    );
+    const sectionMatch = text.match(sectionRe);
+    const section = sectionMatch ? sectionMatch[0] : text;
+
+    const ballMatch = section.match(/Балл:\s*(\d)/i);
+    if (ballMatch) return Math.min(1, parseInt(ballMatch[1], 10));
+
+    const scoreMatch = section.match(/Score:\s*(\d)/i);
+    if (scoreMatch) return Math.min(1, parseInt(scoreMatch[1], 10));
+
     return 0;
   }
 
