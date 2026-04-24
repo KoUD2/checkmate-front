@@ -186,16 +186,14 @@ export class GeminiService {
     const userContent = this.wrapUserInput(taskDescription, solution, !!solutionImageBase64);
     const usage = { prompt: 0, completion: 0 };
 
-    // For k1: include chart image + solution image (if available)
-    const k1Images = [imageBase64, solutionImageBase64].filter(Boolean) as string[];
-    // For k2-k5: only need solution image
-    const solImages = solutionImageBase64 ? [solutionImageBase64] : [];
+    // All criteria get chart image + solution image (if available)
+    const allImages = [imageBase64, solutionImageBase64].filter(Boolean) as string[];
 
     const readPrompt = (name: string) => fs.readFileSync(path.join(this.promptsDir, name), 'utf-8');
 
     const prompt38_1 = readPrompt('prompt38_1.txt');
-    const k1Response = k1Images.length > 0
-      ? await this.callOpenAIWithImage(this.securityPreamble + '\n\n' + prompt38_1, userContent, k1Images, usage)
+    const k1Response = allImages.length > 0
+      ? await this.callOpenAIWithImage(this.securityPreamble + '\n\n' + prompt38_1, userContent, allImages, usage)
       : await this.callOpenAI(this.securityPreamble + '\n\n' + prompt38_1, userContent, usage);
     const k1 = this.extractScore(k1Response);
 
@@ -208,8 +206,8 @@ export class GeminiService {
       };
     }
 
-    const callFn = (promptFile: string) => solImages.length > 0
-      ? this.callOpenAIWithImage(this.securityPreamble + '\n\n' + readPrompt(promptFile), userContent, solImages, usage)
+    const callFn = (promptFile: string) => allImages.length > 0
+      ? this.callOpenAIWithImage(this.securityPreamble + '\n\n' + readPrompt(promptFile), userContent, allImages, usage)
       : this.callOpenAI(this.securityPreamble + '\n\n' + readPrompt(promptFile), userContent, usage);
 
     const k2Response = await callFn('prompt38_2.txt');
