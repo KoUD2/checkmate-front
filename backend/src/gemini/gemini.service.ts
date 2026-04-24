@@ -862,6 +862,11 @@ export class GeminiService {
       ? text.split("ИТОГОВАЯ ОЦЕНКА").pop()
       : text;
 
+    // "Балл: 3" format (used in prompt38 responses)
+    const ballColonMatch = lastSection?.match(/Балл:\s*(\d+)/i);
+    if (ballColonMatch) return parseInt(ballColonMatch[1], 10);
+
+    // "3 балл" format (legacy)
     const fallback = lastSection?.match(/(\d+)\s*балл/);
     if (fallback) return parseInt(fallback[1], 10);
 
