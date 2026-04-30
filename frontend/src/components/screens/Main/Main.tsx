@@ -105,7 +105,14 @@ const Main: FC = () => {
 					<div className={styles['main__empty']}>
 						<span className={styles['main__empty-icon']}>📝</span>
 						<p className={styles['main__empty-title']}>Работ пока нет</p>
-						<p className={styles['main__empty-subtitle']}>Начните проверку, нажав «Добавить работу»</p>
+						<p className={styles['main__empty-subtitle']}>Вставьте своё эссе или письмо — AI проверит его по критериям ЕГЭ</p>
+					<Link href='/create-work'>
+						<ActiveButton
+							text='Начать первую проверку'
+							path={CreatePencil}
+							alt='Начать проверку'
+						/>
+					</Link>
 					</div>
 				) : (
 					tasks.map(task => (
