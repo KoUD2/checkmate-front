@@ -152,6 +152,7 @@ export const TaskCheckProvider: FC<{ children: ReactNode }> = ({ children }) => 
 
 	const failCheck = (error: string) => {
 		setState(prev => ({ ...prev, isChecking: false, error }))
+		posthog.capture('check_failed', { taskType: state.taskType, error })
 	}
 
 	const resetCheck = () => {

@@ -2,6 +2,7 @@
 
 import api from "@/shared/utils/api";
 import { User } from "@/config/context/AuthContext";
+import posthog from "posthog-js";
 import { FC, useEffect, useRef, useState } from "react";
 import styles from "./SocialConnect.module.css";
 
@@ -41,6 +42,7 @@ const SocialConnect: FC<Props> = ({ user, onMessage }) => {
       setTgLoading(true);
       try {
         await api.post("/auth/telegram/connect", tgUser);
+        posthog.capture('social_connected', { provider: 'telegram' });
         onMessage("Соцсеть подключена! Начислено 3 бесплатных проверки.");
         // Reload to refresh user state
         window.location.reload();
@@ -78,6 +80,7 @@ const SocialConnect: FC<Props> = ({ user, onMessage }) => {
     setYandexLoading(true);
     try {
       const res = await api.get<{ url: string }>("/auth/yandex/init");
+      posthog.capture('social_connected', { provider: 'yandex' });
       window.location.href = res.data.url;
     } catch {
       onMessage("Не удалось инициировать подключение Яндекс.");

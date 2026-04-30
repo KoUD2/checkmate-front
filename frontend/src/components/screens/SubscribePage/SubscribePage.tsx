@@ -113,6 +113,7 @@ const SubscribePage: FC = () => {
       await paymentService.activatePromo(promoCode.trim());
       setPromoSuccess("Промокод активирован!");
       setPromoCode("");
+      posthog.capture('promo_activated', { code: promoCode.trim() });
       await refreshUser();
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })
