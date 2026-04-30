@@ -148,6 +148,10 @@ export const TaskCheckProvider: FC<{ children: ReactNode }> = ({ children }) => 
 	const completeCheck = (result: TaskResult) => {
 		setState(prev => ({ ...prev, isChecking: false, isChecked: true, result }))
 		posthog.capture('check_completed', { taskType: result.kind, totalScore: result.totalScore })
+		if (!localStorage.getItem('activated')) {
+			posthog.capture('user_activated')
+			localStorage.setItem('activated', '1')
+		}
 	}
 
 	const failCheck = (error: string) => {
