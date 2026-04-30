@@ -3,6 +3,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import paymentService from "@/services/payment.service";
 import api from "@/shared/utils/api";
+import posthog from "posthog-js";
 import { FC, useEffect, useState } from "react";
 import styles from "./SubscribePage.module.css";
 import SocialConnect from "./ui/SocialConnect/SocialConnect";
@@ -49,6 +50,10 @@ const SubscribePage: FC = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [historyLoading, setHistoryLoading] = useState(false);
+
+  useEffect(() => {
+    posthog.capture('subscription_page_viewed')
+  }, [])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

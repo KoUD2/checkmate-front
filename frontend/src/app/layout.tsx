@@ -1,4 +1,5 @@
 import AppLayout from "@/components/layout/AppLayout/AppLayout";
+import { PostHogProvider } from "@/components/PostHogProvider";
 import { AuthProvider } from "@/config/context/AuthContext";
 import { TaskCheckProvider } from "@/config/context/TaskCheckContext";
 import type { Metadata } from "next";
@@ -107,11 +108,13 @@ export default function RootLayout({
             <img src="https://top-fwz1.mail.ru/counter?id=3755767;js=na" style={{position:"absolute",left:"-9999px"}} alt="Top.Mail.Ru" />
           </div>
         </noscript>
-        <AuthProvider>
-          <TaskCheckProvider>
-            <AppLayout>{children}</AppLayout>
-          </TaskCheckProvider>
-        </AuthProvider>
+        <PostHogProvider>
+          <AuthProvider>
+            <TaskCheckProvider>
+              <AppLayout>{children}</AppLayout>
+            </TaskCheckProvider>
+          </AuthProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

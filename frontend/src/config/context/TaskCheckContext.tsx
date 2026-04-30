@@ -1,5 +1,6 @@
 'use client'
 
+import posthog from 'posthog-js'
 import { createContext, useContext, useState, ReactNode, FC } from 'react'
 
 export type TaskType = '37' | '38.1' | '38.2' | '39' | '40' | '41' | '42'
@@ -141,10 +142,12 @@ export const TaskCheckProvider: FC<{ children: ReactNode }> = ({ children }) => 
 
 	const startCheck = (taskType: TaskType, formData: TaskFormData) => {
 		setState({ ...initialState, isChecking: true, taskType, formData })
+		posthog.capture('check_started', { taskType })
 	}
 
 	const completeCheck = (result: TaskResult) => {
 		setState(prev => ({ ...prev, isChecking: false, isChecked: true, result }))
+		posthog.capture('check_completed', { taskType: result.kind, totalScore: result.totalScore })
 	}
 
 	const failCheck = (error: string) => {
