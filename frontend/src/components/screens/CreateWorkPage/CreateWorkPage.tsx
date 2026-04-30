@@ -4,7 +4,7 @@ import BackButton from '@/components/ui/BackButton/BackButton'
 import MainTitle from '@/components/ui/MainTitle/MainTitle'
 import SecondTitle from '@/components/ui/SecondTitle/SecondTitle'
 import { useTaskCheck } from '@/config/context/TaskCheckContext'
-import { JSX, useState } from 'react'
+import { JSX, useEffect, useState } from 'react'
 import styles from './CreateWorkPage.module.css'
 import TaskNumber from './ui/TaskNumber/TaskNumber'
 import Task37 from './ui/task37/Task37/Task37'
@@ -15,12 +15,14 @@ import Task41 from './ui/task41/Task41/Task41'
 import Task42 from './ui/task42/Task42/Task42'
 
 const CreateWorkPage = (): JSX.Element => {
-	const { taskType, isChecked: ctxChecked } = useTaskCheck()
+	const { resetCheck } = useTaskCheck()
 
-	// Restore task type from context if there's an ongoing/completed check
-	const initialTask = (taskType === '38.1' || taskType === '38.2' || taskType === '39' || taskType === '40' || taskType === '41' || taskType === '42') ? taskType : '37'
-	const [task, setTask] = useState<string>(initialTask)
-	const [isChecked, setIsChecked] = useState(ctxChecked)
+	const [task, setTask] = useState<string>('37')
+	const [isChecked, setIsChecked] = useState(false)
+
+	useEffect(() => {
+		resetCheck()
+	}, [])
 
 	const handleTaskChange = (taskNumber: string) => {
 		setTask(taskNumber)
