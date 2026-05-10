@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { TaskType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -17,6 +18,8 @@ import { CreateTask42Dto } from './dto/create-task42.dto';
 
 @Injectable()
 export class TasksService {
+  private readonly logger = new Logger(TasksService.name);
+
   constructor(
     private prisma: PrismaService,
     private gemini: GeminiService,
@@ -57,7 +60,7 @@ export class TasksService {
       }),
     ]);
 
-    this.triggerEmailsAfterCheck(userId).catch(() => {});
+    this.triggerEmailsAfterCheck(userId).catch((e) => this.logger.error('email trigger failed', e));
     return task;
   }
 

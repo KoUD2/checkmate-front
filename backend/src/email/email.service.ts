@@ -16,6 +16,7 @@ export class EmailService {
   }
 
   async sendFirstCheckEmail(user: { email: string; firstName: string }) {
+    this.logger.log(`Sending first check email to ${user.email}`);
     try {
       await this.resend.emails.send({
         from: this.fromEmail,
@@ -45,6 +46,7 @@ export class EmailService {
   }
 
   async sendChecksExhaustedEmail(user: { email: string; firstName: string }) {
+    this.logger.log(`Sending checks exhausted email to ${user.email}`);
     try {
       await this.resend.emails.send({
         from: this.fromEmail,
