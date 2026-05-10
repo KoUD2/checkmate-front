@@ -7,6 +7,7 @@ import {
 import { TaskType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { GeminiService } from '../gemini/gemini.service';
+import { EmailService } from '../email/email.service';
 import { CreateTask37Dto } from './dto/create-task37.dto';
 import { CreateTask38Dto } from './dto/create-task38.dto';
 import { CreateTask39Dto } from './dto/create-task39.dto';
@@ -19,6 +20,7 @@ export class TasksService {
   constructor(
     private prisma: PrismaService,
     private gemini: GeminiService,
+    private email: EmailService,
   ) {}
 
   async submitTask37(userId: string, dto: CreateTask37Dto) {
@@ -55,6 +57,7 @@ export class TasksService {
       }),
     ]);
 
+    this.triggerEmailsAfterCheck(userId).catch(() => {});
     return task;
   }
 
@@ -96,6 +99,7 @@ export class TasksService {
       }),
     ]);
 
+    this.triggerEmailsAfterCheck(userId).catch(() => {});
     return task;
   }
 
@@ -124,6 +128,7 @@ export class TasksService {
       }),
     ]);
 
+    this.triggerEmailsAfterCheck(userId).catch(() => {});
     return task;
   }
 
@@ -160,6 +165,7 @@ export class TasksService {
       }),
     ]);
 
+    this.triggerEmailsAfterCheck(userId).catch(() => {});
     return task;
   }
 
@@ -196,6 +202,7 @@ export class TasksService {
       }),
     ]);
 
+    this.triggerEmailsAfterCheck(userId).catch(() => {});
     return task;
   }
 
@@ -232,6 +239,7 @@ export class TasksService {
       }),
     ]);
 
+    this.triggerEmailsAfterCheck(userId).catch(() => {});
     return task;
   }
 
@@ -313,6 +321,21 @@ export class TasksService {
       where: { id: userId },
       data: { freeChecksLeft: { decrement: 1 } },
     });
+    this.triggerEmailsAfterCheck(userId).catch(() => {});
+  }
+
+  private async triggerEmailsAfterCheck(userId: string) {
+    const [user, taskCount] = await Promise.all([
+      this.prisma.user.findUnique({ where: { id: userId } }),
+      this.prisma.task.count({ where: { userId } }),
+    ]);
+    if (!user) return;
+    if (taskCount === 1) {
+      await this.email.sendFirstCheckEmail(user);
+    }
+    if (user.freeChecksLeft === 0) {
+      await this.email.sendChecksExhaustedEmail(user);
+    }
   }
 
   async synthesizeSpeech(text: string): Promise<string> {
