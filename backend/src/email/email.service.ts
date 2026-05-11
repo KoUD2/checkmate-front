@@ -6,7 +6,7 @@ import { Resend } from 'resend';
 export class EmailService {
   private resend: Resend;
   private readonly logger = new Logger(EmailService.name);
-  private readonly fromEmail = 'CheckMate <noreply@checkmateai.ru>';
+  private readonly fromEmail = 'CheckMate <hello@checkmateai.ru>';
   private readonly frontendUrl: string;
 
   constructor(private configService: ConfigService) {
