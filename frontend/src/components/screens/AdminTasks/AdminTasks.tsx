@@ -15,6 +15,7 @@ interface AdminTask {
 interface AdminTaskDetail extends AdminTask {
   taskDescription: string
   solution: string
+  imageBase64: string | null
   solutionImageBase64: string | null
   k1: number | null
   k2: number | null
@@ -131,6 +132,17 @@ const AdminTasks: FC = () => {
               <div className={styles.modalSection}>
                 <div className={styles.modalSectionTitle}>Условие задания</div>
                 <div className={styles.modalText}>{selected.taskDescription}</div>
+              </div>
+            )}
+
+            {selected.imageBase64 && (
+              <div className={styles.modalSection}>
+                <div className={styles.modalSectionTitle}>График / таблица</div>
+                <img
+                  src={`data:image/jpeg;base64,${selected.imageBase64}`}
+                  alt="График задания"
+                  className={styles.modalImage}
+                />
               </div>
             )}
 
