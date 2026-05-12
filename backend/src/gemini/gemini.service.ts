@@ -562,6 +562,8 @@ export class GeminiService {
   }
 
   private extractKScore(text: string, k: number): number {
+    // Strip Telegram-style bold markers so "*Балл:* 1" is matched correctly
+    text = text.replace(/\*/g, '');
     // Extract the section for criterion K{k} (up to K{k+1}, "Итого", or end of text)
     // Using [\s\S] to match across newlines — fixes cases where "Балл:" is on a separate line
     const sectionRe = new RegExp(
@@ -845,6 +847,8 @@ export class GeminiService {
   }
 
   private extractScore(text: string): number {
+    // Strip Telegram-style bold markers (*) so patterns like "*Итоговый балл:* 2" are matched correctly
+    text = text.replace(/\*/g, '');
     const patterns = [
       /Итоговый балл:?\s*(\d+)(?:\s*балл|\.|\s|$)/i,
       /ИТОГОВЫЙ БАЛЛ:?\s*(\d+)(?:\s*балл|\.|\s|$)/i,
