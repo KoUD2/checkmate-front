@@ -191,6 +191,15 @@ export class AdminService {
     return { revenueByDay, usersByDay, tasksByType, salesByPackage };
   }
 
+  async getTask(id: string) {
+    const task = await this.prisma.task.findUnique({
+      where: { id },
+      include: { user: { select: { id: true, email: true, firstName: true, lastName: true } } },
+    });
+    if (!task) throw new NotFoundException('Задание не найдено');
+    return task;
+  }
+
   async listTasks(page = 1, limit = 20) {
     const skip = (page - 1) * limit;
     const [tasks, total] = await Promise.all([

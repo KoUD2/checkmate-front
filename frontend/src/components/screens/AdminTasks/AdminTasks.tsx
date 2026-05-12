@@ -6,10 +6,22 @@ import styles from './AdminTasks.module.css'
 
 interface AdminTask {
   id: string
-  type: 'TASK37' | 'TASK38' | 'TASK39'
+  type: string
   totalScore: number | null
   createdAt: string
   user: { id: string; email: string; firstName: string; lastName: string }
+}
+
+interface AdminTaskDetail extends AdminTask {
+  taskDescription: string
+  solution: string
+  k1: number | null
+  k2: number | null
+  k3: number | null
+  k4: number | null
+  k5: number | null
+  feedback: Record<string, string> | null
+  transcription: string | null
 }
 
 const LIMIT = 20
@@ -18,6 +30,9 @@ const TASK_LABELS: Record<string, string> = {
   TASK37: 'Задание 37',
   TASK38: 'Задание 38',
   TASK39: 'Задание 39',
+  TASK40: 'Задание 40',
+  TASK41: 'Задание 41',
+  TASK42: 'Задание 42',
 }
 
 const AdminTasks: FC = () => {
@@ -25,6 +40,8 @@ const AdminTasks: FC = () => {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
+  const [selected, setSelected] = useState<AdminTaskDetail | null>(null)
+  const [loadingId, setLoadingId] = useState<string | null>(null)
 
   const fetchTasks = async (p: number) => {
     try {
@@ -38,10 +55,21 @@ const AdminTasks: FC = () => {
 
   useEffect(() => { fetchTasks(page) }, [page])
 
+  const openTask = async (id: string) => {
+    setLoadingId(id)
+    try {
+      const res = await api.get(`/admin/tasks/${id}`)
+      setSelected(res.data?.data?.task ?? null)
+    } catch {}
+    setLoadingId(null)
+  }
+
   const formatDate = (iso: string) => {
     const d = new Date(iso)
     return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`
   }
+
+  const scoreKeys = ['k1', 'k2', 'k3', 'k4', 'k5'] as const
 
   return (
     <div className={styles.page}>
@@ -59,7 +87,7 @@ const AdminTasks: FC = () => {
         </thead>
         <tbody>
           {tasks.map(t => (
-            <tr key={t.id}>
+            <tr key={t.id} onClick={() => openTask(t.id)} style={{ opacity: loadingId === t.id ? 0.5 : 1 }}>
               <td><span className={styles.taskId}>{t.id.slice(0, 8)}…</span></td>
               <td><span className={styles.badge}>{TASK_LABELS[t.type] ?? t.type}</span></td>
               <td>{t.user.firstName} {t.user.lastName}</td>
@@ -75,6 +103,59 @@ const AdminTasks: FC = () => {
         <span className={styles.pageInfo}>Стр. {page} / {totalPages}</span>
         <button className={styles.pageBtn} onClick={() => setPage(p => p + 1)} disabled={page >= totalPages}>→</button>
       </div>
+
+      {selected && (
+        <div className={styles.overlay} onClick={() => setSelected(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <button className={styles.modalClose} onClick={() => setSelected(null)}>×</button>
+            <div className={styles.modalTitle}>{TASK_LABELS[selected.type] ?? selected.type}</div>
+
+            <div className={styles.modalMeta}>
+              <div className={styles.modalMetaItem}><strong>ID:</strong> {selected.id}</div>
+              <div className={styles.modalMetaItem}><strong>Дата:</strong> {formatDate(selected.createdAt)}</div>
+              <div className={styles.modalMetaItem}><strong>Пользователь:</strong> {selected.user.firstName} {selected.user.lastName}</div>
+              <div className={styles.modalMetaItem}><strong>Email:</strong> {selected.user.email}</div>
+            </div>
+
+            <div className={styles.modalScores}>
+              {scoreKeys.map(k => selected[k] !== null && selected[k] !== undefined && (
+                <span key={k} className={styles.scoreChip}>{k.toUpperCase()}: {selected[k]}</span>
+              ))}
+              <span className={`${styles.scoreChip} ${styles.scoreChipTotal}`}>
+                Итого: {selected.totalScore ?? '—'}
+              </span>
+            </div>
+
+            {selected.taskDescription && (
+              <div className={styles.modalSection}>
+                <div className={styles.modalSectionTitle}>Условие задания</div>
+                <div className={styles.modalText}>{selected.taskDescription}</div>
+              </div>
+            )}
+
+            {selected.transcription && (
+              <div className={styles.modalSection}>
+                <div className={styles.modalSectionTitle}>Транскрипция</div>
+                <div className={styles.modalText}>{selected.transcription}</div>
+              </div>
+            )}
+
+            {selected.solution && (
+              <div className={styles.modalSection}>
+                <div className={styles.modalSectionTitle}>Ответ ученика</div>
+                <div className={styles.modalText}>{selected.solution}</div>
+              </div>
+            )}
+
+            {selected.feedback && Object.entries(selected.feedback).filter(([, v]) => v).map(([k, v]) => (
+              <div key={k} className={styles.modalSection}>
+                <div className={styles.modalSectionTitle}>Фидбек {k.toUpperCase()}</div>
+                <div className={styles.modalText}>{v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

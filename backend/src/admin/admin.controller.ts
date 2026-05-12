@@ -80,6 +80,13 @@ export class AdminController {
     return { success: true, data };
   }
 
+  @Get('tasks/:id')
+  @ApiOperation({ summary: 'Детали задания по ID' })
+  async getTask(@Param('id') id: string) {
+    const task = await this.adminService.getTask(id);
+    return { success: true, data: { task } };
+  }
+
   @Get('tasks')
   @ApiOperation({ summary: 'Все задания пользователей' })
   @ApiQuery({ name: 'page', required: false, type: Number })
