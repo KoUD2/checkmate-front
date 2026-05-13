@@ -11,6 +11,7 @@ import { Task37Result, useTaskCheck } from '@/config/context/TaskCheckContext'
 import api from '@/shared/utils/api'
 import cn from 'classnames'
 import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
+import CheckFeedback from '@/components/ui/CheckFeedback/CheckFeedback'
 import CheckingLoader from '../../CheckingLoader/CheckingLoader'
 import ReservedField from '../ui/ReservedField/ReservedField'
 import styles from './Task37.module.css'
@@ -101,6 +102,7 @@ const Task37: FC<Props> = ({ onChecked, onReset }) => {
 			if (task) {
 				completeCheck({
 					kind: 'task37',
+					taskId: task.id,
 					k1: task.k1 ?? 0,
 					k2: task.k2 ?? 0,
 					k3: task.k3 ?? 0,
@@ -239,6 +241,7 @@ const Task37: FC<Props> = ({ onChecked, onReset }) => {
 							)}
 						</div>
 					)}
+					<CheckFeedback taskId={ctxResult.taskId} />
 				</>
 			)}
 

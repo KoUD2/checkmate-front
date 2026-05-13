@@ -9,6 +9,7 @@ import { Task42Result, useTaskCheck } from '@/config/context/TaskCheckContext'
 import api from '@/shared/utils/api'
 import cn from 'classnames'
 import { FC, useCallback, useEffect, useRef, useState } from 'react'
+import CheckFeedback from '@/components/ui/CheckFeedback/CheckFeedback'
 import CheckingLoader from '../../CheckingLoader/CheckingLoader'
 import styles from './Task42.module.css'
 
@@ -152,6 +153,7 @@ const Task42: FC<Props> = ({ onChecked }) => {
 			if (task) {
 				completeCheck({
 					kind: 'task42',
+					taskId: task.id,
 					k1: task.k1 ?? 0,
 					k2: task.k2 ?? 0,
 					k3: task.k3 ?? 0,
@@ -493,6 +495,7 @@ const Task42: FC<Props> = ({ onChecked }) => {
 					</div>
 				)}
 				{checkError && <p style={{ color: '#eb3131', fontSize: '1vw' }}>{checkError}</p>}
+				<CheckFeedback taskId={ctxResult.taskId} />
 			</div>
 		)
 	}

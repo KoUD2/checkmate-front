@@ -5,7 +5,8 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
-import { TaskType } from '@prisma/client';
+import { TaskType, UserRating } from '@prisma/client';
+import { TaskFeedbackDto } from './dto/task-feedback.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { GeminiService } from '../gemini/gemini.service';
 import { EmailService } from '../email/email.service';
@@ -339,6 +340,19 @@ export class TasksService {
     if (user.freeChecksLeft === 0) {
       await this.email.sendChecksExhaustedEmail(user);
     }
+  }
+
+  async updateTaskFeedback(userId: string, taskId: string, dto: TaskFeedbackDto) {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new NotFoundException('Задание не найдено');
+    if (task.userId !== userId) throw new ForbiddenException('Нет доступа');
+    await this.prisma.task.update({
+      where: { id: taskId },
+      data: {
+        userRating: dto.rating as UserRating,
+        userComment: dto.comment ?? null,
+      },
+    });
   }
 
   async synthesizeSpeech(text: string): Promise<string> {

@@ -75,6 +75,8 @@ model Task {
   totalScore      Int?
   feedback        Json?
   comments        Json?
+  userRating      UserRating?
+  userComment     String?
   createdAt       DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -89,6 +91,11 @@ enum TaskType {
   TASK40
   TASK41
   TASK42
+}
+
+enum UserRating {
+  LIKE
+  DISLIKE
 }
 
 model Subscription {

@@ -7,6 +7,7 @@ export type TaskType = '37' | '38.1' | '38.2' | '39' | '40' | '41' | '42'
 
 export interface Task37Result {
 	kind: 'task37'
+	taskId: string
 	k1: number
 	k2: number
 	k3: number
@@ -16,6 +17,7 @@ export interface Task37Result {
 
 export interface Task38Result {
 	kind: 'task38'
+	taskId: string
 	k1: number
 	k2: number
 	k3: number
@@ -27,6 +29,7 @@ export interface Task38Result {
 
 export interface Task39Result {
 	kind: 'task39'
+	taskId: string
 	k1: number
 	totalScore: number
 	feedback: { k1: string }
@@ -35,6 +38,7 @@ export interface Task39Result {
 
 export interface Task40Result {
 	kind: 'task40'
+	taskId: string
 	k1: number
 	k2: number
 	k3: number
@@ -46,6 +50,7 @@ export interface Task40Result {
 
 export interface Task41Result {
 	kind: 'task41'
+	taskId: string
 	k1: number
 	k2: number
 	k3: number
@@ -58,6 +63,7 @@ export interface Task41Result {
 
 export interface Task42Result {
 	kind: 'task42'
+	taskId: string
 	k1: number
 	k2: number
 	k3: number

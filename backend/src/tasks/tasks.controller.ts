@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Patch,
   Param,
   Body,
   Query,
@@ -17,6 +18,7 @@ import { CreateTask41Dto } from './dto/create-task41.dto';
 import { CreateTask42Dto } from './dto/create-task42.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { TaskFeedbackDto } from './dto/task-feedback.dto';
 
 @ApiTags('tasks')
 @ApiBearerAuth()
@@ -113,5 +115,16 @@ export class TasksController {
   ) {
     const task = await this.tasksService.getTask(userId, taskId);
     return { success: true, data: { task } };
+  }
+
+  @Patch(':id/feedback')
+  @ApiOperation({ summary: 'Оставить фидбек по проверке' })
+  async submitFeedback(
+    @CurrentUser('id') userId: string,
+    @Param('id') taskId: string,
+    @Body() dto: TaskFeedbackDto,
+  ) {
+    await this.tasksService.updateTaskFeedback(userId, taskId, dto);
+    return { success: true };
   }
 }
