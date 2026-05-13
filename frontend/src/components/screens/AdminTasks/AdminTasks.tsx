@@ -9,6 +9,7 @@ interface AdminTask {
   type: string
   totalScore: number | null
   createdAt: string
+  userRating: 'LIKE' | 'DISLIKE' | null
   user: { id: string; email: string; firstName: string; lastName: string }
 }
 
@@ -24,6 +25,7 @@ interface AdminTaskDetail extends AdminTask {
   k5: number | null
   feedback: Record<string, string> | null
   transcription: string | null
+  userComment: string | null
 }
 
 const LIMIT = 20
@@ -84,6 +86,7 @@ const AdminTasks: FC = () => {
             <th>Пользователь</th>
             <th>Email</th>
             <th>Оценка</th>
+            <th>Фидбек</th>
             <th>Дата</th>
           </tr>
         </thead>
@@ -95,6 +98,7 @@ const AdminTasks: FC = () => {
               <td>{t.user.firstName} {t.user.lastName}</td>
               <td>{t.user.email}</td>
               <td><span className={styles.score}>{t.totalScore !== null ? t.totalScore : '—'}</span></td>
+              <td>{t.userRating === 'LIKE' ? '👍' : t.userRating === 'DISLIKE' ? '👎' : '—'}</td>
               <td>{formatDate(t.createdAt)}</td>
             </tr>
           ))}
@@ -177,6 +181,16 @@ const AdminTasks: FC = () => {
                 <div className={styles.modalText}>{v}</div>
               </div>
             ))}
+
+            {selected.userRating && (
+              <div className={styles.modalSection}>
+                <div className={styles.modalSectionTitle}>Оценка пользователя</div>
+                <div className={styles.modalText}>
+                  {selected.userRating === 'LIKE' ? '👍 Полезно' : '👎 Не полезно'}
+                  {selected.userComment && <div style={{ marginTop: 4 }}>{selected.userComment}</div>}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -212,6 +212,7 @@ export class AdminService {
           type: true,
           totalScore: true,
           createdAt: true,
+          userRating: true,
           user: { select: { id: true, email: true, firstName: true, lastName: true } },
         },
       }),
