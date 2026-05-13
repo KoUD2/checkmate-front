@@ -183,6 +183,7 @@ const Task39: FC<Props> = ({ onChecked }) => {
 				if (task) {
 					completeCheck({
 						kind: 'task39',
+						taskId: task.id,
 						k1: task.k1 ?? 0,
 						totalScore: task.totalScore ?? 0,
 						feedback: task.feedback ?? { k1: '' },
