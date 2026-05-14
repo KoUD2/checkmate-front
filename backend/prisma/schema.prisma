@@ -8,23 +8,23 @@ datasource db {
 }
 
 model User {
-  id                 String         @id @default(uuid())
-  email              String         @unique
+  id                 String   @id @default(uuid())
+  email              String   @unique
   passwordHash       String
   firstName          String
   lastName           String
   organization       String?
-  role               Role           @default(USER)
-  isActive           Boolean        @default(true)
-  freeChecksLeft     Int            @default(3)
-  vkId               String?        @unique
-  telegramId         String?        @unique
-  yandexId           String?        @unique
-  socialBonusGranted Boolean        @default(false)
-  referralCode       String?        @unique
+  role               Role     @default(USER)
+  isActive           Boolean  @default(true)
+  freeChecksLeft     Int      @default(3)
+  vkId               String?  @unique
+  telegramId         String?  @unique
+  yandexId           String?  @unique
+  socialBonusGranted Boolean  @default(false)
+  referralCode       String?  @unique
   referredByCode     String?
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   tasks           Task[]
   subscription    Subscription?
@@ -56,28 +56,28 @@ enum Role {
 }
 
 model Task {
-  id              String   @id @default(uuid())
-  type            TaskType
-  userId          String
-  taskDescription String
-  solution        String
-  imageBase64          String?
-  solutionImageBase64  String?
-  image1Base64         String?
-  image2Base64         String?
-  audioBase64          String?
-  transcription        String?
-  k1              Int?
-  k2              Int?
-  k3              Int?
-  k4              Int?
-  k5              Int?
-  totalScore      Int?
-  feedback        Json?
-  comments        Json?
-  userRating      UserRating?
-  userComment     String?
-  createdAt       DateTime @default(now())
+  id                  String      @id @default(uuid())
+  type                TaskType
+  userId              String
+  taskDescription     String
+  solution            String
+  imageBase64         String?
+  solutionImageBase64 String?
+  image1Base64        String?
+  image2Base64        String?
+  audioBase64         String?
+  transcription       String?
+  k1                  Int?
+  k2                  Int?
+  k3                  Int?
+  k4                  Int?
+  k5                  Int?
+  totalScore          Int?
+  feedback            Json?
+  comments            Json?
+  userRating          UserRating?
+  userComment         String?
+  createdAt           DateTime    @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -111,15 +111,15 @@ model Subscription {
 }
 
 model Payment {
-  id         String        @id @default(uuid())
-  userId     String
-  yookassaId String        @unique
-  status     PaymentStatus @default(PENDING)
-  amount     Decimal       @db.Decimal(10, 2)
+  id          String        @id @default(uuid())
+  userId      String
+  yookassaId  String        @unique
+  status      PaymentStatus @default(PENDING)
+  amount      Decimal       @db.Decimal(10, 2)
   daysToAdd   Int
   checksToAdd Int           @default(0)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -206,4 +206,28 @@ enum ResourceType {
   CHECKLIST
   TRAINER
   TEMPLATE
+}
+
+enum TaskFormat {
+  MCQ
+  MATCHING
+  TRUE_FALSE
+  OPEN_CLOZE
+  WORD_FORMATION
+  AI_CHECK
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  COMPLETED
+  FAILED
+}
+
+enum ExamSection {
+  LISTENING
+  READING
+  GRAMMAR
+  WRITING
+  SPEAKING
 }
