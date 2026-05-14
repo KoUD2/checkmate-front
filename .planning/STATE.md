@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-05-14T15:30:12.948Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-05-14T15:34:09.413Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 8
-  percent: 73
+  completed_plans: 9
+  percent: 82
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 2
-Plan: 03 (completed) — next: 04
-Status: Executing (3 plans remaining)
+Plan: 04 (completed) — next: 05
+Status: Executing (2 plans remaining)
 Last activity: 2026-05-14
 
-Progress: [███████░░░] 73%
+Progress: [████████░░] 82%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [███████░░░] 73%
 | Phase 02-task-bank P01 | 5 | 1 tasks | 1 files |
 | Phase 02-task-bank P02 | 15 | 3 tasks | 4 files |
 | Phase 02-task-bank P03 | 10 | 3 tasks | 4 files |
+| Phase 02-task-bank P04 | 8 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - [Phase 02-02]: Service remove() returns HTTP 200 with needsConfirm body for draft-only case (consistent with D-08)
 - [Phase 02-03]: Class-level guards only on ExamTasksController — no per-method @UseGuards or @Roles (D-02 anti-pattern)
 - [Phase 02-03]: ExamTasksModule does not export ExamTasksService — service stays internal to module (D-01)
+- [Phase 02-04]: examTasksService uses api from @/shared/utils/api (not direct axios) — consistent with resources.service.ts pattern
+- [Phase 02-04]: Admin Dashboard /admin uses exact-match only; all other nav items use startsWith for sub-routes
 
 ### Pending Todos
 
@@ -100,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-14T15:30:12.942Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-05-14T15:34:09.406Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None

@@ -50,7 +50,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 02-01-PLAN.md — [BLOCKING] Run `prisma migrate dev --name add_ai_task_type` + regenerate Prisma Client
 - [x] 02-02-PLAN.md — Backend DTOs (CreateExamTaskDto with @ValidateIf, UpdateExamTaskDto) + ExamTasksService (list/findById/getById/create/update/remove with D-08 delete protection) + service.spec implementation (TASK-01, TASK-02, TASK-04, TASK-05, TASK-06)
 - [x] 02-03-PLAN.md — Backend ExamTasksController (5 admin-guarded routes) + ExamTasksModule + AppModule wire + controller.spec implementation (TASK-01, TASK-02, TASK-04, TASK-05, TASK-06)
-- [ ] 02-04-PLAN.md — Frontend exam-tasks.service.ts typed API client + admin sidebar "Банк заданий" nav entry with startsWith active matching
+- [x] 02-04-PLAN.md — Frontend exam-tasks.service.ts typed API client + admin sidebar "Банк заданий" nav entry with startsWith active matching
 - [ ] 02-05-PLAN.md — Frontend /admin/task-bank list page + filters + DeleteWarningModal (two-tier delete UX) (TASK-04, TASK-06)
 - [ ] 02-06-PLAN.md — Frontend ExamTaskForm (format-conditional fields + audio upload via /storage/presign) + new/page + [id]/page (TASK-01, TASK-02, TASK-03, TASK-05)
 **UI hint**: yes
@@ -103,7 +103,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Database & Infrastructure | 4/4 | Complete   | 2026-05-14 |
-| 2. Task Bank | 4/7 | In Progress|  |
+| 2. Task Bank | 5/7 | In Progress|  |
 | 3. Variant Composer | 0/? | Not started | - |
 | 4. Exam Player | 0/? | Not started | - |
 | 5. Grading & Results | 0/? | Not started | - |
