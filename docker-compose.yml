@@ -47,7 +47,7 @@ services:
       YOS_ACCESS_KEY_ID: ${YOS_ACCESS_KEY_ID}
       YOS_SECRET_ACCESS_KEY: ${YOS_SECRET_ACCESS_KEY}
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
 
   frontend:
     build:
