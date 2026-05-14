@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-05-14T15:22:13.363Z"
+stopped_at: "Completed 02-02-PLAN.md"
+last_updated: "2026-05-14T15:35:00.000Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 6
-  percent: 55
+  completed_plans: 7
+  percent: 64
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 2
-Plan: Not started
-Status: Ready to execute (7 plans)
+Plan: 02 (completed) — next: 03
+Status: Executing (4 plans remaining)
 Last activity: 2026-05-14
 
-Progress: [██████░░░░] 55%
+Progress: [███████░░░] 64%
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [██████░░░░] 55%
 | Phase 01-database-infrastructure P03 | 25 | 4 tasks | 10 files |
 | Phase 02-task-bank P00 | 10 | 3 tasks | 3 files |
 | Phase 02-task-bank P01 | 5 | 1 tasks | 1 files |
+| Phase 02-task-bank P02 | 15 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Wave 0 test infrastructure
 - [Phase ?]: Developer replied defer; 6 manual verification steps outstanding before Phase 1 can be marked DONE
 - [Phase ?]: AiTaskType migration
+- [Phase 02-02]: UpdateExamTaskDto uses PartialType from @nestjs/swagger to match UpdateResourceDto convention
+- [Phase 02-02]: Service update() only runs $transaction when options !== undefined to avoid wiping existing options on partial PATCH
+- [Phase 02-02]: Service remove() returns HTTP 200 with needsConfirm body for draft-only case (consistent with D-08)
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-14T15:22:10.584Z
+Last session: 2026-05-14T15:26:35.268Z
 Stopped at: Phase 2 context gathered
 Resume file: None
