@@ -31,8 +31,9 @@ model User {
   refreshTokens   RefreshToken[]
   promoUsages     PromoUsage[]
   payments        Payment[]
-  referralBonuses ReferralBonus[] @relation("ReferrerBonuses")
-  referredBonus   ReferralBonus?  @relation("RefereeBonuses")
+  referralBonuses ReferralBonus[]  @relation("ReferrerBonuses")
+  referredBonus   ReferralBonus?   @relation("RefereeBonuses")
+  variantAttempts VariantAttempt[]
 
   @@map("users")
 }
@@ -206,6 +207,96 @@ enum ResourceType {
   CHECKLIST
   TRAINER
   TEMPLATE
+}
+
+model ExamTask {
+  id            String      @id @default(uuid())
+  format        TaskFormat
+  section       ExamSection
+  title         String
+  body          String?
+  audioUrl      String?
+  correctAnswer String?
+  source        String?
+  explanation   String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  options      ExamTaskOption[]
+  variantTasks VariantTask[]
+
+  @@map("exam_tasks")
+}
+
+model ExamTaskOption {
+  id         String  @id @default(uuid())
+  examTaskId String
+  optionText String
+  matchText  String?
+  isCorrect  Boolean @default(false)
+
+  examTask ExamTask @relation(fields: [examTaskId], references: [id], onDelete: Cascade)
+
+  @@map("exam_task_options")
+}
+
+model Variant {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  variantTasks    VariantTask[]
+  variantAttempts VariantAttempt[]
+
+  @@map("variants")
+}
+
+model VariantTask {
+  id         String @id @default(uuid())
+  variantId  String
+  examTaskId String
+  position   Float
+
+  variant  Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  examTask ExamTask @relation(fields: [examTaskId], references: [id], onDelete: Restrict)
+
+  @@map("variant_tasks")
+}
+
+model VariantAttempt {
+  id        String        @id @default(uuid())
+  userId    String
+  variantId String
+  status    AttemptStatus @default(IN_PROGRESS)
+  startedAt DateTime      @default(now())
+  endedAt   DateTime?
+  updatedAt DateTime      @updatedAt
+
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variant Variant         @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  answers AttemptAnswer[]
+
+  @@map("variant_attempts")
+}
+
+model AttemptAnswer {
+  id               String   @id @default(uuid())
+  variantAttemptId String
+  examTaskId       String
+  content          Json?
+  playCount        Int      @default(0)
+  aiScore          Int?
+  aiFeedback       Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  variantAttempt VariantAttempt @relation(fields: [variantAttemptId], references: [id], onDelete: Cascade)
+
+  @@unique([variantAttemptId, examTaskId])
+  @@map("attempt_answers")
 }
 
 enum TaskFormat {
