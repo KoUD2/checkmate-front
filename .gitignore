@@ -19,3 +19,6 @@ Thumbs.db
 postgres_data/
 CheckMate/
 backend/dump.rdb
+
+# Planning docs (local only)
+.planning/
