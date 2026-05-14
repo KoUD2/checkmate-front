@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: '/admin/payments', label: 'Платежи' },
   { href: '/admin/promos', label: 'Промокоды' },
   { href: '/admin/tasks', label: 'Задания' },
+  { href: '/admin/task-bank', label: 'Банк заданий' },
   { href: '/admin/resources', label: 'Полезное' },
 ]
 
@@ -51,7 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               href={item.href}
               onClick={() => setSidebarOpen(false)}
               className={
-                pathname === item.href
+                (item.href === '/admin' ? pathname === item.href : pathname === item.href || pathname.startsWith(item.href + '/'))
                   ? `${styles.navLink} ${styles.navLinkActive}`
                   : styles.navLink
               }
