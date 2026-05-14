@@ -219,6 +219,7 @@ model ExamTask {
   correctAnswer String?
   source        String?
   explanation   String?
+  aiTaskType    AiTaskType?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
@@ -314,6 +315,15 @@ enum AttemptStatus {
   SUBMITTED
   COMPLETED
   FAILED
+}
+
+enum AiTaskType {
+  TASK37
+  TASK38
+  TASK39
+  TASK40
+  TASK41
+  TASK42
 }
 
 enum ExamSection {
