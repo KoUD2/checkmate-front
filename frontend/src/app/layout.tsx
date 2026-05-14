@@ -42,6 +42,9 @@ export const metadata: Metadata = {
   authors: [{ name: "CheckMate" }],
   creator: "CheckMate",
   publisher: "CheckMate",
+  verification: {
+    yandex: 'c435d1462a7f89ce',
+  },
   robots: {
     index: true,
     follow: true,
