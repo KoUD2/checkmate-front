@@ -12,6 +12,7 @@ import { AdminModule } from './admin/admin.module';
 import { ReferralsModule } from './referrals/referrals.module';
 import { ResourcesModule } from './resources/resources.module';
 import { StorageModule } from './storage/storage.module';
+import { ExamTasksModule } from './exam-tasks/exam-tasks.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { StorageModule } from './storage/storage.module';
     ReferralsModule,
     ResourcesModule,
     StorageModule,
+    ExamTasksModule,
   ],
 })
 export class AppModule {}
