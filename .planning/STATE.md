@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 02-02-PLAN.md"
-last_updated: "2026-05-14T15:35:00.000Z"
+stopped_at: Phase 2 context gathered
+last_updated: "2026-05-14T15:30:12.948Z"
 last_activity: 2026-05-14
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 11
-  completed_plans: 7
-  percent: 64
+  completed_plans: 8
+  percent: 73
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 2
-Plan: 02 (completed) — next: 03
-Status: Executing (4 plans remaining)
+Plan: 03 (completed) — next: 04
+Status: Executing (3 plans remaining)
 Last activity: 2026-05-14
 
-Progress: [███████░░░] 64%
+Progress: [███████░░░] 73%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [███████░░░] 64%
 | Phase 02-task-bank P00 | 10 | 3 tasks | 3 files |
 | Phase 02-task-bank P01 | 5 | 1 tasks | 1 files |
 | Phase 02-task-bank P02 | 15 | 3 tasks | 4 files |
+| Phase 02-task-bank P03 | 10 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Recent decisions affecting current work:
 - [Phase 02-02]: UpdateExamTaskDto uses PartialType from @nestjs/swagger to match UpdateResourceDto convention
 - [Phase 02-02]: Service update() only runs $transaction when options !== undefined to avoid wiping existing options on partial PATCH
 - [Phase 02-02]: Service remove() returns HTTP 200 with needsConfirm body for draft-only case (consistent with D-08)
+- [Phase 02-03]: Class-level guards only on ExamTasksController — no per-method @UseGuards or @Roles (D-02 anti-pattern)
+- [Phase 02-03]: ExamTasksModule does not export ExamTasksService — service stays internal to module (D-01)
 
 ### Pending Todos
 
@@ -97,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-14T15:26:35.268Z
-Stopped at: Phase 2 context gathered
+Last session: 2026-05-14T15:30:12.942Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
