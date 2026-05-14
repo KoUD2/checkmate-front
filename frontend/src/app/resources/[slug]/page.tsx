@@ -6,7 +6,7 @@ import ResourceDetailClient from './ResourceDetailClient'
 import styles from './ResourceDetail.module.css'
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3001'
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://checkmateai.ru'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://app.checkmateai.ru'
 
 async function fetchResource(slug: string) {
   try {
