@@ -11,13 +11,20 @@ export class StorageService {
 	private readonly s3: S3Client;
 
 	constructor(private configService: ConfigService) {
-		this.bucket = this.configService.get<string>('YOS_BUCKET') || '';
+		const bucket = this.configService.get<string>('YOS_BUCKET');
 		const endpoint = this.configService.get<string>('YOS_ENDPOINT') || 'https://storage.yandexcloud.net';
 		const region = this.configService.get<string>('YOS_REGION') || 'ru-central1';
-		const accessKeyId = this.configService.get<string>('YOS_ACCESS_KEY_ID') || '';
-		const secretAccessKey = this.configService.get<string>('YOS_SECRET_ACCESS_KEY') || '';
+		const accessKeyId = this.configService.get<string>('YOS_ACCESS_KEY_ID');
+		const secretAccessKey = this.configService.get<string>('YOS_SECRET_ACCESS_KEY');
 
-		this.cdnBase = `${endpoint}/${this.bucket}`;
+		if (!bucket || !accessKeyId || !secretAccessKey) {
+			throw new Error(
+				'Missing required YOS environment variables: YOS_BUCKET, YOS_ACCESS_KEY_ID, YOS_SECRET_ACCESS_KEY',
+			);
+		}
+
+		this.bucket = bucket;
+		this.cdnBase = `${endpoint}/${bucket}`;
 
 		this.s3 = new S3Client({
 			region,
@@ -45,7 +52,9 @@ export class StorageService {
 			return { presignedUrl, cdnUrl };
 		} catch (error) {
 			this.logger.error('Ошибка при генерации presigned URL', error);
-			throw new InternalServerErrorException('Не удалось получить URL для загрузки');
+			throw new InternalServerErrorException(
+				`Не удалось получить URL для загрузки: ${error instanceof Error ? error.message : String(error)}`,
+			);
 		}
 	}
 }
