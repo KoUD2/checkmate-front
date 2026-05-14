@@ -263,6 +263,7 @@ model VariantTask {
   variant  Variant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
   examTask ExamTask @relation(fields: [examTaskId], references: [id], onDelete: Restrict)
 
+  @@unique([variantId, examTaskId])
   @@map("variant_tasks")
 }
 
