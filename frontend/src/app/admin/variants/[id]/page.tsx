@@ -293,14 +293,20 @@ export default function VariantBuilderPage() {
 	}
 
 	async function handleTogglePublish() {
+		if (metaSaving) return
 		const prev = published
 		setPublished(!prev)
+		setMetaSaving(true)
 		try {
-			await variantsService.adminUpdate(id, { published: !prev })
+			const updated = await variantsService.adminUpdate(id, { published: !prev })
+			setVariant(updated)
+			setPublished(updated.published)
 		} catch {
 			setPublished(prev)
 			setMetaError('Ошибка при публикации — попробуйте снова')
 			setTimeout(() => setMetaError(null), 3000)
+		} finally {
+			setMetaSaving(false)
 		}
 	}
 
