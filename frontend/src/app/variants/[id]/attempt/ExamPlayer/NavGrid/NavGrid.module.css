@@ -1,0 +1,82 @@
+.navSection {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.navSectionHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.navSectionLabel {
+	font-size: 12px;
+	font-weight: 600;
+	color: #374151;
+	text-transform: uppercase;
+}
+
+.navSectionSkipBtn {
+	font-size: 12px;
+	color: #6b7280;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+}
+
+.navSectionSkipBtnActive {
+	font-size: 12px;
+	color: #eb5931;
+	font-weight: 600;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+}
+
+.navCells {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.navCell {
+	width: 36px;
+	height: 36px;
+	border-radius: 6px;
+	font-size: 12px;
+	font-weight: 600;
+	background: #f3f4f6;
+	color: #374151;
+	border: 1px solid #e5e7eb;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.navCellAnswered {
+	background: #111827;
+	color: #ffffff;
+	border: none;
+}
+
+.navCellCurrent {
+	outline: 2px solid #6b7280;
+	outline-offset: 2px;
+}
+
+.navCellSkipped {
+	background: #f3f4f6;
+	color: #d1d5db;
+	border: 1px solid #e5e7eb;
+	text-decoration: line-through;
+	cursor: not-allowed;
+}
+
+.navCell:hover:not(:disabled) {
+	opacity: 0.85;
+}
