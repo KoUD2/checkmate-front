@@ -294,7 +294,7 @@ export default function ExamTaskForm({ initial, taskId }: Props) {
 
 				<div className={styles.field}>
 					<label className={styles.label} htmlFor="ef-body">
-						Текст задания *
+						Текст задания
 					</label>
 					<textarea
 						id="ef-body"
@@ -302,7 +302,6 @@ export default function ExamTaskForm({ initial, taskId }: Props) {
 						rows={4}
 						value={form.body}
 						onChange={(e) => set('body', e.target.value)}
-						required
 						placeholder="Инструкция или условие задания для студента"
 					/>
 				</div>
