@@ -184,15 +184,24 @@ export default function ExamTaskForm({ initial, taskId }: Props) {
 			let payload: CreateExamTaskPayload | Partial<CreateExamTaskPayload>
 
 			if (form.format === 'MCQ' || form.format === 'MATCHING') {
+				const filteredOptions = options
+					.filter((o) => o.optionText.trim())
+					.map((o) => ({
+						optionText: o.optionText,
+						matchText: o.matchText || undefined,
+						isCorrect: o.isCorrect,
+					}))
+				const initialOptions = (initial?.options ?? []).map((o) => ({
+					optionText: o.optionText,
+					matchText: o.matchText || undefined,
+					isCorrect: o.isCorrect,
+				}))
+				const optionsChanged =
+					!taskId ||
+					JSON.stringify(filteredOptions) !== JSON.stringify(initialOptions)
 				payload = {
 					...common,
-					options: options
-						.filter((o) => o.optionText.trim())
-						.map((o) => ({
-							optionText: o.optionText,
-							matchText: o.matchText || undefined,
-							isCorrect: o.isCorrect,
-						})),
+					...(optionsChanged ? { options: filteredOptions } : {}),
 				}
 			} else if (
 				form.format === 'TRUE_FALSE' ||
