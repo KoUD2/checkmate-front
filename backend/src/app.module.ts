@@ -14,6 +14,7 @@ import { ResourcesModule } from './resources/resources.module';
 import { StorageModule } from './storage/storage.module';
 import { ExamTasksModule } from './exam-tasks/exam-tasks.module';
 import { VariantsModule } from './variants/variants.module';
+import { AttemptsModule } from './attempts/attempts.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { VariantsModule } from './variants/variants.module';
     StorageModule,
     ExamTasksModule,
     VariantsModule,
+    AttemptsModule,
   ],
 })
 export class AppModule {}
