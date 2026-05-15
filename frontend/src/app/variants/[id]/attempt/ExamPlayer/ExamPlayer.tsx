@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import type { AttemptWithAnswers, SaveState, ExamSection } from '@/services/attempts.service'
 import type { VariantListItem } from '@/services/variants.service'
+import attemptsService from '@/services/attempts.service'
 import SaveIndicator from './SaveIndicator/SaveIndicator'
 import NavGrid from './NavGrid/NavGrid'
+import TaskView from './TaskView/TaskView'
 import styles from './ExamPlayer.module.css'
 import sidebarStyles from './ExamPlayerSidebar.module.css'
 
@@ -33,6 +35,9 @@ export default function ExamPlayer({ attempt, variant }: Props) {
 
 	const [saveState, setSaveState] = useState<SaveState>('idle')
 
+	const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const pendingPayloadRef = useRef<{ taskId: string; content: unknown } | null>(null)
+
 	const isAnswered = (taskId: string): boolean => {
 		const v = answers[taskId]?.content
 		if (v === null || v === undefined) return false
@@ -42,11 +47,65 @@ export default function ExamPlayer({ attempt, variant }: Props) {
 		return true
 	}
 
+	const performSave = useCallback(async (taskId: string, content: unknown) => {
+		setSaveState('saving')
+		pendingPayloadRef.current = { taskId, content }
+		try {
+			await attemptsService.upsertAnswer(attempt.id, taskId, content)
+			setAnswers(prev => ({ ...prev, [taskId]: { content, playCount: prev[taskId]?.playCount ?? 0 } }))
+			pendingPayloadRef.current = null
+			setSaveState('saved')
+		} catch {
+			setSaveState('error')
+		}
+	}, [attempt.id])
+
+	const scheduleAutoSave = useCallback((taskId: string, content: unknown) => {
+		if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+		setSaveState('saving')
+		pendingPayloadRef.current = { taskId, content }
+		saveTimerRef.current = setTimeout(() => { void performSave(taskId, content) }, 1500)
+	}, [performSave])
+
+	const handleRetry = useCallback(() => {
+		const p = pendingPayloadRef.current
+		if (p) void performSave(p.taskId, p.content)
+	}, [performSave])
+
+	const handleIncrementPlay = useCallback(async (taskId: string) => {
+		try {
+			const { playCount } = await attemptsService.incrementPlay(attempt.id, taskId)
+			setAnswers(prev => ({ ...prev, [taskId]: { content: prev[taskId]?.content ?? null, playCount } }))
+		} catch {
+			// server rejected (e.g. at limit) — do nothing; UI already shows the count
+		}
+	}, [attempt.id])
+
+	// Clear debounce timer on unmount
+	useEffect(() => {
+		return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current) }
+	}, [])
+
+	// Cancel any pending save when switching tasks — do NOT flush
+	useEffect(() => {
+		if (saveTimerRef.current) { clearTimeout(saveTimerRef.current); saveTimerRef.current = null }
+		pendingPayloadRef.current = null
+		setSaveState('idle')
+	}, [currentTaskId])
+
+	const currentTask = tasks.find(t => t.examTaskId === currentTaskId)
+	const currentIndex = tasks.findIndex(t => t.examTaskId === currentTaskId) + 1
+	const currentAnswerContent = answers[currentTaskId]?.content ?? null
+	const currentPlayCount = answers[currentTaskId]?.playCount ?? 0
+	const isFirst = currentIndex === 1
+	const isLast = currentIndex === tasks.length
+	const isSkipped = currentTask ? skippedSections.includes(currentTask.examTask.section) : false
+
 	return (
 		<div className={styles.examPlayer}>
 			<aside className={styles.sidebar}>
 				<div className={sidebarStyles.saveIndicator}>
-					<SaveIndicator state={saveState} onRetry={() => { void setSaveState('error') }} />
+					<SaveIndicator state={saveState} onRetry={handleRetry} />
 				</div>
 				<div className={sidebarStyles.navGrid}>
 					<NavGrid
@@ -64,12 +123,27 @@ export default function ExamPlayer({ attempt, variant }: Props) {
 			</aside>
 			<main className={styles.mainArea}>
 				<div className={styles.mainContent}>
-					{/* Plans 06 + 07 render TaskView, AnswerInput, AudioPlayer, modals here */}
-					<p style={{ color: '#6b7280' }}>Current task: {currentTaskId} (контент задания добавит Plan 06)</p>
-					<input
-						type="hidden"
-						data-staterefs={typeof setAnswers === 'function' && typeof setSkippedSections === 'function' ? '1' : '0'}
-					/>
+					{currentTask ? (
+						<TaskView
+							task={currentTask}
+							taskIndex={currentIndex}
+							answer={currentAnswerContent}
+							saveState={saveState}
+							playCount={currentPlayCount}
+							onAnswerChange={(content) => scheduleAutoSave(currentTaskId, content)}
+							onPlay={() => handleIncrementPlay(currentTaskId)}
+							onPrev={() => { const prev = tasks[currentIndex - 2]; if (prev) setCurrentTaskId(prev.examTaskId) }}
+							onNext={() => {
+								// TODO(plan-07): if isLast, open submit modal instead of advancing
+								const next = tasks[currentIndex]; if (next) setCurrentTaskId(next.examTaskId)
+							}}
+							isFirst={isFirst}
+							isLast={isLast}
+							isSkipped={isSkipped}
+						/>
+					) : (
+						<p>Задание не найдено</p>
+					)}
 				</div>
 			</main>
 		</div>

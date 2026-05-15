@@ -1,0 +1,46 @@
+.audioPlayer {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 16px;
+	background: #f9fafb;
+	border-radius: 8px;
+	border: 1px solid #e5e7eb;
+}
+
+.audioControls {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.playBtn {
+	background: #111827;
+	color: #ffffff;
+	border: none;
+	border-radius: 8px;
+	padding: 8px 16px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.playBtn:hover {
+	background: #374151;
+}
+
+.playBtnDisabled {
+	background: #d1d5db;
+	color: #9ca3af;
+	border: none;
+	border-radius: 8px;
+	padding: 8px 16px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: not-allowed;
+}
+
+.playCount {
+	font-size: 12px;
+	color: #6b7280;
+}

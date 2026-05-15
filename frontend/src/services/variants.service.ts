@@ -2,13 +2,19 @@ import api from '@/shared/utils/api'
 
 export type { ExamSection, TaskFormat } from './exam-tasks.service'
 
-import type { ExamSection, TaskFormat } from './exam-tasks.service'
+import type { ExamSection, TaskFormat, AiTaskType, ExamTaskOption } from './exam-tasks.service'
 
 export interface VariantTaskExamTaskMeta {
 	id: string
 	title: string
 	section: ExamSection
 	format: TaskFormat
+	body?: string | null
+	audioUrl?: string | null
+	source?: string | null
+	explanation?: string | null
+	aiTaskType?: AiTaskType | null
+	options?: ExamTaskOption[]
 }
 
 export interface VariantTask {

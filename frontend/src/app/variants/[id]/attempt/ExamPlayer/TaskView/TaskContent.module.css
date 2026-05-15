@@ -1,0 +1,68 @@
+.taskHeader {
+	display: flex;
+	gap: 8px;
+	align-items: baseline;
+	margin-bottom: 16px;
+}
+
+.taskNumber {
+	font-size: 12px;
+	font-weight: 600;
+	color: #6b7280;
+}
+
+.taskTitle {
+	font-size: 18px;
+	font-weight: 600;
+	color: #111827;
+	margin: 0;
+}
+
+.taskDescription {
+	font-size: 14px;
+	color: #374151;
+	line-height: 1.5;
+	margin-bottom: 24px;
+	white-space: pre-wrap;
+}
+
+.taskAnswerArea {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.prevNextRow {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 32px;
+}
+
+.btn_prev {
+	background: #ffffff;
+	color: #374151;
+	border: 1px solid #e5e7eb;
+	padding: 8px 24px;
+	border-radius: 8px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.btn_prev:hover {
+	background: #f9fafb;
+}
+
+.btn_next {
+	background: #111827;
+	color: #ffffff;
+	border: none;
+	padding: 8px 24px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.btn_next:hover {
+	background: #374151;
+}
