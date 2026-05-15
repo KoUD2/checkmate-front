@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { href: '/admin/promos', label: 'Промокоды' },
   { href: '/admin/tasks', label: 'Задания' },
   { href: '/admin/task-bank', label: 'Банк заданий' },
+  { href: '/admin/variants', label: 'Варианты' },
   { href: '/admin/resources', label: 'Полезное' },
 ]
 
