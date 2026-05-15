@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Database & Infrastructure** - Prisma schema migration (5 new models + 2 enums) and Yandex Object Storage setup (CORS, presigned URL endpoint) (completed 2026-05-14)
 - [x] **Phase 2: Task Bank** - ExamTasksModule with CRUD for all 6 task formats, audio upload integration, and admin UI for managing the task bank (completed 2026-05-15)
-- [ ] **Phase 3: Variant Composer** - VariantsModule backend (create, assign tasks, reorder, publish/unpublish) and admin UI variant builder with student catalog and preview page
+- [x] **Phase 3: Variant Composer** - VariantsModule backend (create, assign tasks, reorder, publish/unpublish) and admin UI variant builder with student catalog and preview page (completed 2026-05-15)
 - [ ] **Phase 4: Exam Player** - AttemptsModule backend and full exam player frontend (navigation grid, auto-save, audio play-count enforcement, resume, section-skip, submit modal)
 - [ ] **Phase 5: Grading & Results** - Submit endpoint (atomic check deduction + instant 1–36 grading + AI fire-and-forget) and result page (PARTIAL/COMPLETED/FAILED states, per-task breakdown, AI feedback, attempt history, upsell flow)
 
@@ -71,7 +71,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 03-04-PLAN.md — Frontend prerequisites: install @dnd-kit/core+sortable+utilities, create variantsService API client, add admin sidebar 'Варианты' nav
 - [x] 03-05-PLAN.md — Admin variants list page + create form + VariantForm component (VARIANT-01, VARIANT-03)
 - [x] 03-06-PLAN.md — Admin variant builder split-pane with @dnd-kit drag-and-drop + Save-button persistence (VARIANT-01, VARIANT-02, VARIANT-03) [checkpoint:human-verify]
-- [ ] 03-07-PLAN.md — Student catalog + preview pages + MainLayout 'Варианты ЕГЭ' nav entry (VARIANT-04, VARIANT-05) [checkpoint:human-verify]
+- [x] 03-07-PLAN.md — Student catalog + preview pages + MainLayout 'Варианты ЕГЭ' nav entry (VARIANT-04, VARIANT-05) [checkpoint:human-verify]
 **UI hint**: yes
 
 ### Phase 4: Exam Player
@@ -111,6 +111,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Database & Infrastructure | 4/4 | Complete   | 2026-05-14 |
 | 2. Task Bank | 7/7 | Complete | 2026-05-15 |
-| 3. Variant Composer | 6/7 | In Progress|  |
+| 3. Variant Composer | 7/7 | Complete   | 2026-05-15 |
 | 4. Exam Player | 0/? | Not started | - |
 | 5. Grading & Results | 0/? | Not started | - |
