@@ -270,6 +270,7 @@ export default function VariantBuilderPage() {
 	}
 
 	async function handleMetaSave() {
+		if (!metaForm.title.trim()) return
 		if (
 			metaForm.title === variant?.title &&
 			(metaForm.description || '') === (variant?.description || '')
