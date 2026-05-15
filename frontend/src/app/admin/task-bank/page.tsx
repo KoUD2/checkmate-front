@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import examTasksService, {
 	ExamSection,
 	ExamTaskListItem,
@@ -50,8 +50,6 @@ export default function AdminTaskBankPage() {
 	const [modalState, setModalState] = useState<ModalState>(null)
 	const [deleteError, setDeleteError] = useState<string | null>(null)
 
-	const sourceDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
 	const fetchItems = async (overridePage?: number) => {
 		setLoading(true)
 		try {
@@ -72,24 +70,14 @@ export default function AdminTaskBankPage() {
 		}
 	}
 
-	// Refetch on page, section, format changes
+	// Refetch on any filter or page change; debounce only when source is non-empty
 	useEffect(() => {
-		fetchItems()
+		const id = setTimeout(() => {
+			fetchItems()
+		}, source ? 300 : 0)
+		return () => clearTimeout(id)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [page, section, format])
-
-	// Debounced source filter
-	useEffect(() => {
-		if (sourceDebounceRef.current) clearTimeout(sourceDebounceRef.current)
-		sourceDebounceRef.current = setTimeout(() => {
-			setPage(1)
-			fetchItems(1)
-		}, 300)
-		return () => {
-			if (sourceDebounceRef.current) clearTimeout(sourceDebounceRef.current)
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [source])
+	}, [page, section, format, source])
 
 	const handleDelete = async (id: string) => {
 		if (!confirm('Удалить это задание? Это действие нельзя отменить.')) return
