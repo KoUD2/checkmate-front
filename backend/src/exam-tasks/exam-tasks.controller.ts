@@ -37,10 +37,12 @@ export class ExamTasksController {
     @Query('section') section?: ExamSection,
     @Query('format') format?: TaskFormat,
     @Query('source') source?: string,
-    @Query('page') page = 1,
-    @Query('limit') limit = 20,
+    @Query('page') rawPage = '1',
+    @Query('limit') rawLimit = '20',
   ) {
-    const result = await this.examTasksService.list({ section, format, source }, +page, +limit);
+    const page = Math.max(1, parseInt(rawPage, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(rawLimit, 10) || 20));
+    const result = await this.examTasksService.list({ section, format, source }, page, limit);
     return { success: true, data: result };
   }
 
