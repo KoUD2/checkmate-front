@@ -254,40 +254,42 @@ export default function ExamTaskForm({ initial, taskId }: Props) {
 					/>
 				</div>
 
-				<div className={styles.field}>
-					<label className={styles.label} htmlFor="ef-section">
-						Раздел *
-					</label>
-					<select
-						id="ef-section"
-						className={styles.select}
-						value={form.section}
-						onChange={(e) => set('section', e.target.value as ExamSection)}
-					>
-						{SECTION_OPTIONS.map((o) => (
-							<option key={o.value} value={o.value}>
-								{o.label}
-							</option>
-						))}
-					</select>
-				</div>
+				<div className={styles.fieldRow}>
+					<div className={styles.field}>
+						<label className={styles.label} htmlFor="ef-section">
+							Раздел *
+						</label>
+						<select
+							id="ef-section"
+							className={styles.select}
+							value={form.section}
+							onChange={(e) => set('section', e.target.value as ExamSection)}
+						>
+							{SECTION_OPTIONS.map((o) => (
+								<option key={o.value} value={o.value}>
+									{o.label}
+								</option>
+							))}
+						</select>
+					</div>
 
-				<div className={styles.field}>
-					<label className={styles.label} htmlFor="ef-format">
-						Формат *
-					</label>
-					<select
-						id="ef-format"
-						className={styles.select}
-						value={form.format}
-						onChange={(e) => set('format', e.target.value as TaskFormat)}
-					>
-						{FORMAT_OPTIONS.map((o) => (
-							<option key={o.value} value={o.value}>
-								{o.label}
-							</option>
-						))}
-					</select>
+					<div className={styles.field}>
+						<label className={styles.label} htmlFor="ef-format">
+							Формат *
+						</label>
+						<select
+							id="ef-format"
+							className={styles.select}
+							value={form.format}
+							onChange={(e) => set('format', e.target.value as TaskFormat)}
+						>
+							{FORMAT_OPTIONS.map((o) => (
+								<option key={o.value} value={o.value}>
+									{o.label}
+								</option>
+							))}
+						</select>
+					</div>
 				</div>
 
 				<div className={styles.field}>
@@ -315,7 +317,6 @@ export default function ExamTaskForm({ initial, taskId }: Props) {
 						value={form.source}
 						onChange={(e) => set('source', e.target.value)}
 						placeholder="ФИПИ 2024"
-						style={{ maxWidth: 360 }}
 					/>
 				</div>
 			</fieldset>

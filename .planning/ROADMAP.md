@@ -13,7 +13,7 @@ This milestone adds full ЕГЭ English variant support to CheckMate. Work proce
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Database & Infrastructure** - Prisma schema migration (5 new models + 2 enums) and Yandex Object Storage setup (CORS, presigned URL endpoint) (completed 2026-05-14)
-- [ ] **Phase 2: Task Bank** - ExamTasksModule with CRUD for all 6 task formats, audio upload integration, and admin UI for managing the task bank
+- [x] **Phase 2: Task Bank** - ExamTasksModule with CRUD for all 6 task formats, audio upload integration, and admin UI for managing the task bank (completed 2026-05-15)
 - [ ] **Phase 3: Variant Composer** - VariantsModule backend (create, assign tasks, reorder, publish/unpublish) and admin UI variant builder with student catalog and preview page
 - [ ] **Phase 4: Exam Player** - AttemptsModule backend and full exam player frontend (navigation grid, auto-save, audio play-count enforcement, resume, section-skip, submit modal)
 - [ ] **Phase 5: Grading & Results** - Submit endpoint (atomic check deduction + instant 1–36 grading + AI fire-and-forget) and result page (PARTIAL/COMPLETED/FAILED states, per-task breakdown, AI feedback, attempt history, upsell flow)
@@ -52,7 +52,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 02-03-PLAN.md — Backend ExamTasksController (5 admin-guarded routes) + ExamTasksModule + AppModule wire + controller.spec implementation (TASK-01, TASK-02, TASK-04, TASK-05, TASK-06)
 - [x] 02-04-PLAN.md — Frontend exam-tasks.service.ts typed API client + admin sidebar "Банк заданий" nav entry with startsWith active matching
 - [x] 02-05-PLAN.md — Frontend /admin/task-bank list page + filters + DeleteWarningModal (two-tier delete UX) (TASK-04, TASK-06) ✓ human-verify approved 2026-05-15
-- [x] 02-06-PLAN.md — Frontend ExamTaskForm (format-conditional fields + audio upload via /storage/presign) + new/page + [id]/page (TASK-01, TASK-02, TASK-03, TASK-05) — auto tasks complete, human-verify pending
+- [x] 02-06-PLAN.md — Frontend ExamTaskForm (format-conditional fields + audio upload via /storage/presign) + new/page + [id]/page (TASK-01, TASK-02, TASK-03, TASK-05) ✓ human-verify approved 2026-05-15
 **UI hint**: yes
 
 ### Phase 3: Variant Composer
@@ -103,7 +103,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Database & Infrastructure | 4/4 | Complete   | 2026-05-14 |
-| 2. Task Bank | 7/7 | Human-verify pending | 2026-05-15 |
+| 2. Task Bank | 7/7 | Complete | 2026-05-15 |
 | 3. Variant Composer | 0/? | Not started | - |
 | 4. Exam Player | 0/? | Not started | - |
 | 5. Grading & Results | 0/? | Not started | - |

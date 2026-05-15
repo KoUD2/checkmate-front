@@ -58,7 +58,7 @@ completed: "2026-05-15"
 - **Duration:** ~22 minutes
 - **Started:** 2026-05-15T07:24:39Z
 - **Completed:** 2026-05-15T07:46:25Z
-- **Tasks:** 2/3 auto complete (Task 3 is human-verify checkpoint)
+- **Tasks:** 3/3 complete (Task 3 human-verify approved 2026-05-15)
 - **Files created:** 4
 
 ## Accomplishments
@@ -72,6 +72,7 @@ completed: "2026-05-15"
 
 1. **Task 1: ExamTaskForm + CSS module** — `f238f98` (feat)
 2. **Task 2: new/page.tsx + [id]/page.tsx wrappers** — `5643fb8` (feat)
+3. **Task 3: Human-verify** — approved 2026-05-15 (all 10 smoke tests passed: create/edit/format-swap/audio-upload confirmed end-to-end)
 
 ## Format/Section Label Maps
 
@@ -152,7 +153,17 @@ All 6 Phase 2 requirements (TASK-01 through TASK-06) are now implemented:
 
 ### Auto-fixed Issues
 
-None — plan executed exactly as written.
+**1. [Rule 1 - Bug] Widened form and added 2-column grid for Раздел/Формат selects**
+- **Found during:** Task 3 (Human verify)
+- **Issue:** During browser verification the form felt narrow (max-width 760px) and the Раздел + Формат selects stacked vertically, taking unnecessary vertical space
+- **Fix:** Increased form max-width to 1100px; added `.fieldRow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px }` CSS class; wrapped Раздел and Формат selects in a `.fieldRow` div; removed inline `style={{ maxWidth: 360 }}` from source input
+- **Files modified:** `frontend/src/app/admin/task-bank/ExamTaskForm.tsx`, `frontend/src/app/admin/task-bank/ExamTaskForm.module.css`
+- **Verification:** Human-verify approved after fix — all 10 smoke tests passed
+
+---
+
+**Total deviations:** 1 auto-fixed (Rule 1 — layout bug found during human-verify)
+**Impact on plan:** Minor CSS/layout adjustment. No logic changes, no new deps. Human-verify approved.
 
 ### ESLint Note
 
