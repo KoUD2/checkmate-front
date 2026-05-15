@@ -70,7 +70,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 03-03-PLAN.md — Backend Controllers (admin + student dual-namespace) + VariantsModule + AppModule wire + 8 controller.spec tests
 - [x] 03-04-PLAN.md — Frontend prerequisites: install @dnd-kit/core+sortable+utilities, create variantsService API client, add admin sidebar 'Варианты' nav
 - [x] 03-05-PLAN.md — Admin variants list page + create form + VariantForm component (VARIANT-01, VARIANT-03)
-- [ ] 03-06-PLAN.md — Admin variant builder split-pane with @dnd-kit drag-and-drop + Save-button persistence (VARIANT-01, VARIANT-02, VARIANT-03) [checkpoint:human-verify]
+- [x] 03-06-PLAN.md — Admin variant builder split-pane with @dnd-kit drag-and-drop + Save-button persistence (VARIANT-01, VARIANT-02, VARIANT-03) [checkpoint:human-verify]
 - [ ] 03-07-PLAN.md — Student catalog + preview pages + MainLayout 'Варианты ЕГЭ' nav entry (VARIANT-04, VARIANT-05) [checkpoint:human-verify]
 **UI hint**: yes
 
@@ -111,6 +111,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Database & Infrastructure | 4/4 | Complete   | 2026-05-14 |
 | 2. Task Bank | 7/7 | Complete | 2026-05-15 |
-| 3. Variant Composer | 5/7 | In Progress|  |
+| 3. Variant Composer | 6/7 | In Progress|  |
 | 4. Exam Player | 0/? | Not started | - |
 | 5. Grading & Results | 0/? | Not started | - |
