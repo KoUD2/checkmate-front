@@ -67,7 +67,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 7 plans
 - [x] 03-01-PLAN.md — Wave 0 Jest spec skeletons for VariantsService and VariantsController (5+3 it.todo placeholders)
 - [x] 03-02-PLAN.md — Backend DTOs (Create/Update/AssignTasks) + VariantsService (CRUD + bulk-replace assignTasks) + 5 service.spec tests (VARIANT-01..05)
-- [ ] 03-03-PLAN.md — Backend Controllers (admin + student dual-namespace) + VariantsModule + AppModule wire + 8 controller.spec tests
+- [x] 03-03-PLAN.md — Backend Controllers (admin + student dual-namespace) + VariantsModule + AppModule wire + 8 controller.spec tests
 - [ ] 03-04-PLAN.md — Frontend prerequisites: install @dnd-kit/core+sortable+utilities, create variantsService API client, add admin sidebar 'Варианты' nav
 - [ ] 03-05-PLAN.md — Admin variants list page + create form + VariantForm component (VARIANT-01, VARIANT-03)
 - [ ] 03-06-PLAN.md — Admin variant builder split-pane with @dnd-kit drag-and-drop + Save-button persistence (VARIANT-01, VARIANT-02, VARIANT-03) [checkpoint:human-verify]
