@@ -61,6 +61,11 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               Полезное
             </Link>
             {user && (
+              <Link href="/variants" className={styles["main-layout__checks"]}>
+                Варианты ЕГЭ
+              </Link>
+            )}
+            {user && (
               <Link href="/referral" className={styles["main-layout__checks"]}>
                 Пригласить друга
               </Link>
@@ -101,6 +106,9 @@ const MainLayout: FC<PropsWithChildren> = ({ children }) => {
               <Link href="/admin" onClick={() => setMenuOpen(false)}>Админка</Link>
             )}
             <Link href="/resources" onClick={() => setMenuOpen(false)}>Полезное</Link>
+            {user && (
+              <Link href="/variants" onClick={() => setMenuOpen(false)}>Варианты ЕГЭ</Link>
+            )}
             {user && (
               <Link href="/referral" onClick={() => setMenuOpen(false)}>Пригласить друга</Link>
             )}
