@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-05-PLAN.md
-last_updated: "2026-05-15T07:00:00.000Z"
+stopped_at: Completed 02-06-PLAN.md (checkpoint:human-verify pending)
+last_updated: "2026-05-15T07:46:25.000Z"
 last_activity: 2026-05-15
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 11
   completed_plans: 11
   percent: 100
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-05-14)
 ## Current Position
 
 Phase: 2
-Plan: 05 (completed) — next: 06
-Status: Executing (1 plan remaining)
+Plan: 06 (checkpoint:human-verify pending)
+Status: Executing (human verify required)
 Last activity: 2026-05-15
 
 Progress: [██████████] 100%
@@ -61,6 +61,7 @@ Progress: [██████████] 100%
 | Phase 02-task-bank P03 | 10 | 3 tasks | 4 files |
 | Phase 02-task-bank P04 | 8 | 2 tasks | 2 files |
 | Phase 02-task-bank P05 | 25 | 3 tasks | 3 files |
+| Phase 02-task-bank P06 | 22 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,9 @@ Recent decisions affecting current work:
 - [Phase 02-05]: DeleteWarningModal rendered inline (no portal) — overlay position:fixed handles stacking without a mount target
 - [Phase 02-05]: Plan 06 (ExamTaskForm) can reuse AdminTaskBank.module.css overlay/modal/button classes directly
 - [Phase 02-05]: Delete Cases 2 and 3 (draft/published variants) deferred until Phase 3 ships VariantsModule
+- [Phase 02-06]: cancel button rendered as <Link> not useRouter().push — cleaner HTML semantics for nav-away without side effects
+- [Phase 02-06]: options array holds both MCQ rows and Matching pairs+distractors; isCorrect=true marks pairs vs distractors
+- [Phase 02-06]: No delete button in ExamTaskForm — delete handled exclusively from list page (Plan 05)
 
 ### Pending Todos
 
@@ -107,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-15T07:00:00.000Z
-Stopped at: Completed 02-05-PLAN.md
+Last session: 2026-05-15T07:46:25.000Z
+Stopped at: Completed 02-06-PLAN.md auto tasks (Task 3 = human-verify checkpoint pending)
 Resume file: None
