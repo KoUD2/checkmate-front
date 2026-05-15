@@ -275,7 +275,8 @@ model VariantAttempt {
   status    AttemptStatus @default(IN_PROGRESS)
   startedAt DateTime      @default(now())
   endedAt   DateTime?
-  updatedAt DateTime      @updatedAt
+  updatedAt        DateTime      @updatedAt
+  skippedSections  ExamSection[]
 
   user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   variant Variant         @relation(fields: [variantId], references: [id], onDelete: Restrict)
