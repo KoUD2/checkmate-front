@@ -13,6 +13,7 @@ import { ReferralsModule } from './referrals/referrals.module';
 import { ResourcesModule } from './resources/resources.module';
 import { StorageModule } from './storage/storage.module';
 import { ExamTasksModule } from './exam-tasks/exam-tasks.module';
+import { VariantsModule } from './variants/variants.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ExamTasksModule } from './exam-tasks/exam-tasks.module';
     ResourcesModule,
     StorageModule,
     ExamTasksModule,
+    VariantsModule,
   ],
 })
 export class AppModule {}
