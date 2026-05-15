@@ -1,0 +1,214 @@
+.form {
+	max-width: 760px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.fieldset {
+	border: 1px solid #e5e5e5;
+	border-radius: 8px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	background: #ffffff;
+}
+
+.legend {
+	font-size: 13px;
+	font-weight: 600;
+	color: #374151;
+	padding: 0 8px;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #374151;
+	line-height: 1.4;
+}
+
+.input,
+.select,
+.textarea {
+	padding: 8px 12px;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	font-size: 14px;
+	font-family: inherit;
+	color: #2e3339;
+	background: #ffffff;
+	outline: none;
+	transition: border-color 0.12s;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+	border-color: #6366f1;
+}
+
+.textarea {
+	resize: vertical;
+	min-height: 96px;
+}
+
+.optionRow {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.removeBtn {
+	background: none;
+	border: none;
+	color: #9ca3af;
+	font-size: 16px;
+	cursor: pointer;
+	padding: 4px;
+	line-height: 1;
+	transition: color 0.12s;
+}
+
+.removeBtn:hover {
+	color: #dc2626;
+}
+
+.ghostBtn {
+	background: #ffffff;
+	border: 1px solid #e5e5e5;
+	color: #374151;
+	font-size: 13px;
+	padding: 8px 12px;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background 0.12s;
+	align-self: flex-start;
+}
+
+.ghostBtn:hover:not(:disabled) {
+	background: #f9fafb;
+}
+
+.ghostBtn:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.helperText {
+	font-size: 12px;
+	color: #6b7280;
+	margin: 0;
+}
+
+.error {
+	background: #fef2f2;
+	border: 1px solid #fecaca;
+	color: #dc2626;
+	border-radius: 8px;
+	padding: 8px 16px;
+	font-size: 14px;
+}
+
+.footer {
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+	align-items: center;
+}
+
+.btn_save {
+	background: #111827;
+	color: #ffffff;
+	border: none;
+	padding: 8px 24px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.12s;
+}
+
+.btn_save:hover:not(:disabled) {
+	background: #374151;
+}
+
+.btn_save:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.btn_cancel {
+	background: #ffffff;
+	color: #374151;
+	border: 1px solid #e5e5e5;
+	padding: 8px 24px;
+	border-radius: 8px;
+	font-size: 14px;
+	cursor: pointer;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	transition: background 0.12s;
+}
+
+.btn_cancel:hover {
+	background: #f9fafb;
+}
+
+.audioChip {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	background: #dcfce7;
+	color: #15803d;
+	border-radius: 12px;
+	padding: 4px 8px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.audioUrl {
+	font-family: monospace;
+	font-size: 12px;
+	color: #6b7280;
+}
+
+.audioRemove {
+	color: #dc2626;
+	font-size: 13px;
+	cursor: pointer;
+	background: none;
+	border: none;
+	padding: 0;
+	text-decoration: underline;
+}
+
+.audioRemove:hover {
+	opacity: 0.8;
+}
+
+.spinner {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid #e5e7eb;
+	border-top-color: #6366f1;
+	border-radius: 50%;
+	animation: spin 0.6s linear infinite;
+	flex-shrink: 0;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
