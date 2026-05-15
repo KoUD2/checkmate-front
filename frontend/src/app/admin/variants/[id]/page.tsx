@@ -358,7 +358,7 @@ export default function VariantBuilderPage() {
 			{/* Save bar (sticky) */}
 			<div className={styles.saveBar}>
 				<button
-					className={isDirty ? `${styles.btn_save} ${styles.btn_save_dirty}` : styles.btn_save}
+					className={styles.btn_save}
 					disabled={saving || !isDirty}
 					onClick={handleSave}
 				>
