@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsNotEmpty,
   IsArray,
+  ArrayMinSize,
   ValidateNested,
   ValidateIf,
 } from 'class-validator'
@@ -84,6 +85,7 @@ export class CreateExamTaskDto {
     (o) => o.format === TaskFormat.MCQ || o.format === TaskFormat.MATCHING,
   )
   @IsArray()
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => ExamTaskOptionDto)
   options?: ExamTaskOptionDto[]

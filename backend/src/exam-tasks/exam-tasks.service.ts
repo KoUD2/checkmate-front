@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common'
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common'
 import { TaskFormat, ExamSection, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateExamTaskDto } from './dto/create-exam-task.dto'
@@ -61,6 +61,11 @@ export class ExamTasksService {
     await this.findById(id)
     const { options, ...taskData } = dto
     if (options !== undefined) {
+      if (options.length === 0) {
+        throw new BadRequestException(
+          'options[] must not be empty; send undefined to leave options unchanged',
+        )
+      }
       await this.prisma.$transaction([
         this.prisma.examTaskOption.deleteMany({ where: { examTaskId: id } }),
         this.prisma.examTask.update({
