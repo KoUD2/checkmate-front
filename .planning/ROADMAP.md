@@ -64,7 +64,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Admin can publish a variant; it immediately appears in the student catalog; admin can unpublish it and it disappears
   3. Student can browse the published variant catalog showing variant name, section breakdown, and task count
   4. Student can open a variant preview page and see sections, task count per section, and the check cost before committing to start
-**Plans**: TBD
+**Plans**: 7 plans
+- [ ] 03-01-PLAN.md — Wave 0 Jest spec skeletons for VariantsService and VariantsController (5+3 it.todo placeholders)
+- [ ] 03-02-PLAN.md — Backend DTOs (Create/Update/AssignTasks) + VariantsService (CRUD + bulk-replace assignTasks) + 5 service.spec tests (VARIANT-01..05)
+- [ ] 03-03-PLAN.md — Backend Controllers (admin + student dual-namespace) + VariantsModule + AppModule wire + 8 controller.spec tests
+- [ ] 03-04-PLAN.md — Frontend prerequisites: install @dnd-kit/core+sortable+utilities, create variantsService API client, add admin sidebar 'Варианты' nav
+- [ ] 03-05-PLAN.md — Admin variants list page + create form + VariantForm component (VARIANT-01, VARIANT-03)
+- [ ] 03-06-PLAN.md — Admin variant builder split-pane with @dnd-kit drag-and-drop + Save-button persistence (VARIANT-01, VARIANT-02, VARIANT-03) [checkpoint:human-verify]
+- [ ] 03-07-PLAN.md — Student catalog + preview pages + MainLayout 'Варианты ЕГЭ' nav entry (VARIANT-04, VARIANT-05) [checkpoint:human-verify]
 **UI hint**: yes
 
 ### Phase 4: Exam Player
@@ -104,6 +111,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Database & Infrastructure | 4/4 | Complete   | 2026-05-14 |
 | 2. Task Bank | 7/7 | Complete | 2026-05-15 |
-| 3. Variant Composer | 0/? | Not started | - |
+| 3. Variant Composer | 0/7 | Planned | - |
 | 4. Exam Player | 0/? | Not started | - |
 | 5. Grading & Results | 0/? | Not started | - |
