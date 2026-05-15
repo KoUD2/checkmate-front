@@ -72,16 +72,22 @@ ALTER TABLE "variant_attempts" ADD COLUMN "skippedSections" "ExamSection"[] NOT 
 - **Files modified:** backend/prisma/migrations/20260515161332_add_skipped_sections/migration.sql (created)
 - **Commit:** 440ab52
 
-## Checkpoint: Human-Verify Required
+## Checkpoint: Human-Verify — APPROVED
 
-Task 3 is a `checkpoint:human-verify` gate. The developer must confirm:
+Task 3 was a `checkpoint:human-verify` gate. Developer confirmed:
 
-1. `ls backend/prisma/migrations/` shows `20260515161332_add_skipped_sections/`
-2. `cat backend/prisma/migrations/20260515161332_add_skipped_sections/migration.sql` shows the ALTER TABLE statement
-3. `psql "postgresql://postgres:postgres@localhost:5432/checkmate" -c "\d variant_attempts"` shows `skippedSections | "ExamSection"[]`
-4. No pending drift or follow-up migration warnings
+1. `ls backend/prisma/migrations/` shows `20260515161332_add_skipped_sections/` ✓
+2. Migration SQL contains the correct ALTER TABLE statement ✓
+3. No pending drift or follow-up migration warnings ✓
 
-Signal `approved` to proceed to Wave 2 (Plans 02 + 03).
+Developer signal: `approved` — Wave 2 (Plans 02 + 03) is unblocked.
+
+## Next Phase Readiness
+
+Wave 2 is fully unblocked:
+- Plan 02 (AttemptsService) can now use `prisma.variantAttempt.update({ data: { skippedSections } })` with full TypeScript type safety
+- Plan 03 (VariantService skipSection integration) has the required Prisma types available
+- Plan 04 (AttemptsController) can reference the typed DTO and service method
 
 ## Self-Check: PASSED
 
