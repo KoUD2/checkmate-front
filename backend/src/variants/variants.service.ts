@@ -25,6 +25,20 @@ export class VariantsService {
 		return this.findById(id)
 	}
 
+	async getPublishedById(id: string) {
+		const variant = await this.prisma.variant.findFirst({
+			where: { id, published: true },
+			include: {
+				variantTasks: {
+					orderBy: { position: 'asc' },
+					include: { examTask: true },
+				},
+			},
+		})
+		if (!variant) throw new NotFoundException('Вариант не найден')
+		return variant
+	}
+
 	async adminList(page = 1, limit = 20) {
 		const [items, total] = await Promise.all([
 			this.prisma.variant.findMany({

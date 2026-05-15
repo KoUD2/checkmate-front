@@ -102,7 +102,7 @@ export class VariantsController {
   @Get(':id')
   @ApiOperation({ summary: 'Получить вариант по id' })
   async getById(@Param('id') id: string) {
-    const result = await this.variantsService.getById(id);
+    const result = await this.variantsService.getPublishedById(id);
     return { success: true, data: result };
   }
 }
