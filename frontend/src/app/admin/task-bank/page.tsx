@@ -48,6 +48,7 @@ export default function AdminTaskBankPage() {
 	const [source, setSource] = useState('')
 	const [loading, setLoading] = useState(false)
 	const [modalState, setModalState] = useState<ModalState>(null)
+	const [deleteError, setDeleteError] = useState<string | null>(null)
 
 	const sourceDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -107,8 +108,6 @@ export default function AdminTaskBankPage() {
 					variantNames: axiosErr.response.data!.variants!,
 					taskId: id,
 				})
-			} else {
-				console.error('Delete failed:', err)
 			}
 		}
 	}
@@ -117,10 +116,11 @@ export default function AdminTaskBankPage() {
 		if (!modalState) return
 		try {
 			await examTasksService.remove(modalState.taskId, true)
+			setDeleteError(null)
 			setModalState(null)
 			fetchItems()
-		} catch (err) {
-			console.error('Force delete failed:', err)
+		} catch {
+			setDeleteError('Не удалось удалить задание. Попробуйте ещё раз.')
 		}
 	}
 
@@ -258,7 +258,8 @@ export default function AdminTaskBankPage() {
 					mode={modalState.mode}
 					variantNames={modalState.variantNames}
 					onConfirm={modalState.mode === 'draft' ? handleConfirmDraftDelete : undefined}
-					onClose={() => setModalState(null)}
+					onClose={() => { setModalState(null); setDeleteError(null) }}
+					errorMessage={deleteError}
 				/>
 			)}
 		</div>

@@ -7,9 +7,10 @@ interface Props {
 	variantNames: string[]
 	onConfirm?: () => void
 	onClose: () => void
+	errorMessage?: string | null
 }
 
-export default function DeleteWarningModal({ mode, variantNames, onConfirm, onClose }: Props) {
+export default function DeleteWarningModal({ mode, variantNames, onConfirm, onClose, errorMessage }: Props) {
 	const handleOverlayClick = () => {
 		if (mode === 'blocked') {
 			onClose()
@@ -24,12 +25,14 @@ export default function DeleteWarningModal({ mode, variantNames, onConfirm, onCl
 					<p className={styles.modalBody}>
 						Это задание входит в следующие неопубликованные варианты: {variantNames.join(', ')}. При удалении задание будет автоматически убрано из этих вариантов.
 					</p>
+					{errorMessage && (
+						<p style={{ color: '#dc2626', fontSize: 14, margin: '0 0 12px' }}>{errorMessage}</p>
+					)}
 					<div className={styles.modalFooter}>
 						<button
 							className={styles.btn_destructive}
 							onClick={() => {
 								if (onConfirm) onConfirm()
-								onClose()
 							}}
 						>
 							Удалить всё равно
