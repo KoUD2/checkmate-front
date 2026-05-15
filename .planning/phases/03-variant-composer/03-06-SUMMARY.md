@@ -118,7 +118,9 @@ None — plan executed exactly as written.
 
 ## Human-Verify Checkpoint
 
-Task 3 is a `checkpoint:human-verify` gate that blocks further execution. The 18-step verification checklist covers:
+**Status: APPROVED** — user reviewed the variant builder and confirmed all interactions working.
+
+The 18-step verification checklist covers:
 
 1. Left-panel add task (gray-out + row appears in right panel)
 2. Save dirty state (btn_save_dirty accent border)
@@ -134,6 +136,13 @@ Task 3 is a `checkpoint:human-verify` gate that blocks further execution. The 18
 12. Pitfall 3 gray-out across pages (bank page 2 task stays muted after add)
 13. Error path (offline → Не удалось сохранить. → retry succeeds)
 14. Mobile responsive at <768px
+
+### Post-Approval Fix
+
+During human review, the user requested removal of the orange dirty-state border on the save button (the 2px solid #eb5931 border applied via `.btn_save_dirty`). The border was removed — the save button now relies solely on opacity/disabled-state contrast to indicate non-dirty vs dirty status.
+
+- **Commit:** `ba4e5ee` — `fix(03-06): remove orange dirty-state border from save button`
+- **File modified:** `frontend/src/app/admin/variants/[id]/VariantBuilder.module.css` (`.btn_save_dirty` border rule removed)
 
 ## Known Stubs
 
