@@ -1,0 +1,43 @@
+.examPlayer {
+	display: flex;
+	min-height: 100vh;
+	background: #f9fafb;
+}
+
+.sidebar {
+	width: 240px;
+	flex-shrink: 0;
+	background: #ffffff;
+	border-right: 1px solid #e5e7eb;
+	display: flex;
+	flex-direction: column;
+	position: sticky;
+	top: 0;
+	align-self: flex-start;
+	height: 100vh;
+}
+
+.mainArea {
+	flex: 1;
+	overflow-y: auto;
+	padding: 32px;
+}
+
+.mainContent {
+	max-width: 720px;
+	margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+	.examPlayer {
+		flex-direction: column;
+	}
+
+	.sidebar {
+		position: relative;
+		width: 100%;
+		height: auto;
+		max-height: 50vh;
+		overflow-y: auto;
+	}
+}
