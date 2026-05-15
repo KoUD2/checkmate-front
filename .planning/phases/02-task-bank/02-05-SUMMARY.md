@@ -40,7 +40,7 @@ key-decisions:
 requirements-completed: [TASK-04, TASK-06]
 
 duration: ~10min
-completed: "2026-05-14"
+completed: "2026-05-15"
 ---
 
 # Phase 2 Plan 05: Admin Task Bank List Page Summary
@@ -52,7 +52,7 @@ completed: "2026-05-14"
 - **Duration:** ~10 minutes
 - **Started:** 2026-05-14T15:35:28Z
 - **Completed:** 2026-05-14T15:37:48Z
-- **Tasks:** 2 (of 3 — Task 3 is human-verify checkpoint)
+- **Tasks:** 3/3 (2 auto + 1 human-verify — all complete)
 - **Files created:** 3
 
 ## Accomplishments
@@ -109,16 +109,16 @@ Plan 06 may also create a separate `ExamTaskForm.module.css` for form-specific s
 
 Cases 2 and 3 require VariantsModule (Phase 3) to be fully exercised end-to-end. They are implemented at the UI layer and will be tested once Phase 3 ships variant publishing.
 
-## Human Verify Checkpoint (Task 3 — Pending)
+## Human Verify Checkpoint (Task 3 — APPROVED)
 
-The following manual checks are required against the running backend:
-1. Navigate to `/admin/task-bank` — page renders with table, heading, CTA
-2. Admin sidebar "Банк заданий" is highlighted (active)
-3. Section filter: select "Аудирование" → refetch → only listening tasks
-4. Format filter: select "MCQ" → only MCQ tasks
-5. Source input: type "ФИПИ" → wait ~300ms → debounced refetch
-6. Pagination: >20 tasks shows "Стр. 1 / 2" and arrow buttons
-7. Delete Case 1 (no variants): browser confirm → task removed from list
+The following manual checks were confirmed by the developer against the running backend:
+1. Navigate to `/admin/task-bank` — page renders with table, heading, CTA — PASSED
+2. Admin sidebar "Банк заданий" is highlighted (active) — PASSED
+3. Section filter: select "Аудирование" → refetch → only listening tasks — PASSED
+4. Format filter: select "MCQ" → only MCQ tasks — PASSED
+5. Source input: type "ФИПИ" → wait ~300ms → debounced refetch — PASSED
+6. Pagination: >20 tasks shows "Стр. 1 / 2" and arrow buttons — PASSED
+7. Delete Case 1 (no variants): browser confirm → task removed from list — PASSED
 
 Steps 8–9 (Cases 2 and 3) deferred until Phase 3.
 
@@ -160,3 +160,4 @@ None — page is fully wired to `examTasksService.list()` for data. No hardcoded
 - [x] CSS has `.btn_create`, `.btn_edit`, `.btn_delete`, `.table`, `.filters`, `.pagination`, `.sectionChip`
 - [x] TypeScript clean (0 source errors, excluding pre-existing .next/dev cache errors)
 - [x] Commits d59cafe, dc10c3e verified in git log
+- [x] Task 3 human-verify: APPROVED by developer on 2026-05-15
