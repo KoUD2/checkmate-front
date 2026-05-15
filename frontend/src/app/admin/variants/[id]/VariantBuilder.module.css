@@ -98,10 +98,6 @@
 	cursor: default;
 }
 
-/* Dirty state: accent border indicates unsaved changes */
-.btn_save_dirty {
-	border: 2px solid #eb5931;
-}
 
 /* ---- Task rows (right panel — sortable) ---- */
 
