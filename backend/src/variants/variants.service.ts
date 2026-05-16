@@ -31,7 +31,7 @@ export class VariantsService {
 			include: {
 				variantTasks: {
 					orderBy: { position: 'asc' },
-					include: { examTask: true },
+					include: { examTask: { include: { options: true } } },
 				},
 			},
 		})
