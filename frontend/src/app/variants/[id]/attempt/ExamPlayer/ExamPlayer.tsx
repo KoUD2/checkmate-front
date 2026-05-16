@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import type { AttemptWithAnswers, SaveState, ExamSection } from '@/services/attempts.service'
 import type { VariantListItem } from '@/services/variants.service'
 import attemptsService from '@/services/attempts.service'
 import SaveIndicator from './SaveIndicator/SaveIndicator'
 import NavGrid from './NavGrid/NavGrid'
 import TaskView from './TaskView/TaskView'
+import SkipModal from './SkipModal/SkipModal'
+import SubmitModal from './SubmitModal/SubmitModal'
 import styles from './ExamPlayer.module.css'
 import sidebarStyles from './ExamPlayerSidebar.module.css'
 
@@ -16,6 +19,8 @@ interface Props {
 }
 
 export default function ExamPlayer({ attempt, variant }: Props) {
+	const router = useRouter()
+
 	const tasks = useMemo(
 		() => [...(variant.variantTasks ?? [])].sort((a, b) => a.position - b.position),
 		[variant.variantTasks],
@@ -34,6 +39,10 @@ export default function ExamPlayer({ attempt, variant }: Props) {
 	const [skippedSections, setSkippedSections] = useState<ExamSection[]>(attempt.skippedSections ?? [])
 
 	const [saveState, setSaveState] = useState<SaveState>('idle')
+
+	const [skipModalState, setSkipModalState] = useState<{ section: 'WRITING' | 'SPEAKING'; action: 'skip' | 'unskip' } | null>(null)
+	const [submitModalOpen, setSubmitModalOpen] = useState(false)
+	const [submitting, setSubmitting] = useState(false)
 
 	const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 	const pendingPayloadRef = useRef<{ taskId: string; content: unknown } | null>(null)
@@ -81,6 +90,54 @@ export default function ExamPlayer({ attempt, variant }: Props) {
 		}
 	}, [attempt.id])
 
+	const handleToggleSkip = useCallback((section: ExamSection) => {
+		if (section !== 'WRITING' && section !== 'SPEAKING') return
+		const action: 'skip' | 'unskip' = skippedSections.includes(section) ? 'unskip' : 'skip'
+		setSkipModalState({ section: section as 'WRITING' | 'SPEAKING', action })
+	}, [skippedSections])
+
+	const handleSkipConfirm = useCallback(async () => {
+		if (!skipModalState) return
+		const { section, action } = skipModalState
+		const skip = action === 'skip'
+		try {
+			const updated = await attemptsService.skipSection(attempt.id, section, skip)
+			setSkippedSections(updated.skippedSections ?? [])
+		} catch (err) {
+			console.error('Failed to toggle section skip:', err)
+		} finally {
+			setSkipModalState(null)
+		}
+	}, [skipModalState, attempt.id])
+
+	const handleSubmit = useCallback(async () => {
+		if (submitting) return
+		setSubmitting(true)
+		try {
+			await attemptsService.submit(attempt.id)
+			router.push(`/variants/${attempt.variantId}/result/${attempt.id}`)
+		} catch (err) {
+			console.error('Failed to submit attempt:', err)
+			setSubmitting(false)
+		}
+	}, [attempt.id, attempt.variantId, router, submitting])
+
+	const unansweredCount = useMemo(() => {
+		let n = 0
+		for (const t of tasks) {
+			if (skippedSections.includes(t.examTask.section)) continue
+			const a = answers[t.examTaskId]?.content
+			const answered =
+				a !== null &&
+				a !== undefined &&
+				!(typeof a === 'string' && a.trim() === '') &&
+				!(Array.isArray(a) && a.length === 0) &&
+				!(typeof a === 'object' && a !== null && !Array.isArray(a) && Object.keys(a as object).length === 0)
+			if (!answered) n++
+		}
+		return n
+	}, [tasks, answers, skippedSections])
+
 	// Clear debounce timer on unmount
 	useEffect(() => {
 		return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current) }
@@ -114,11 +171,18 @@ export default function ExamPlayer({ attempt, variant }: Props) {
 						isAnswered={isAnswered}
 						skippedSections={skippedSections}
 						onSelectTask={setCurrentTaskId}
-						onToggleSkip={() => { /* Plan 07 wires this */ }}
+						onToggleSkip={handleToggleSkip}
 					/>
 				</div>
 				<div className={sidebarStyles.sidebarFooter}>
-					<button className={sidebarStyles.btn_submit} disabled type="button">Завершить вариант</button>
+					<button
+						type="button"
+						className={sidebarStyles.btn_submit}
+						onClick={() => setSubmitModalOpen(true)}
+						disabled={submitting}
+					>
+						Завершить вариант
+					</button>
 				</div>
 			</aside>
 			<main className={styles.mainArea}>
@@ -134,8 +198,11 @@ export default function ExamPlayer({ attempt, variant }: Props) {
 							onPlay={() => handleIncrementPlay(currentTaskId)}
 							onPrev={() => { const prev = tasks[currentIndex - 2]; if (prev) setCurrentTaskId(prev.examTaskId) }}
 							onNext={() => {
-								// TODO(plan-07): if isLast, open submit modal instead of advancing
-								const next = tasks[currentIndex]; if (next) setCurrentTaskId(next.examTaskId)
+								if (isLast) {
+									setSubmitModalOpen(true)
+								} else {
+									const next = tasks[currentIndex]; if (next) setCurrentTaskId(next.examTaskId)
+								}
 							}}
 							isFirst={isFirst}
 							isLast={isLast}
@@ -146,6 +213,21 @@ export default function ExamPlayer({ attempt, variant }: Props) {
 					)}
 				</div>
 			</main>
+			{skipModalState && (
+				<SkipModal
+					section={skipModalState.section}
+					action={skipModalState.action}
+					onConfirm={handleSkipConfirm}
+					onCancel={() => setSkipModalState(null)}
+				/>
+			)}
+			{submitModalOpen && (
+				<SubmitModal
+					unansweredCount={unansweredCount}
+					onConfirm={handleSubmit}
+					onCancel={() => setSubmitModalOpen(false)}
+				/>
+			)}
 		</div>
 	)
 }
