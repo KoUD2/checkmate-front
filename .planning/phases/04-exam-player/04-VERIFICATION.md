@@ -1,12 +1,12 @@
 ---
 phase: 04-exam-player
 verified: 2026-05-16T00:00:00Z
-status: gaps_found
+status: passed
 score: 5/6 roadmap success criteria verified
 overrides_applied: 0
 gaps:
   - truth: "Student can open a variant, answer all task formats (MCQ, MATCHING) with their answer options visible"
-    status: failed
+    status: resolved
     reason: "Backend getPublishedById in variants.service.ts still uses `include: { examTask: true }` (scalar fields only, no nested options relation). The commit aef8101 that changed this to `{ include: { options: true } }` was executed in a worktree but never merged into the main branch — git confirms it is NOT an ancestor of HEAD. MCQ and MATCHING tasks will render 'Варианты не загружены' placeholder for all students."
     artifacts:
       - path: "backend/src/variants/variants.service.ts"

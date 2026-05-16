@@ -85,7 +85,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Student can skip the writing section (37–38) or speaking section (39–42) after confirming an explicit prompt; skipped sections are excluded from AI grading
   5. Each audio track in the listening section enforces a maximum of 2 plays; the play count is shown and survives a page reload
   6. Student can open the submit modal, see the count of unanswered tasks, and confirm to submit the attempt
-**Plans**: TBD
+**Plans**: 8 plans
+- [x] 04-00-PLAN.md — Wave 0: schema edit (skippedSections ExamSection[]) + spec skeletons for AttemptsService and AttemptsController (12 it.todo placeholders)
+- [x] 04-01-PLAN.md — [BLOCKING] Run prisma migrate dev --name add_skipped_sections + regenerate Prisma Client
+- [x] 04-02-PLAN.md — Backend DTOs (UpsertAnswerDto, SkipSectionDto) + AttemptsService (5 methods with ownership checks) + 7 service.spec tests (ATTEMPT-01, 02, 04, 06, 07, 09 + IDOR)
+- [x] 04-03-PLAN.md — Frontend attempts.service.ts typed API client with 5 endpoint methods + interfaces (AttemptWithAnswers, SaveState)
+- [x] 04-04-PLAN.md — Backend AttemptsController + AttemptsModule + AppModule wire + 5 controller.spec tests (DTO validation + JwtAuthGuard)
+- [x] 04-05-PLAN.md — Frontend ExamPlayer shell: page route + two-column layout + SaveIndicator + NavGrid + constants (ATTEMPT-01, ATTEMPT-02, ATTEMPT-03, ATTEMPT-05)
+- [x] 04-06-PLAN.md — Frontend task interaction: TaskView + AnswerInput (format-conditional) + AudioPlayer + auto-save debounce in ExamPlayer + variants payload widening for full task body (ATTEMPT-04, ATTEMPT-05, ATTEMPT-07)
+- [x] 04-07-PLAN.md — Frontend modals: SkipModal + SubmitModal + final ExamPlayer wiring + human-verify checkpoint (ATTEMPT-06, ATTEMPT-08, ATTEMPT-09)
 **UI hint**: yes
 
 ### Phase 5: Grading & Results
@@ -112,5 +120,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Database & Infrastructure | 4/4 | Complete   | 2026-05-14 |
 | 2. Task Bank | 7/7 | Complete | 2026-05-15 |
 | 3. Variant Composer | 7/7 | Complete   | 2026-05-15 |
-| 4. Exam Player | 0/? | Not started | - |
+| 4. Exam Player | 0/8 | Planned     | - |
 | 5. Grading & Results | 0/? | Not started | - |
