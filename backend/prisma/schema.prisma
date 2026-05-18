@@ -135,7 +135,7 @@ enum PaymentStatus {
 model PromoCode {
   id          String    @id @default(uuid())
   code        String    @unique
-  days        Int
+  checksToAdd Int
   description String?
   maxUses     Int?
   usedCount   Int       @default(0)
