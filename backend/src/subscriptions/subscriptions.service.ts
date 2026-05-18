@@ -34,16 +34,13 @@ export class SubscriptionsService {
   }
 
   async activatePromo(userId: string, code: string) {
-    const promo = await this.prisma.promoCode.findUnique({ where: { code } });
+    const normalizedCode = code.trim().toUpperCase();
+    const promo = await this.prisma.promoCode.findUnique({ where: { code: normalizedCode } });
 
     if (!promo) throw new NotFoundException('Промо-код не найден');
 
     if (promo.expiresAt && promo.expiresAt < new Date()) {
       throw new BadRequestException('Промо-код истёк');
-    }
-
-    if (promo.maxUses !== null && promo.usedCount >= promo.maxUses) {
-      throw new BadRequestException('Промо-код уже использован максимальное количество раз');
     }
 
     const alreadyUsed = await this.prisma.promoUsage.findUnique({
@@ -54,19 +51,17 @@ export class SubscriptionsService {
       throw new ConflictException('Вы уже использовали этот промо-код');
     }
 
-    await this.prisma.$transaction([
-      this.prisma.promoUsage.create({
-        data: { promoId: promo.id, userId },
-      }),
-      this.prisma.promoCode.update({
-        where: { id: promo.id },
-        data: { usedCount: { increment: 1 } },
-      }),
-      this.prisma.user.update({
-        where: { id: userId },
-        data: { freeChecksLeft: { increment: promo.checksToAdd } },
-      }),
-    ]);
+    await this.prisma.$transaction(async (tx) => {
+      const [locked] = await tx.$queryRaw<{ usedCount: number; maxUses: number | null }[]>`
+        SELECT "usedCount", "maxUses" FROM promo_codes WHERE id = ${promo.id} FOR UPDATE
+      `;
+      if (locked.maxUses !== null && locked.usedCount >= locked.maxUses) {
+        throw new BadRequestException('Промо-код уже использован максимальное количество раз');
+      }
+      await tx.promoUsage.create({ data: { promoId: promo.id, userId } });
+      await tx.promoCode.update({ where: { id: promo.id }, data: { usedCount: { increment: 1 } } });
+      await tx.user.update({ where: { id: userId }, data: { freeChecksLeft: { increment: promo.checksToAdd } } });
+    });
 
     return {
       message: `Промо-код активирован! Добавлено ${promo.checksToAdd} чеков.`,
@@ -78,7 +73,11 @@ export class SubscriptionsService {
     const existing = await this.prisma.subscription.findUnique({ where: { userId } });
 
     const now = new Date();
-    const newExpiry = new Date(now);
+    const base =
+      existing?.isActive && existing.expiresAt && existing.expiresAt > now
+        ? existing.expiresAt
+        : now;
+    const newExpiry = new Date(base);
     newExpiry.setDate(newExpiry.getDate() + days);
 
     await this.prisma.subscription.upsert({
