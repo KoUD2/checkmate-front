@@ -37,7 +37,9 @@ const AdminPromos: FC = () => {
       const data = res.data?.data
       setPromos(data?.promos ?? [])
       setTotalPages(data?.totalPages ?? 1)
-    } catch {}
+    } catch {
+      setError('Не удалось загрузить промокоды')
+    }
   }
 
   useEffect(() => { fetchPromos(page) }, [page])
