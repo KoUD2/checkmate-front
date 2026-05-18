@@ -58,7 +58,7 @@ export class AdminService {
     const promo = await this.prisma.promoCode.create({
       data: {
         code: dto.code.toUpperCase(),
-        days: dto.days,
+        checksToAdd: dto.checksToAdd,
         description: dto.description,
         maxUses: dto.maxUses,
         expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : null,
