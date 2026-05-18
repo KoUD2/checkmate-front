@@ -21,6 +21,7 @@ Students can practice a full ЕГЭ English exam from start to result — with i
 - ✓ Admin can manage users, promo codes, view platform stats — existing
 - ✓ Resource library (articles, checklists, trainers, templates) — existing
 - ✓ Referral system with bonus checks — existing
+- ✓ Promo codes use checksToAdd (credits freeChecksLeft); admin UI uses Чеков labels — Validated in Phase 06
 
 ### Active
 
@@ -95,4 +96,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-14 after initialization*
+*Last updated: 2026-05-18 — Phase 06 complete (promo codes converted to checks-balance)*
