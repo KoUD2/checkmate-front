@@ -84,8 +84,8 @@ const AdminPromos: FC = () => {
           <input className={styles.input} value={code} onChange={e => setCode(e.target.value)} placeholder='SUMMER2025' />
         </div>
         <div className={styles.field}>
-          <label className={styles.label}>Дней *</label>
-          <input className={styles.input} type='number' min={1} value={checks} onChange={e => setChecks(e.target.value)} placeholder='30' />
+          <label className={styles.label}>Чеков *</label>
+          <input className={styles.input} type='number' min={1} value={checks} onChange={e => setChecks(e.target.value)} placeholder='10' />
         </div>
         <div className={styles.field}>
           <label className={styles.label}>Описание</label>
@@ -109,7 +109,7 @@ const AdminPromos: FC = () => {
           <tr>
             <th>Код</th>
             <th>Описание</th>
-            <th>Дней</th>
+            <th>Чеков</th>
             <th>Использований</th>
             <th>Истекает</th>
             <th>Создан</th>
@@ -120,7 +120,7 @@ const AdminPromos: FC = () => {
             <tr key={p.id}>
               <td><span className={styles.code}>{p.code}</span></td>
               <td>{p.description ?? '—'}</td>
-              <td>{p.days}</td>
+              <td>{p.checksToAdd}</td>
               <td>{p._count.usages}{p.maxUses ? ` / ${p.maxUses}` : ''}</td>
               <td>{formatDate(p.expiresAt)}</td>
               <td>{formatDate(p.createdAt)}</td>
