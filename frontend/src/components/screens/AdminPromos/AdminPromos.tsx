@@ -7,7 +7,7 @@ import styles from './AdminPromos.module.css'
 interface PromoCode {
   id: string
   code: string
-  days: number
+  checksToAdd: number
   description: string | null
   maxUses: number | null
   usedCount: number
@@ -24,7 +24,7 @@ const AdminPromos: FC = () => {
   const [totalPages, setTotalPages] = useState(1)
 
   const [code, setCode] = useState('')
-  const [days, setDays] = useState('')
+  const [checks, setChecks] = useState('')
   const [description, setDescription] = useState('')
   const [maxUses, setMaxUses] = useState('')
   const [expiresAt, setExpiresAt] = useState('')
@@ -45,18 +45,18 @@ const AdminPromos: FC = () => {
   const handleCreate = async () => {
     setSuccess('')
     setError('')
-    if (!code || !days) { setError('Код и количество дней обязательны'); return }
+    if (!code || !checks) { setError('Код и количество чеков обязательны'); return }
     try {
       await api.post('/admin/promo', {
         code: code.toUpperCase(),
-        days: parseInt(days),
+        checksToAdd: parseInt(checks),
         description: description || undefined,
         maxUses: maxUses ? parseInt(maxUses) : undefined,
         expiresAt: expiresAt || undefined,
       })
       setSuccess(`Промокод ${code.toUpperCase()} создан`)
       setCode('')
-      setDays('')
+      setChecks('')
       setDescription('')
       setMaxUses('')
       setExpiresAt('')
@@ -85,7 +85,7 @@ const AdminPromos: FC = () => {
         </div>
         <div className={styles.field}>
           <label className={styles.label}>Дней *</label>
-          <input className={styles.input} type='number' min={1} value={days} onChange={e => setDays(e.target.value)} placeholder='30' />
+          <input className={styles.input} type='number' min={1} value={checks} onChange={e => setChecks(e.target.value)} placeholder='30' />
         </div>
         <div className={styles.field}>
           <label className={styles.label}>Описание</label>
