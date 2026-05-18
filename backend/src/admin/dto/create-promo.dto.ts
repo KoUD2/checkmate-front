@@ -14,10 +14,10 @@ export class CreatePromoDto {
   @MinLength(3)
   code: string;
 
-  @ApiProperty({ example: 30, description: 'Количество дней' })
+  @ApiProperty({ example: 10, description: 'Количество чеков' })
   @IsInt()
   @Min(1)
-  days: number;
+  checksToAdd: number;
 
   @ApiPropertyOptional({ example: 'Летняя акция' })
   @IsOptional()

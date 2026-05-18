@@ -62,13 +62,15 @@ export class SubscriptionsService {
         where: { id: promo.id },
         data: { usedCount: { increment: 1 } },
       }),
+      this.prisma.user.update({
+        where: { id: userId },
+        data: { freeChecksLeft: { increment: promo.checksToAdd } },
+      }),
     ]);
 
-    await this.addDaysToSubscription(userId, promo.days);
-
     return {
-      message: `Промо-код активирован! Добавлено ${promo.days} дней.`,
-      daysAdded: promo.days,
+      message: `Промо-код активирован! Добавлено ${promo.checksToAdd} чеков.`,
+      checksAdded: promo.checksToAdd,
     };
   }
 
