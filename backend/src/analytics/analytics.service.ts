@@ -29,6 +29,7 @@ export class AnalyticsService {
           vkId: true,
           telegramId: true,
           yandexId: true,
+          isInternal: true,
         },
       }),
       this.prisma.task.findMany({

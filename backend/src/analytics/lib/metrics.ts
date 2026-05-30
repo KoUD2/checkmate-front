@@ -10,6 +10,7 @@ export interface RawUser {
   vkId: string | null;
   telegramId: string | null;
   yandexId: string | null;
+  isInternal: boolean;
 }
 
 export interface RawTask {
@@ -154,7 +155,12 @@ export function computeMetrics(
   input: MetricsInput,
   range: { from: Date; to: Date },
 ): MetricsResponse {
-  const { users, tasks, payments } = input;
+  const { users: usersAll, tasks: tasksAll, payments: paymentsAll } = input;
+  // Exclude internal (test/QA/staff) accounts and everything they produced from ALL metrics.
+  const internalIds = new Set(usersAll.filter((u) => u.isInternal).map((u) => u.id));
+  const users = usersAll.filter((u) => !internalIds.has(u.id));
+  const tasks = tasksAll.filter((t) => !internalIds.has(t.userId));
+  const payments = paymentsAll.filter((p) => !internalIds.has(p.userId));
   const weeks = enumerateWeeks(range.from, range.to);
   // Effective analysis window snapped to the week grid (half-open [effFrom, effEnd)).
   // Range-level scalars use this so they reconcile with the per-week series even when

@@ -12,6 +12,7 @@ interface AdminUser {
   role: 'ADMIN' | 'USER'
   isActive: boolean
   freeChecksLeft: number
+  isInternal: boolean
   createdAt: string
   subscription: { isActive: boolean; expiresAt: string | null } | null
   _count: { tasks: number }
@@ -60,6 +61,7 @@ const AdminUsers: FC = () => {
             <th>Имя</th>
             <th>Роль</th>
             <th>Статус</th>
+            <th>Внутренний</th>
             <th>Проверок</th>
             <th>Задания</th>
             <th>Дата рег.</th>
@@ -81,6 +83,14 @@ const AdminUsers: FC = () => {
                   ? <span className={`${styles.badge} ${styles.badgeUser}`}>Активен</span>
                   : <span className={`${styles.badge} ${styles.badgeInactive}`}>Заблокирован</span>
                 }
+              </td>
+              <td>
+                <button
+                  className={u.isInternal ? `${styles.btn} ${styles.btnDanger}` : styles.btn}
+                  onClick={() => patch(u.id, { isInternal: !u.isInternal })}
+                >
+                  {u.isInternal ? 'Внутренний ✓' : 'Отметить'}
+                </button>
               </td>
               <td>{u.freeChecksLeft}</td>
               <td>{u._count.tasks}</td>
