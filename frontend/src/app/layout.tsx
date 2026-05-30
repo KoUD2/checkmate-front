@@ -1,5 +1,4 @@
 import AppLayout from "@/components/layout/AppLayout/AppLayout";
-import { PostHogProvider } from "@/components/PostHogProvider";
 import { AuthProvider } from "@/config/context/AuthContext";
 import { TaskCheckProvider } from "@/config/context/TaskCheckContext";
 import type { Metadata } from "next";
@@ -124,13 +123,11 @@ export default function RootLayout({
             <img src="https://mc.yandex.ru/watch/103365255" style={{position:"absolute",left:"-9999px"}} alt="" />
           </div>
         </noscript>
-        <PostHogProvider>
-          <AuthProvider>
-            <TaskCheckProvider>
-              <AppLayout>{children}</AppLayout>
-            </TaskCheckProvider>
-          </AuthProvider>
-        </PostHogProvider>
+        <AuthProvider>
+          <TaskCheckProvider>
+            <AppLayout>{children}</AppLayout>
+          </TaskCheckProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -15,7 +15,6 @@
     "jose": "^6.0.10",
     "jsonwebtoken": "^9.0.2",
     "next": "^16.2.2",
-    "posthog-js": "^1.372.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^3.8.1"
