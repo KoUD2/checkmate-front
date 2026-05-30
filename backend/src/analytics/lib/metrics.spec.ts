@@ -25,7 +25,7 @@ function task(userId: string, day: string, solution: string | null): RawTask {
 
 describe('metrics helpers', () => {
   it('channelOf classifies referral / social / direct', () => {
-    const base = { id: 'u', createdAt: new Date(), referredByCode: null, vkId: null, telegramId: null, yandexId: null };
+    const base = { id: 'u', createdAt: new Date(), referredByCode: null, vkId: null, telegramId: null, yandexId: null, isInternal: false };
     expect(channelOf({ ...base, referredByCode: 'ABC' })).toBe('referral');
     expect(channelOf({ ...base, telegramId: '123' })).toBe('social');
     expect(channelOf(base)).toBe('direct');
@@ -71,7 +71,7 @@ describe('metrics helpers', () => {
 const LONG2 = 'b '.repeat(40).trim();
 
 function user(id: string, createdAt: string, extra: Partial<RawUser> = {}): RawUser {
-  return { id, createdAt: new Date(createdAt), referredByCode: null, vkId: null, telegramId: null, yandexId: null, ...extra };
+  return { id, createdAt: new Date(createdAt), referredByCode: null, vkId: null, telegramId: null, yandexId: null, isInternal: false, ...extra };
 }
 function succ(userId: string, day: string): RawPayment {
   return { userId, status: 'SUCCEEDED', amount: 549, daysToAdd: 30, checksToAdd: 50, createdAt: new Date(day), updatedAt: new Date(day) };
@@ -172,5 +172,36 @@ describe('computeMetrics', () => {
     expect(w2?.reactivated).toBe(1); // was PAC before, not last week
     expect(w2?.new).toBe(0);
     expect(w2?.retained).toBe(0);
+  });
+
+  it('excludes internal users and their tasks/payments from all metrics', () => {
+    const range = { from: new Date('2026-05-04T00:00:00Z'), to: new Date('2026-05-31T00:00:00Z') };
+    const users = [
+      user('real', '2026-05-05T09:00:00Z'),
+      user('staff', '2026-05-05T09:00:00Z', { isInternal: true }),
+    ];
+    // Both pay (covers the PAC week of 05-18) and both make 3 unique checks that week.
+    const payments = [succ('real', '2026-05-11T00:00:00Z'), succ('staff', '2026-05-11T00:00:00Z')];
+    const tasks = [
+      task('real', '2026-05-18T10:00:00Z', LONG2 + ' a'),
+      task('real', '2026-05-18T11:00:00Z', LONG2 + ' b'),
+      task('real', '2026-05-18T12:00:00Z', LONG2 + ' c'),
+      task('staff', '2026-05-18T10:00:00Z', LONG2 + ' a'),
+      task('staff', '2026-05-18T11:00:00Z', LONG2 + ' b'),
+      task('staff', '2026-05-18T12:00:00Z', LONG2 + ' c'),
+    ];
+
+    const m = computeMetrics({ users, tasks, payments }, range);
+
+    // PAC counts only the real user, not staff
+    const wk = m.nsm.pacByWeek.find((w) => w.week === '2026-05-18');
+    expect(wk?.pac).toBe(1);
+    // registrations: only the real user is counted (its week is 2026-05-04)
+    const totalRegs = m.newPac.registrationsByWeek.reduce((s, w) => s + w.count, 0);
+    expect(totalRegs).toBe(1);
+    // revenue: only the real user's payment (549), staff's excluded
+    expect(m.backup.revenue).toBe(549);
+    // tariff mix: one Plus (real), staff not counted
+    expect(m.newPac.tariffMix.Plus).toBe(1);
   });
 });
