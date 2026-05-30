@@ -1,7 +1,6 @@
 "use client";
 
 import authService from "@/services/auth.service";
-import posthog from "posthog-js";
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -139,10 +138,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         (window as any)._tmr = (window as any)._tmr || [];
         (window as any)._tmr.push({ type: "reachGoal", id: 3755767, goal: "registration" });
       }
-      if (data.user) {
-        posthog.identify(data.user.id, { email, firstName, lastName });
-        posthog.capture('user_registered');
-      }
       window.location.href = "/";
     } catch (err: unknown) {
       const msg = (err as Error).message || "Ошибка регистрации";
@@ -159,10 +154,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await authService.login(email, password);
       if (data.user) setUser(data.user);
-      if (data.user) {
-        posthog.identify(data.user.id, { email });
-        posthog.capture('user_logged_in');
-      }
       window.location.href = "/";
     } catch (err: unknown) {
       const msg = (err as Error).message || "Неверный email или пароль";

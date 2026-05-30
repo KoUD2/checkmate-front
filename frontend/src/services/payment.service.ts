@@ -1,9 +1,7 @@
 import api from '@/shared/utils/api'
-import posthog from 'posthog-js'
 
 const paymentService = {
   async createPayment(amount: number, checksToAdd: number, daysToAdd: number) {
-    posthog.capture('payment_started', { amount, checksToAdd, daysToAdd })
     const res = await api.post<{ data: { paymentId: string; confirmationUrl: string } }>(
       '/payments/create',
       { amount, checksToAdd, daysToAdd },
