@@ -22,6 +22,7 @@ export class AdminService {
           role: true,
           isActive: true,
           freeChecksLeft: true,
+          isInternal: true,
           createdAt: true,
           subscription: { select: { isActive: true, expiresAt: true } },
           _count: { select: { tasks: true } },
@@ -48,6 +49,7 @@ export class AdminService {
         role: true,
         isActive: true,
         freeChecksLeft: true,
+        isInternal: true,
       },
     });
 

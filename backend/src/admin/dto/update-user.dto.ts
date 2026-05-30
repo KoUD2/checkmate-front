@@ -13,6 +13,11 @@ export class UpdateUserDto {
   @IsBoolean()
   isActive?: boolean;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isInternal?: boolean;
+
   @ApiPropertyOptional({ description: 'Установить кол-во бесплатных проверок' })
   @IsOptional()
   @IsInt()
