@@ -16,6 +16,7 @@ model User {
   organization       String?
   role               Role           @default(USER)
   isActive           Boolean        @default(true)
+  isInternal         Boolean        @default(false)
   freeChecksLeft     Int            @default(3)
   vkId               String?        @unique
   telegramId         String?        @unique
