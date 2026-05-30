@@ -9,6 +9,7 @@ import { GeminiModule } from './gemini/gemini.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 import { ReferralsModule } from './referrals/referrals.module';
 import { ResourcesModule } from './resources/resources.module';
 
@@ -24,6 +25,7 @@ import { ResourcesModule } from './resources/resources.module';
     SubscriptionsModule,
     PaymentsModule,
     AdminModule,
+    AnalyticsModule,
     ReferralsModule,
     ResourcesModule,
   ],
