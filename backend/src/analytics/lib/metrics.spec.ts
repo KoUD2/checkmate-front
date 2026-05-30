@@ -135,4 +135,42 @@ describe('computeMetrics', () => {
     expect(w2?.retained).toBe(1);
     expect(w2?.new).toBe(0);
   });
+
+  it('counts reactivated PAC: PAC, idle week, PAC again', () => {
+    const users = [user('r', '2026-05-01T00:00:00Z')];
+    // Two coverage windows with a gap across week 05-11 (MSK weeks; week-end ~Sun 21:00Z):
+    //   pay 05-04 (+7d) -> covers [05-04, 05-11) -> active at week-end of 05-04, expired by week-end of 05-11
+    //   pay 05-18 (+7d) -> covers [05-18, 05-25) -> active at week-end of 05-18
+    // Week 05-11 has no coverage at its week-end -> not PAC -> week 05-18 is a REACTIVATION.
+    const payments: RawPayment[] = [
+      { userId: 'r', status: 'SUCCEEDED', amount: 149, daysToAdd: 7, checksToAdd: 10,
+        createdAt: new Date('2026-05-04T00:00:00Z'), updatedAt: new Date('2026-05-04T00:00:00Z') },
+      { userId: 'r', status: 'SUCCEEDED', amount: 149, daysToAdd: 7, checksToAdd: 10,
+        createdAt: new Date('2026-05-18T00:00:00Z'), updatedAt: new Date('2026-05-18T00:00:00Z') },
+    ];
+    const tasks = [
+      // PAC in week 05-04
+      task('r', '2026-05-05T10:00:00Z', LONG2 + ' a'),
+      task('r', '2026-05-05T11:00:00Z', LONG2 + ' b'),
+      task('r', '2026-05-05T12:00:00Z', LONG2 + ' c'),
+      // checks in week 05-11 but NO coverage -> not PAC
+      task('r', '2026-05-12T10:00:00Z', LONG2 + ' a'),
+      task('r', '2026-05-12T11:00:00Z', LONG2 + ' b'),
+      task('r', '2026-05-12T12:00:00Z', LONG2 + ' c'),
+      // PAC again in week 05-18
+      task('r', '2026-05-19T10:00:00Z', LONG2 + ' a'),
+      task('r', '2026-05-19T11:00:00Z', LONG2 + ' b'),
+      task('r', '2026-05-19T12:00:00Z', LONG2 + ' c'),
+    ];
+    const m = computeMetrics({ users, tasks, payments },
+      { from: new Date('2026-05-04T00:00:00Z'), to: new Date('2026-05-24T00:00:00Z') });
+    const w0 = m.nsm.pacByWeek.find((w) => w.week === '2026-05-04');
+    const w1 = m.nsm.pacByWeek.find((w) => w.week === '2026-05-11');
+    const w2 = m.nsm.pacByWeek.find((w) => w.week === '2026-05-18');
+    expect(w0?.new).toBe(1); // first ever PAC
+    expect(w1?.pac).toBe(0); // idle (no coverage)
+    expect(w2?.reactivated).toBe(1); // was PAC before, not last week
+    expect(w2?.new).toBe(0);
+    expect(w2?.retained).toBe(0);
+  });
 });

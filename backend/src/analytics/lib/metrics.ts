@@ -156,6 +156,12 @@ export function computeMetrics(
 ): MetricsResponse {
   const { users, tasks, payments } = input;
   const weeks = enumerateWeeks(range.from, range.to);
+  // Effective analysis window snapped to the week grid (half-open [effFrom, effEnd)).
+  // Range-level scalars use this so they reconcile with the per-week series even when
+  // `from`/`to` fall mid-week — otherwise the last week (which extends past `to`) would
+  // count activity that the scalars exclude.
+  const effFrom = weeks[0].start.getTime();
+  const effEnd = weeks[weeks.length - 1].end.getTime();
   const coverageByUser = buildCoverageByUser(payments);
   const succeeded = payments.filter((p) => p.status === 'SUCCEEDED');
 
@@ -185,9 +191,7 @@ export function computeMetrics(
 
   // --- registrations + channel ---
   const usersInRange = users.filter(
-    (u) =>
-      u.createdAt.getTime() >= range.from.getTime() &&
-      u.createdAt.getTime() <= range.to.getTime(),
+    (u) => u.createdAt.getTime() >= effFrom && u.createdAt.getTime() < effEnd,
   );
   const registrationsByWeek = weeks.map((week) => ({
     week: week.key,
@@ -235,7 +239,7 @@ export function computeMetrics(
   const tariffMix: Record<string, number> = {};
   for (const p of succeeded) {
     const t = (p.updatedAt ?? p.createdAt).getTime();
-    if (t < range.from.getTime() || t > range.to.getTime()) continue;
+    if (t < effFrom || t >= effEnd) continue;
     const name = tariffForChecks(p.checksToAdd);
     tariffMix[name] = (tariffMix[name] ?? 0) + 1;
   }
@@ -277,7 +281,7 @@ export function computeMetrics(
   let scoreCount = 0;
   for (const t of tasks) {
     const ts = t.createdAt.getTime();
-    if (ts < range.from.getTime() || ts > range.to.getTime()) continue;
+    if (ts < effFrom || ts >= effEnd) continue;
     if (t.userRating === 'LIKE') likes++;
     else if (t.userRating === 'DISLIKE') dislikes++;
     if (t.totalScore !== null && t.totalScore !== undefined) {
@@ -294,18 +298,19 @@ export function computeMetrics(
   let revenue = 0;
   for (const p of succeeded) {
     const t = (p.updatedAt ?? p.createdAt).getTime();
-    if (t >= range.from.getTime() && t <= range.to.getTime()) revenue += Number(p.amount);
+    if (t >= effFrom && t < effEnd) revenue += Number(p.amount);
   }
-  const mrrFrom = range.to.getTime() - 30 * MS_DAY;
+  // Trailing 30 days ending at the analysis window's end (week-grid aligned).
+  const mrrFrom = effEnd - 30 * MS_DAY;
   let mrrEquivalent = 0;
   for (const p of succeeded) {
     const t = (p.updatedAt ?? p.createdAt).getTime();
-    if (t > mrrFrom && t <= range.to.getTime()) mrrEquivalent += Number(p.amount);
+    if (t >= mrrFrom && t < effEnd) mrrEquivalent += Number(p.amount);
   }
   const dauMap = new Map<string, Set<string>>();
   for (const t of tasks) {
     const ts = t.createdAt.getTime();
-    if (ts < range.from.getTime() || ts > range.to.getTime()) continue;
+    if (ts < effFrom || ts >= effEnd) continue;
     const day = new Date(t.createdAt.getTime() + 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
     const set = dauMap.get(day) ?? new Set<string>();
     set.add(t.userId);
@@ -332,7 +337,7 @@ export function computeMetrics(
   const perUserHashCounts = new Map<string, Map<string, number>>();
   for (const t of tasks) {
     const ts = t.createdAt.getTime();
-    if (ts < range.from.getTime() || ts > range.to.getTime()) continue;
+    if (ts < effFrom || ts >= effEnd) continue;
     const text = checkText(t);
     if (text === null) continue;
     withTextCount++;
