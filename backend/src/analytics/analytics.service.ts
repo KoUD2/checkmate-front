@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { computeMetrics, MetricsResponse, RawPayment } from './lib/metrics';
+import { computeMetrics, MetricsResponse, RawPayment, RawCancelFeedback } from './lib/metrics';
 
 @Injectable()
 export class AnalyticsService {
@@ -20,7 +20,7 @@ export class AnalyticsService {
 
     // We fetch ALL rows (not just the window): coverage reconstruction needs each
     // user's full payment history so historical week-end coverage is correct.
-    const [users, tasks, payments] = await Promise.all([
+    const [users, tasks, payments, cancelFeedback] = await Promise.all([
       this.prisma.user.findMany({
         select: {
           id: true,
@@ -54,6 +54,9 @@ export class AnalyticsService {
           updatedAt: true,
         },
       }),
+      this.prisma.cancelFeedback.findMany({
+        select: { userId: true, reason: true, comment: true, createdAt: true },
+      }),
     ]);
 
     const normalizedPayments: RawPayment[] = payments.map((p) => ({
@@ -67,7 +70,7 @@ export class AnalyticsService {
     }));
 
     return computeMetrics(
-      { users, tasks, payments: normalizedPayments },
+      { users, tasks, payments: normalizedPayments, cancelFeedback },
       { from, to },
     );
   }
