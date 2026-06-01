@@ -31,14 +31,45 @@ const SegmentBanner: FC = () => {
   }
 
   return (
-    <div className={styles.banner}>
-      <span className={styles.text}>Кто вы?</span>
-      {OPTIONS.map((o) => (
-        <button key={o.value} className={styles.btn} disabled={saving} onClick={() => choose(o.value)}>
-          {o.label}
+    <div className={styles.banner} role='dialog' aria-label='Кто вы?'>
+      <div className={styles.lead}>
+        <span className={styles.question}>Кто вы?</span>
+        <span className={styles.subtitle}>Настроим CheckMate под вас</span>
+      </div>
+
+      <div className={styles.roles}>
+        {OPTIONS.map((o) => (
+          <button
+            key={o.value}
+            className={styles.role}
+            disabled={saving}
+            onClick={() => choose(o.value)}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+
+      <div className={styles.end}>
+        <button className={styles.later} onClick={() => setDismissed(true)}>
+          Позже
         </button>
-      ))}
-      <button className={styles.skip} onClick={() => setDismissed(true)}>Позже</button>
+        <button
+          className={styles.close}
+          aria-label='Закрыть'
+          onClick={() => setDismissed(true)}
+        >
+          <svg
+            viewBox='0 0 14 14'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='2'
+            strokeLinecap='round'
+          >
+            <path d='M2 2l10 10M12 2L2 12' />
+          </svg>
+        </button>
+      </div>
     </div>
   )
 }
