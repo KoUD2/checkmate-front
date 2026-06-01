@@ -232,4 +232,26 @@ describe('computeMetrics', () => {
     // PAC by segment over the period: only 'tut' (a TUTOR) is PAC; staff excluded
     expect(m.segments.pacBySegment).toEqual({ TUTOR: 1, STUDENT: 0, PARENT: 0, unknown: 0 });
   });
+
+  it('counts a pre-range-registered PAC user in pacBySegment but not distribution', () => {
+    const range = { from: new Date('2026-05-04T00:00:00Z'), to: new Date('2026-05-31T00:00:00Z') };
+    // 'early' registered BEFORE the range, but is PAC inside it.
+    const users = [
+      user('early', '2026-03-01T09:00:00Z', { segment: 'TUTOR' }),
+      user('inrange', '2026-05-05T09:00:00Z', { segment: 'STUDENT' }),
+    ];
+    const payments = [succ('early', '2026-05-11T00:00:00Z')]; // covers week of 05-18
+    const tasks = [
+      task('early', '2026-05-18T10:00:00Z', LONG2 + ' a'),
+      task('early', '2026-05-18T11:00:00Z', LONG2 + ' b'),
+      task('early', '2026-05-18T12:00:00Z', LONG2 + ' c'), // PAC, TUTOR
+    ];
+
+    const m = computeMetrics({ users, tasks, payments }, range);
+
+    // distribution: only the in-range registration is counted (early registered before range)
+    expect(m.segments.distribution).toEqual({ TUTOR: 0, STUDENT: 1, PARENT: 0, unknown: 0 });
+    // pacBySegment: the pre-range TUTOR is still counted as PAC for the period
+    expect(m.segments.pacBySegment).toEqual({ TUTOR: 1, STUDENT: 0, PARENT: 0, unknown: 0 });
+  });
 });

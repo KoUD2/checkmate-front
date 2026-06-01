@@ -379,6 +379,10 @@ export function computeMetrics(
   };
 
   // --- segments: distribution over in-range users + period-unique PAC by segment ---
+  // NOTE: distribution counts users registered within the window (usersInRange);
+  // pacBySegment counts period-unique PAC users (everPac), which may include users
+  // registered before the range. The two have different denominators — do NOT divide
+  // pacBySegment by distribution to get a per-segment conversion rate.
   const segKey = (s: RawUser['segment']): 'TUTOR' | 'STUDENT' | 'PARENT' | 'unknown' =>
     s === 'TUTOR' || s === 'STUDENT' || s === 'PARENT' ? s : 'unknown';
   const segmentOf = new Map(users.map((u) => [u.id, segKey(u.segment)]));
