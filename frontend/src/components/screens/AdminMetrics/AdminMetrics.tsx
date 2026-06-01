@@ -7,7 +7,7 @@ import {
 } from 'recharts'
 import styles from './AdminMetrics.module.css'
 
-interface PacWeek { week: string; pac: number; new: number; retained: number; reactivated: number }
+interface PacWeek { week: string; pac: number; new: number; retained: number; reactivated: number; reactivatedWarm: number; reactivatedCold: number }
 interface Metrics {
   range: { from: string; to: string; weeks: string[] }
   nsm: { pacByWeek: PacWeek[]; current: number; wowGrowthPct: number | null }
@@ -32,6 +32,10 @@ interface Metrics {
   segments: {
     distribution: { TUTOR: number; STUDENT: number; PARENT: number; unknown: number }
     pacBySegment: { TUTOR: number; STUDENT: number; PARENT: number; unknown: number }
+  }
+  churn: {
+    reasonDistribution: Record<'PRICE'|'NO_NEED_NOW'|'MISSING_FEATURES'|'QUALITY'|'TECH_ISSUES'|'SWITCHED'|'OTHER', number>
+    totalResponses: number
   }
 }
 
@@ -104,6 +108,8 @@ const AdminMetrics: FC = () => {
                   <Line type="monotone" dataKey="new" name="New" stroke="#16a34a" />
                   <Line type="monotone" dataKey="retained" name="Retained" stroke="#9333ea" />
                   <Line type="monotone" dataKey="reactivated" name="Reactivated" stroke="#ea580c" />
+                  <Line type="monotone" dataKey="reactivatedWarm" name="Reactivated ≤90д" stroke="#f59e0b" />
+                  <Line type="monotone" dataKey="reactivatedCold" name="Reactivated >90д" stroke="#7c3aed" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -175,6 +181,21 @@ const AdminMetrics: FC = () => {
                 <tr><td>Ученик</td><td>{data.segments.distribution.STUDENT}</td><td>{data.segments.pacBySegment.STUDENT}</td></tr>
                 <tr><td>Родитель</td><td>{data.segments.distribution.PARENT}</td><td>{data.segments.pacBySegment.PARENT}</td></tr>
                 <tr><td>Не указан</td><td>{data.segments.distribution.unknown}</td><td>{data.segments.pacBySegment.unknown}</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>Отток: причины (всего ответов: {data.churn.totalResponses})</div>
+            <table className={styles.table}>
+              <tbody>
+                <tr><td>Дорого</td><td>{data.churn.reasonDistribution.PRICE}</td></tr>
+                <tr><td>Не нужно сейчас / сезон</td><td>{data.churn.reasonDistribution.NO_NEED_NOW}</td></tr>
+                <tr><td>Не хватает функций</td><td>{data.churn.reasonDistribution.MISSING_FEATURES}</td></tr>
+                <tr><td>Качество проверки</td><td>{data.churn.reasonDistribution.QUALITY}</td></tr>
+                <tr><td>Технические проблемы</td><td>{data.churn.reasonDistribution.TECH_ISSUES}</td></tr>
+                <tr><td>Ушёл к конкуренту</td><td>{data.churn.reasonDistribution.SWITCHED}</td></tr>
+                <tr><td>Другое</td><td>{data.churn.reasonDistribution.OTHER}</td></tr>
               </tbody>
             </table>
           </div>
