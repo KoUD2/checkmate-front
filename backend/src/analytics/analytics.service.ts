@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { computeMetrics, MetricsResponse, RawPayment, RawCancelFeedback } from './lib/metrics';
+import { computeMetrics, MetricsResponse, RawPayment } from './lib/metrics';
 
 @Injectable()
 export class AnalyticsService {
