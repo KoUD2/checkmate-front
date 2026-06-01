@@ -113,7 +113,9 @@ export interface PacWeek {
   pac: number;
   new: number;
   retained: number;
-  reactivated: number;
+  reactivated: number; // = reactivatedWarm + reactivatedCold (back-compat)
+  reactivatedWarm: number; // gap <= 90 days
+  reactivatedCold: number; // gap > 90 days
 }
 
 export interface MetricsResponse {
@@ -179,19 +181,37 @@ export function computeMetrics(
   // --- PAC series with new/retained/reactivated ---
   const everPac = new Set<string>();
   let prevPac = new Set<string>();
+  const lastPacWeekEnd = new Map<string, number>(); // userId -> week.end ts of last PAC week
   const pacByWeek: PacWeek[] = weeks.map((week) => {
     const pac = pacUserIdsForWeek(coverageByUser, tasks, week);
     let isNew = 0;
     let retained = 0;
-    let reactivated = 0;
+    let reactivatedWarm = 0;
+    let reactivatedCold = 0;
     for (const id of pac) {
       if (!everPac.has(id)) isNew++;
       else if (prevPac.has(id)) retained++;
-      else reactivated++;
+      else {
+        const last = lastPacWeekEnd.get(id);
+        const gapDays = last == null ? Infinity : (week.end.getTime() - last) / MS_DAY;
+        if (gapDays <= 90) reactivatedWarm++;
+        else reactivatedCold++;
+      }
     }
-    for (const id of pac) everPac.add(id);
+    for (const id of pac) {
+      everPac.add(id);
+      lastPacWeekEnd.set(id, week.end.getTime());
+    }
     prevPac = pac;
-    return { week: week.key, pac: pac.size, new: isNew, retained, reactivated };
+    return {
+      week: week.key,
+      pac: pac.size,
+      new: isNew,
+      retained,
+      reactivated: reactivatedWarm + reactivatedCold,
+      reactivatedWarm,
+      reactivatedCold,
+    };
   });
   const current = pacByWeek.length ? pacByWeek[pacByWeek.length - 1].pac : 0;
   let wowGrowthPct: number | null = null;
