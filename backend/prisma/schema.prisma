@@ -17,6 +17,7 @@ model User {
   role               Role           @default(USER)
   isActive           Boolean        @default(true)
   isInternal         Boolean        @default(false)
+  segment            Segment?
   freeChecksLeft     Int            @default(3)
   vkId               String?        @unique
   telegramId         String?        @unique
@@ -54,6 +55,12 @@ model ReferralBonus {
 enum Role {
   USER
   ADMIN
+}
+
+enum Segment {
+  TUTOR
+  STUDENT
+  PARENT
 }
 
 model Task {
