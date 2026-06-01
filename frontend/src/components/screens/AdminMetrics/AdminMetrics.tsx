@@ -29,6 +29,10 @@ interface Metrics {
     wauByWeek: { week: string; count: number }[]
   }
   guardrails: { duplicateTextRate: number; medianTextLength: number; shortCheckRate: number }
+  segments: {
+    distribution: { TUTOR: number; STUDENT: number; PARENT: number; unknown: number }
+    pacBySegment: { TUTOR: number; STUDENT: number; PARENT: number; unknown: number }
+  }
 }
 
 const pct = (v: number | null) => (v === null ? '—' : `${(v * 100).toFixed(1)}%`)
@@ -158,6 +162,19 @@ const AdminMetrics: FC = () => {
                 <tr><td>% проверок с дублем текста (норма &lt; 5%)</td><td>{pct(data.guardrails.duplicateTextRate)}</td></tr>
                 <tr><td>Медианная длина текста (норма &gt; 100)</td><td>{data.guardrails.medianTextLength}</td></tr>
                 <tr><td>% коротких проверок (&lt; 50 симв)</td><td>{pct(data.guardrails.shortCheckRate)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>Сегменты пользователей</div>
+            <table className={styles.table}>
+              <thead><tr><th>Сегмент</th><th>Всего</th><th>PAC за период</th></tr></thead>
+              <tbody>
+                <tr><td>Репетитор</td><td>{data.segments.distribution.TUTOR}</td><td>{data.segments.pacBySegment.TUTOR}</td></tr>
+                <tr><td>Ученик</td><td>{data.segments.distribution.STUDENT}</td><td>{data.segments.pacBySegment.STUDENT}</td></tr>
+                <tr><td>Родитель</td><td>{data.segments.distribution.PARENT}</td><td>{data.segments.pacBySegment.PARENT}</td></tr>
+                <tr><td>Не указан</td><td>{data.segments.distribution.unknown}</td><td>{data.segments.pacBySegment.unknown}</td></tr>
               </tbody>
             </table>
           </div>
