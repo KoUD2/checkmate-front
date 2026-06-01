@@ -283,6 +283,27 @@ it('reactivation after 90d is cold', () => {
   expect(w2?.reactivatedCold).toBe(1);
 });
 
+  it('tallies churn reason distribution within range, excluding internal users', () => {
+  const range = { from: new Date('2026-05-04T00:00:00Z'), to: new Date('2026-05-31T00:00:00Z') };
+  const users = [
+    user('a', '2026-05-05T00:00:00Z'),
+    user('b', '2026-05-05T00:00:00Z'),
+    user('staff', '2026-05-05T00:00:00Z', { isInternal: true }),
+  ];
+  const cancelFeedback = [
+    { userId: 'a', reason: 'PRICE' as const, comment: null, createdAt: new Date('2026-05-10T00:00:00Z') },
+    { userId: 'b', reason: 'PRICE' as const, comment: null, createdAt: new Date('2026-05-12T00:00:00Z') },
+    { userId: 'a', reason: 'OTHER' as const, comment: 'meh', createdAt: new Date('2026-05-15T00:00:00Z') },
+    { userId: 'staff', reason: 'QUALITY' as const, comment: null, createdAt: new Date('2026-05-15T00:00:00Z') }, // internal -> excluded
+    { userId: 'a', reason: 'PRICE' as const, comment: null, createdAt: new Date('2026-04-01T00:00:00Z') }, // before range -> excluded
+  ];
+  const m = computeMetrics({ users, tasks: [], payments: [], cancelFeedback }, range);
+  expect(m.churn.reasonDistribution.PRICE).toBe(2);
+  expect(m.churn.reasonDistribution.OTHER).toBe(1);
+  expect(m.churn.reasonDistribution.QUALITY).toBe(0);
+  expect(m.churn.totalResponses).toBe(3);
+});
+
   it('counts a pre-range-registered PAC user in pacBySegment but not distribution', () => {
     const range = { from: new Date('2026-05-04T00:00:00Z'), to: new Date('2026-05-31T00:00:00Z') };
     // 'early' registered BEFORE the range, but is PAC inside it.

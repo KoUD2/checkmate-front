@@ -33,6 +33,17 @@ export interface RawPayment {
   updatedAt: Date;
 }
 
+export type CancelReason =
+  | 'PRICE' | 'NO_NEED_NOW' | 'MISSING_FEATURES'
+  | 'QUALITY' | 'TECH_ISSUES' | 'SWITCHED' | 'OTHER';
+
+export interface RawCancelFeedback {
+  userId: string;
+  reason: CancelReason;
+  comment: string | null;
+  createdAt: Date;
+}
+
 export function channelOf(u: RawUser): 'referral' | 'social' | 'direct' {
   if (u.referredByCode) return 'referral';
   if (u.vkId || u.telegramId || u.yandexId) return 'social';
@@ -148,12 +159,17 @@ export interface MetricsResponse {
     distribution: { TUTOR: number; STUDENT: number; PARENT: number; unknown: number };
     pacBySegment: { TUTOR: number; STUDENT: number; PARENT: number; unknown: number };
   };
+  churn: {
+    reasonDistribution: Record<CancelReason, number>;
+    totalResponses: number;
+  };
 }
 
 export interface MetricsInput {
   users: RawUser[];
   tasks: RawTask[];
   payments: RawPayment[];
+  cancelFeedback?: RawCancelFeedback[];
 }
 
 const MS_DAY = 86400000;
@@ -168,6 +184,9 @@ export function computeMetrics(
   const users = usersAll.filter((u) => !internalIds.has(u.id));
   const tasks = tasksAll.filter((t) => !internalIds.has(t.userId));
   const payments = paymentsAll.filter((p) => !internalIds.has(p.userId));
+  const cancelFeedback = (input.cancelFeedback ?? []).filter(
+    (f) => !internalIds.has(f.userId),
+  );
   const weeks = enumerateWeeks(range.from, range.to);
   // Effective analysis window snapped to the week grid (half-open [effFrom, effEnd)).
   // Range-level scalars use this so they reconcile with the per-week series even when
@@ -411,6 +430,20 @@ export function computeMetrics(
   const pacBySegment = { TUTOR: 0, STUDENT: 0, PARENT: 0, unknown: 0 };
   for (const id of everPac) pacBySegment[segmentOf.get(id) ?? 'unknown']++;
 
+  // --- churn reason distribution ---
+  const reasonDistribution: Record<CancelReason, number> = {
+    PRICE: 0, NO_NEED_NOW: 0, MISSING_FEATURES: 0,
+    QUALITY: 0, TECH_ISSUES: 0, SWITCHED: 0, OTHER: 0,
+  };
+  let totalResponses = 0;
+  for (const f of cancelFeedback) {
+    const ts = f.createdAt.getTime();
+    if (ts < effFrom || ts >= effEnd) continue;
+    reasonDistribution[f.reason]++;
+    totalResponses++;
+  }
+  const churn = { reasonDistribution, totalResponses };
+
   return {
     range: { from: range.from.toISOString(), to: range.to.toISOString(), weeks: weeks.map((w) => w.key) },
     nsm: { pacByWeek, current, wowGrowthPct },
@@ -419,5 +452,6 @@ export function computeMetrics(
     backup: { revenue, mrrEquivalent, dauByDay, wauByWeek },
     guardrails,
     segments: { distribution, pacBySegment },
+    churn,
   };
 }
