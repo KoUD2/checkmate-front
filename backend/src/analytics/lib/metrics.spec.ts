@@ -25,7 +25,7 @@ function task(userId: string, day: string, solution: string | null): RawTask {
 
 describe('metrics helpers', () => {
   it('channelOf classifies referral / social / direct', () => {
-    const base = { id: 'u', createdAt: new Date(), referredByCode: null, vkId: null, telegramId: null, yandexId: null, isInternal: false };
+    const base = { id: 'u', createdAt: new Date(), referredByCode: null, vkId: null, telegramId: null, yandexId: null, isInternal: false, segment: null };
     expect(channelOf({ ...base, referredByCode: 'ABC' })).toBe('referral');
     expect(channelOf({ ...base, telegramId: '123' })).toBe('social');
     expect(channelOf(base)).toBe('direct');
@@ -71,7 +71,7 @@ describe('metrics helpers', () => {
 const LONG2 = 'b '.repeat(40).trim();
 
 function user(id: string, createdAt: string, extra: Partial<RawUser> = {}): RawUser {
-  return { id, createdAt: new Date(createdAt), referredByCode: null, vkId: null, telegramId: null, yandexId: null, isInternal: false, ...extra };
+  return { id, createdAt: new Date(createdAt), referredByCode: null, vkId: null, telegramId: null, yandexId: null, isInternal: false, segment: null, ...extra };
 }
 function succ(userId: string, day: string): RawPayment {
   return { userId, status: 'SUCCEEDED', amount: 549, daysToAdd: 30, checksToAdd: 50, createdAt: new Date(day), updatedAt: new Date(day) };
@@ -203,5 +203,33 @@ describe('computeMetrics', () => {
     expect(m.backup.revenue).toBe(549);
     // tariff mix: one Plus (real), staff not counted
     expect(m.newPac.tariffMix.Plus).toBe(1);
+  });
+
+  it('reports segment distribution and PAC by segment, internal excluded', () => {
+    const range = { from: new Date('2026-05-04T00:00:00Z'), to: new Date('2026-05-31T00:00:00Z') };
+    const users = [
+      user('tut', '2026-05-05T09:00:00Z', { segment: 'TUTOR' }),
+      user('stu', '2026-05-05T09:00:00Z', { segment: 'STUDENT' }),
+      user('par', '2026-05-05T09:00:00Z', { segment: 'PARENT' }),
+      user('unk', '2026-05-05T09:00:00Z'), // segment null -> unknown
+      user('staff', '2026-05-05T09:00:00Z', { segment: 'TUTOR', isInternal: true }), // excluded
+    ];
+    // tut becomes PAC in week 05-18; staff would too but is internal.
+    const payments = [succ('tut', '2026-05-11T00:00:00Z'), succ('staff', '2026-05-11T00:00:00Z')];
+    const tasks = [
+      task('tut', '2026-05-18T10:00:00Z', LONG2 + ' a'),
+      task('tut', '2026-05-18T11:00:00Z', LONG2 + ' b'),
+      task('tut', '2026-05-18T12:00:00Z', LONG2 + ' c'),
+      task('staff', '2026-05-18T10:00:00Z', LONG2 + ' a'),
+      task('staff', '2026-05-18T11:00:00Z', LONG2 + ' b'),
+      task('staff', '2026-05-18T12:00:00Z', LONG2 + ' c'),
+    ];
+
+    const m = computeMetrics({ users, tasks, payments }, range);
+
+    // distribution: 4 non-internal users (staff excluded)
+    expect(m.segments.distribution).toEqual({ TUTOR: 1, STUDENT: 1, PARENT: 1, unknown: 1 });
+    // PAC by segment over the period: only 'tut' (a TUTOR) is PAC; staff excluded
+    expect(m.segments.pacBySegment).toEqual({ TUTOR: 1, STUDENT: 0, PARENT: 0, unknown: 0 });
   });
 });
