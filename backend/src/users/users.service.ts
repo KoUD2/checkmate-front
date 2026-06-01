@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Segment } from '@prisma/client';
+import { CancelReason, Segment } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -24,5 +24,16 @@ export class UsersService {
       data: { segment },
     });
     return { segment };
+  }
+
+  async createCancelFeedback(
+    userId: string,
+    reason: CancelReason,
+    comment?: string,
+  ) {
+    await this.prisma.cancelFeedback.create({
+      data: { userId, reason, comment: comment ?? null },
+    });
+    return { ok: true };
   }
 }
