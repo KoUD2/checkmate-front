@@ -15,6 +15,7 @@ export interface User {
   telegramId: string | null;
   yandexId: string | null;
   socialBonusGranted: boolean;
+  segment: 'TUTOR' | 'STUDENT' | 'PARENT' | null;
   subscription?: {
     isActive: boolean;
     expiresAt: string | null;
