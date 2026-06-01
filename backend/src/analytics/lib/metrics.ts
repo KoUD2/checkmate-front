@@ -11,6 +11,7 @@ export interface RawUser {
   telegramId: string | null;
   yandexId: string | null;
   isInternal: boolean;
+  segment: 'TUTOR' | 'STUDENT' | 'PARENT' | null;
 }
 
 export interface RawTask {
@@ -140,6 +141,10 @@ export interface MetricsResponse {
     duplicateTextRate: number;
     medianTextLength: number;
     shortCheckRate: number;
+  };
+  segments: {
+    distribution: { TUTOR: number; STUDENT: number; PARENT: number; unknown: number };
+    pacBySegment: { TUTOR: number; STUDENT: number; PARENT: number; unknown: number };
   };
 }
 
@@ -373,6 +378,19 @@ export function computeMetrics(
     shortCheckRate: withTextCount === 0 ? 0 : shortCount / withTextCount,
   };
 
+  // --- segments: distribution over in-range users + period-unique PAC by segment ---
+  // NOTE: distribution counts users registered within the window (usersInRange);
+  // pacBySegment counts period-unique PAC users (everPac), which may include users
+  // registered before the range. The two have different denominators — do NOT divide
+  // pacBySegment by distribution to get a per-segment conversion rate.
+  const segKey = (s: RawUser['segment']): 'TUTOR' | 'STUDENT' | 'PARENT' | 'unknown' =>
+    s === 'TUTOR' || s === 'STUDENT' || s === 'PARENT' ? s : 'unknown';
+  const segmentOf = new Map(users.map((u) => [u.id, segKey(u.segment)]));
+  const distribution = { TUTOR: 0, STUDENT: 0, PARENT: 0, unknown: 0 };
+  for (const u of usersInRange) distribution[segKey(u.segment)]++;
+  const pacBySegment = { TUTOR: 0, STUDENT: 0, PARENT: 0, unknown: 0 };
+  for (const id of everPac) pacBySegment[segmentOf.get(id) ?? 'unknown']++;
+
   return {
     range: { from: range.from.toISOString(), to: range.to.toISOString(), weeks: weeks.map((w) => w.key) },
     nsm: { pacByWeek, current, wowGrowthPct },
@@ -380,5 +398,6 @@ export function computeMetrics(
     retained: { subscriptionRetentionByWeek, arpcByWeek, quality },
     backup: { revenue, mrrEquivalent, dauByDay, wauByWeek },
     guardrails,
+    segments: { distribution, pacBySegment },
   };
 }

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Segment } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -15,5 +16,13 @@ export class UsersService {
 
     const { passwordHash, ...rest } = user;
     return rest;
+  }
+
+  async setSegment(userId: string, segment: Segment) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { segment },
+    });
+    return { segment };
   }
 }

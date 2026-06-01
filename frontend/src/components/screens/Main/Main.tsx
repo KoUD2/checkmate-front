@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
 import CreatePencil from '../../../shared/images/CreatePencil.svg'
 import styles from './Main.module.css'
+import SegmentBanner from './ui/SegmentBanner/SegmentBanner'
 
 interface TaskItem {
 	id: string
@@ -88,6 +89,7 @@ const Main: FC = () => {
 				</Link>
 			)}
 			<div className={styles['main__content']}>
+				<SegmentBanner />
 				<div className={styles['main__header']}>
 					<MainTitle text='Все работы' />
 				</div>
