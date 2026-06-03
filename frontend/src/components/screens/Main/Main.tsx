@@ -99,10 +99,10 @@ const Main: FC = () => {
 			)}
 			<div className={styles['main__content']}>
 				{churnPending ? (
-						<ChurnSurveyBanner onDone={() => setChurnPending(false)} />
-					) : (
-						<SegmentBanner />
-					)}
+					<ChurnSurveyBanner onDone={() => setChurnPending(false)} />
+				) : (
+					<SegmentBanner />
+				)}
 				<div className={styles['main__header']}>
 					<MainTitle text='Все работы' />
 				</div>
