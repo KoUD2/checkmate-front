@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
 import CreatePencil from '../../../shared/images/CreatePencil.svg'
 import styles from './Main.module.css'
+import ChurnSurveyBanner from './ui/ChurnSurveyBanner/ChurnSurveyBanner'
 import SegmentBanner from './ui/SegmentBanner/SegmentBanner'
 
 interface TaskItem {
@@ -28,6 +29,14 @@ const Main: FC = () => {
 	const [loadingMore, setLoadingMore] = useState(false)
 	const { isChecking, isChecked, taskType } = useTaskCheck()
 	const initialFetched = useRef(false)
+	const [churnPending, setChurnPending] = useState(false)
+
+	useEffect(() => {
+		api
+			.get('/subscriptions/me')
+			.then(res => setChurnPending(!!res.data?.data?.subscription?.churnSurveyPending))
+			.catch(() => {})
+	}, [])
 
 	const fetchTasks = async (pageNum: number, append = false) => {
 		try {
@@ -89,7 +98,11 @@ const Main: FC = () => {
 				</Link>
 			)}
 			<div className={styles['main__content']}>
-				<SegmentBanner />
+				{churnPending ? (
+					<ChurnSurveyBanner onDone={() => setChurnPending(false)} />
+				) : (
+					<SegmentBanner />
+				)}
 				<div className={styles['main__header']}>
 					<MainTitle text='Все работы' />
 				</div>

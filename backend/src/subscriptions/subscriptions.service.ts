@@ -16,21 +16,32 @@ export class SubscriptionsService {
     });
 
     if (!subscription) {
-      return { isActive: false, expiresAt: null };
+      return { isActive: false, expiresAt: null, churnSurveyPending: false };
     }
 
-    const isExpired =
-      subscription.expiresAt && subscription.expiresAt < new Date();
+    const now = new Date();
+    const lapsed = !!subscription.expiresAt && subscription.expiresAt < now;
 
-    if (isExpired && subscription.isActive) {
+    if (lapsed && subscription.isActive) {
       await this.prisma.subscription.update({
         where: { userId },
         data: { isActive: false },
       });
-      return { isActive: false, expiresAt: subscription.expiresAt };
     }
 
-    return subscription;
+    let churnSurveyPending = false;
+    if (lapsed) {
+      const answered = await this.prisma.cancelFeedback.findFirst({
+        where: { userId, createdAt: { gte: subscription.expiresAt as Date } },
+      });
+      churnSurveyPending = !answered;
+    }
+
+    return {
+      ...subscription,
+      isActive: lapsed ? false : subscription.isActive,
+      churnSurveyPending,
+    };
   }
 
   async activatePromo(userId: string, code: string) {

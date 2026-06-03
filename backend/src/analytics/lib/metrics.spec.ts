@@ -233,6 +233,77 @@ describe('computeMetrics', () => {
     expect(m.segments.pacBySegment).toEqual({ TUTOR: 1, STUDENT: 0, PARENT: 0, unknown: 0 });
   });
 
+  it('reactivation within 90d is warm', () => {
+  // PAC week 05-04, idle 05-11 (no coverage), PAC again 05-18 -> gap ~14d -> WARM
+  const users = [user('w', '2026-05-01T00:00:00Z')];
+  const payments: RawPayment[] = [
+    { userId: 'w', status: 'SUCCEEDED', amount: 149, daysToAdd: 7, checksToAdd: 10,
+      createdAt: new Date('2026-05-04T00:00:00Z'), updatedAt: new Date('2026-05-04T00:00:00Z') },
+    { userId: 'w', status: 'SUCCEEDED', amount: 149, daysToAdd: 7, checksToAdd: 10,
+      createdAt: new Date('2026-05-18T00:00:00Z'), updatedAt: new Date('2026-05-18T00:00:00Z') },
+  ];
+  const tasks = [
+    task('w', '2026-05-05T10:00:00Z', LONG2 + ' a'),
+    task('w', '2026-05-05T11:00:00Z', LONG2 + ' b'),
+    task('w', '2026-05-05T12:00:00Z', LONG2 + ' c'),
+    task('w', '2026-05-19T10:00:00Z', LONG2 + ' a'),
+    task('w', '2026-05-19T11:00:00Z', LONG2 + ' b'),
+    task('w', '2026-05-19T12:00:00Z', LONG2 + ' c'),
+  ];
+  const m = computeMetrics({ users, tasks, payments },
+    { from: new Date('2026-05-04T00:00:00Z'), to: new Date('2026-05-24T00:00:00Z') });
+  const w2 = m.nsm.pacByWeek.find((w) => w.week === '2026-05-18');
+  expect(w2?.reactivated).toBe(1);
+  expect(w2?.reactivatedWarm).toBe(1);
+  expect(w2?.reactivatedCold).toBe(0);
+});
+
+it('reactivation after 90d is cold', () => {
+  // PAC week of 02-02, idle for >90 days, PAC again week of 05-18 -> COLD
+  const users = [user('c', '2026-01-01T00:00:00Z')];
+  const payments: RawPayment[] = [
+    { userId: 'c', status: 'SUCCEEDED', amount: 149, daysToAdd: 7, checksToAdd: 10,
+      createdAt: new Date('2026-02-02T00:00:00Z'), updatedAt: new Date('2026-02-02T00:00:00Z') },
+    { userId: 'c', status: 'SUCCEEDED', amount: 149, daysToAdd: 7, checksToAdd: 10,
+      createdAt: new Date('2026-05-18T00:00:00Z'), updatedAt: new Date('2026-05-18T00:00:00Z') },
+  ];
+  const tasks = [
+    task('c', '2026-02-03T10:00:00Z', LONG2 + ' a'),
+    task('c', '2026-02-03T11:00:00Z', LONG2 + ' b'),
+    task('c', '2026-02-03T12:00:00Z', LONG2 + ' c'),
+    task('c', '2026-05-19T10:00:00Z', LONG2 + ' a'),
+    task('c', '2026-05-19T11:00:00Z', LONG2 + ' b'),
+    task('c', '2026-05-19T12:00:00Z', LONG2 + ' c'),
+  ];
+  const m = computeMetrics({ users, tasks, payments },
+    { from: new Date('2026-02-02T00:00:00Z'), to: new Date('2026-05-24T00:00:00Z') });
+  const w2 = m.nsm.pacByWeek.find((w) => w.week === '2026-05-18');
+  expect(w2?.reactivated).toBe(1);
+  expect(w2?.reactivatedWarm).toBe(0);
+  expect(w2?.reactivatedCold).toBe(1);
+});
+
+  it('tallies churn reason distribution within range, excluding internal users', () => {
+  const range = { from: new Date('2026-05-04T00:00:00Z'), to: new Date('2026-05-31T00:00:00Z') };
+  const users = [
+    user('a', '2026-05-05T00:00:00Z'),
+    user('b', '2026-05-05T00:00:00Z'),
+    user('staff', '2026-05-05T00:00:00Z', { isInternal: true }),
+  ];
+  const cancelFeedback = [
+    { userId: 'a', reason: 'PRICE' as const, comment: null, createdAt: new Date('2026-05-10T00:00:00Z') },
+    { userId: 'b', reason: 'PRICE' as const, comment: null, createdAt: new Date('2026-05-12T00:00:00Z') },
+    { userId: 'a', reason: 'OTHER' as const, comment: 'meh', createdAt: new Date('2026-05-15T00:00:00Z') },
+    { userId: 'staff', reason: 'QUALITY' as const, comment: null, createdAt: new Date('2026-05-15T00:00:00Z') }, // internal -> excluded
+    { userId: 'a', reason: 'PRICE' as const, comment: null, createdAt: new Date('2026-04-01T00:00:00Z') }, // before range -> excluded
+  ];
+  const m = computeMetrics({ users, tasks: [], payments: [], cancelFeedback }, range);
+  expect(m.churn.reasonDistribution.PRICE).toBe(2);
+  expect(m.churn.reasonDistribution.OTHER).toBe(1);
+  expect(m.churn.reasonDistribution.QUALITY).toBe(0);
+  expect(m.churn.totalResponses).toBe(3);
+});
+
   it('counts a pre-range-registered PAC user in pacBySegment but not distribution', () => {
     const range = { from: new Date('2026-05-04T00:00:00Z'), to: new Date('2026-05-31T00:00:00Z') };
     // 'early' registered BEFORE the range, but is PAC inside it.
